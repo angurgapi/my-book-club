@@ -25,9 +25,7 @@ td {
 	border-collapse: collapse;
 	padding: 10px;
 }
-.dim {
-	background-color: rgba(0, 0, 0, 0.8);
-}
+
 
 @font-face {
 	font-family: 'Macondo';
@@ -58,4 +56,13 @@ td {
 .sigmar {
 	font-family: "Sigmar", sans-serif !important;
 	-webkit-text-stroke: 2px #fff;
+}
+
+.register {
+	background-image: url("../images/signin.jpeg");
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+	background-blend-mode: multiply;
+	
 }

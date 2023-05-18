@@ -7,14 +7,22 @@ const Navbar = () => {
 	return (
 		
 		<nav className='w-full h-[10vh] flex items-center flex-wrap justify-between sticky top-0 bg-teal-500 px-[20px]'>
-			<Link href='/' >				
-				<span className='text-xl font-bold text-amber-300'>my book club</span>			
+			<Link href='/' className="flex">	
+			<Image
+          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
+          src="/books.svg"
+          alt="books"
+          width={22}
+          height={22}
+          
+        />			
+				<span className='mx-[16px] text-xl font-bold text-amber-300'>my book club</span>			
 			</Link>
 			<div className='md:flex items-center justify-between hidden space-x-8'>
-				<Link href='/login' className='text-amber-400 hover:text-white'>
+				<Link href='/login' className='text-lg text-amber-400 font-semibold hover:text-white'>
 					Login
 				</Link>
-				<Link href='/register' className='text-amber-400 hover:text-white'>
+				<Link href='/register' className='text-lg text-amber-400 font-semibold hover:text-white'>
 					Register
 				</Link>
 				

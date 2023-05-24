@@ -1,20 +1,26 @@
-import "../styles/globals.css";
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
+import '../styles/globals.css';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 import type { AppProps } from 'next/app';
+import { useEffect, useState } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { AuthProvider } from '@/providers/AuthProvider';
+import { Provider } from 'react-redux';
+import { persistor, store } from '@/store/store';
+import { PersistGate } from 'redux-persist/integration/react';
+import '@/utils/firebase';
 
-  
 export default function MyApp({ Component, pageProps }: AppProps) {
-		return (
-		<div>
-			<Component {...pageProps} />
-			<ToastContainer />
-		</div>
-	)
-  }
-  
-  
-  
-  
-  
-  
+  return (
+    <>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <AuthProvider>
+            <Component {...pageProps} />
+            <ToastContainer />
+          </AuthProvider>
+        </PersistGate>
+      </Provider>
+    </>
+  );
+}

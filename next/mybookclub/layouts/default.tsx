@@ -10,7 +10,7 @@ const DefaultLayout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div>
       <Navbar />
-      <main className='wrapper flex flex-col'>{children}</main>
+      <main className="wrapper flex flex-col bg-amber-50">{children}</main>
       <Footer />
     </div>
   );

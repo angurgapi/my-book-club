@@ -1,5 +1,6 @@
 import { IUser } from './user';
 import { IComment } from './comment';
+import { Timestamp } from 'firebase/firestore';
 
 export interface IEvent {
   // author: IUser;
@@ -9,9 +10,13 @@ export interface IEvent {
   // comments: IComment[];
   // images: string[];
   // id: string;
+  date: Timestamp;
   bookTitle: string;
-  title: string;
+  city: string;
   id: string;
+  participants: string[];
+  coverUrl: string;
+  hostId: string;
 }
 
 export interface IEventsState {

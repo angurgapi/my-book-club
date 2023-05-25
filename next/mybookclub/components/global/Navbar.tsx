@@ -11,7 +11,7 @@ const Navbar = () => {
 
   const [hamburger, setHamburger] = useState(false);
   return (
-    <nav className="w-full h-[10vh] flex items-center flex-wrap justify-between sticky top-0 bg-teal-500 px-[20px]">
+    <nav className="w-full h-[10vh] z-50 flex items-center flex-wrap justify-between sticky top-0 bg-teal-500 px-[20px]">
       <Link href="/" className="flex">
         <Image
           className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
@@ -25,13 +25,19 @@ const Navbar = () => {
         </span>
       </Link>
       <div className="md:flex items-center justify-between hidden space-x-8">
+        <Link
+          href="/events"
+          className="text-lg text-amber-400 font-semibold hover:text-white"
+        >
+          events
+        </Link>
         {!isAuth && (
           <>
             <Link
               href="/login"
               className="text-lg text-amber-400 font-semibold hover:text-white"
             >
-              Login
+              login
             </Link>
           </>
         )}
@@ -85,7 +91,7 @@ const Navbar = () => {
             ) : (
               <>
                 <Link href="/login" className="text-white hover:text-[#C07F00]">
-                  | Login
+                  login
                 </Link>
               </>
             )}

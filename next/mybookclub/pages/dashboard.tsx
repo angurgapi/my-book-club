@@ -1,8 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-
-import { updateUserProfile } from '../utils/updateProfile';
-
 import PageHead from '@/components/global/Head';
 import Loader from '@/components/global/Loader';
 import DefaultLayout from '../layouts/default';
@@ -11,16 +8,16 @@ import { BsFillPencilFill } from 'react-icons/bs';
 import { IoMdCheckmarkCircle } from 'react-icons/io';
 import { useAppSelector } from '@/hooks/redux';
 import { useAuth } from '@/hooks/useAuth';
-import { updateProfile } from 'firebase/auth';
+import { updateProfile, signOut } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { setUser } from '@/store/reducers/UserSlice';
+import { setUser, removeUser } from '@/store/reducers/UserSlice';
 import { useAppDispatch } from '@/hooks/redux';
+import UserEvents from '@/components/events/UserEvents';
 
 const Dashboard = () => {
-  const router = useRouter();
   const { uid, displayName } = useAppSelector((state) => state.user);
   const { db, getFirebaseAuth } = useAuth();
-  //   const [events, setEvents] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState(displayName || '');
   const [edit, setEdit] = useState(false);
@@ -29,6 +26,13 @@ const Dashboard = () => {
     edit ? handleUpdateProfile() : setEdit(true);
   };
   const dispatch = useAppDispatch();
+  const router = useRouter();
+
+  const logOut = () => {
+    signOut(getFirebaseAuth);
+    dispatch(removeUser());
+    router.push('/');
+  };
 
   const handleUpdateProfile = async () => {
     if (!uid || !getFirebaseAuth.currentUser) return;
@@ -60,7 +64,7 @@ const Dashboard = () => {
           <div className="user-data flex flex-col ">
             <div className="flex flex-col items-center justify-center md:flex-row my-2">
               <label htmlFor="name" className="mr-2">
-                Your name
+                Username
               </label>
               <div className="max-w-[300px] h-[42px]">
                 <div className="w-full h-full relative">
@@ -73,6 +77,7 @@ const Dashboard = () => {
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
                   />
+
                   <button
                     className="absolute right-4 top-3 text-gray-300 text-xl"
                     onClick={changeUpdateMode}
@@ -84,7 +89,11 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <button className="my-2">Log out</button>
+          <button className="my-2 rounded bg-teal-500 p-2" onClick={logOut}>
+            Log out
+          </button>
+
+          <UserEvents uid={uid} />
         </div>
       )}
       {loading && <Loader />}

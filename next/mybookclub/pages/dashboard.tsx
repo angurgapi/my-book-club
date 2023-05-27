@@ -13,6 +13,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { setUser, removeUser } from '@/store/reducers/UserSlice';
 import { useAppDispatch } from '@/hooks/redux';
 import UserEvents from '@/components/events/UserEvents';
+import { EventModal } from '@/components/events/EventModal';
 
 const Dashboard = () => {
   const { uid, displayName } = useAppSelector((state) => state.user);
@@ -21,6 +22,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState(displayName || '');
   const [edit, setEdit] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const changeUpdateMode = () => {
     edit ? handleUpdateProfile() : setEdit(true);
@@ -95,11 +97,18 @@ const Dashboard = () => {
 
           <div className="flex justify-center items-center">
             <h3 className="tex-2xl">My events</h3>
-            <button className="rounded ml-2 bg-teal-600 text-white p-2">
+            <button
+              onClick={() => setModalOpen(true)}
+              className="rounded ml-2 bg-teal-600 text-white p-2"
+            >
               New
             </button>
           </div>
           <UserEvents uid={uid} />
+          <EventModal
+            openModal={modalOpen}
+            handleCloseModal={() => setModalOpen(false)}
+          />
         </div>
       )}
       {loading && <Loader />}

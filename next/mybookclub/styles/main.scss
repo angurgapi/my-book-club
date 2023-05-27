@@ -1,3 +1,35 @@
+.wrapper {
+  min-height: 80vh;
+}
+
+.hero,
+.register,
+.login {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: multiply;
+}
+
+.hero {
+  background-image: url('../images/cover.webp');
+  color: #0b074a;
+  font-family: 'Sigmar', sans-serif !important;
+}
+
+.sigmar {
+  font-family: 'Sigmar', sans-serif !important;
+  -webkit-text-stroke: 2px #fff;
+}
+
+.register {
+  background-image: url('../images/signin.jpeg');
+}
+
+.login {
+  background-image: url('../images/login.jpeg');
+}
+
 .tab-btn {
   opacity: 0.6;
   &--active {

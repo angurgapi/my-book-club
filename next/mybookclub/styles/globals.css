@@ -70,11 +70,3 @@ td {
 .login {
   background-image: url('../images/login.jpeg');
 }
-
-.tab-btn {
-  opacity: 0.6;
-}
-.tab-btn--active {
-  opacity: 1;
-  text-decoration: underline;
-}

@@ -1,0 +1,7 @@
+.tab-btn {
+  opacity: 0.6;
+  &--active {
+    opacity: 1;
+    text-decoration: underline;
+  }
+}

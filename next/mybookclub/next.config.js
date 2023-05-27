@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
+
 const nextConfig = {
   images: {
     domains: [
@@ -6,6 +8,9 @@ const nextConfig = {
       'encrypted-tbn0.gstatic.com',
       'my-book-club-a097a.appspot.com',
     ],
+  },
+  sassOptions: {
+    includePaths: [path.join(__dirname, 'styles')],
   },
 };
 

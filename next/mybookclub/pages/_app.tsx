@@ -1,9 +1,9 @@
 import '../styles/globals.css';
+import '../styles/main.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import type { AppProps } from 'next/app';
-import { useEffect, useState } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
+
 import { AuthProvider } from '@/providers/AuthProvider';
 import { Provider } from 'react-redux';
 import { persistor, store } from '@/store/store';

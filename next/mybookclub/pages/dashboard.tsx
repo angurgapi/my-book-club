@@ -60,7 +60,7 @@ const Dashboard = () => {
       <PageHead pageTitle="Dashboard" />
       {!loading && (
         <div className="p-2 md:p-5 text-center">
-          <h2 className="text-xl">Welcome to dashboard</h2>
+          <h2 className="text-3xl">Welcome to dashboard</h2>
           <div className="user-data flex flex-col ">
             <div className="flex flex-col items-center justify-center md:flex-row my-2">
               <label htmlFor="name" className="mr-2">
@@ -89,10 +89,16 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <button className="my-2 rounded bg-teal-500 p-2" onClick={logOut}>
+          <button className="my-2" onClick={logOut}>
             Log out
           </button>
 
+          <div className="flex justify-center items-center">
+            <h3 className="tex-2xl">My events</h3>
+            <button className="rounded ml-2 bg-teal-600 text-white p-2">
+              New
+            </button>
+          </div>
           <UserEvents uid={uid} />
         </div>
       )}

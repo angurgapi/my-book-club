@@ -32,8 +32,16 @@
 
 .tab-btn {
   opacity: 0.6;
+  font-size: 22px;
   &--active {
     opacity: 1;
     text-decoration: underline;
+  }
+}
+
+.modal {
+  scrollbar-width: none;
+  ::-webkit-scrollbar {
+    display: none;
   }
 }

@@ -1,6 +1,9 @@
 import { FC } from 'react';
-
+import { AiFillCloseCircle } from 'react-icons/ai';
 import { IconButton, Modal } from '@mui/material';
+
+import EventForm from './EventForm';
+import EventFormik from './EventFormik';
 
 type Props = {
   openModal: boolean;
@@ -11,25 +14,31 @@ export const EventModal: FC<Props> = ({ openModal, handleCloseModal }) => {
   return (
     <Modal
       open={openModal}
-      onClick={handleCloseModal}
       BackdropProps={{
         style: { backgroundColor: 'rgba(0, 0, 0, 0.45)' },
+        onClick: (event) => {
+          handleCloseModal();
+        },
       }}
-      sx={{ zIndex: 1600 }}
+      sx={{ zIndex: 100 }}
+      className="p-3 md:p-5"
     >
       <>
-        <IconButton
-          color="secondary"
-          sx={{
-            position: 'absolute',
-            height: '100px',
-            width: '100px',
-            top: 20,
-            right: 20,
-          }}
-        >
-          x
-        </IconButton>
+        <div className="modal m-auto bg-white relative p-2 rounded top-3 w-fit min-w-[300px] max-h-[80vh] overflow-y-auto">
+          <IconButton
+            onClick={handleCloseModal}
+            sx={{
+              position: 'absolute',
+              top: 2,
+              right: 2,
+            }}
+          >
+            <AiFillCloseCircle className="text-slate-500" />
+          </IconButton>
+          <h3 className="mt-2 text-center text-2xl">New event</h3>
+          {/* <EventForm /> */}
+          <EventFormik />
+        </div>
       </>
     </Modal>
   );

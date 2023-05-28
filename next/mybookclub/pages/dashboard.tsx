@@ -5,6 +5,7 @@ import Loader from '@/components/global/Loader';
 import DefaultLayout from '../layouts/default';
 
 import { BsFillPencilFill } from 'react-icons/bs';
+import { AiFillPlusSquare } from 'react-icons/ai';
 import { IoMdCheckmarkCircle } from 'react-icons/io';
 import { useAppSelector } from '@/hooks/redux';
 import { useAuth } from '@/hooks/useAuth';
@@ -91,20 +92,24 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-          <button className="my-2" onClick={logOut}>
+          <button className="my-2 text-slate-500" onClick={logOut}>
             Log out
           </button>
 
-          <div className="flex justify-center items-center">
-            <h3 className="tex-2xl">My events</h3>
-            <button
-              onClick={() => setModalOpen(true)}
-              className="rounded ml-2 bg-teal-600 text-white p-2"
-            >
-              New
-            </button>
+          <div className="flex flex-col justify-center items-center bg-slate-100 p-3">
+            <div className="flex items-center">
+              {' '}
+              <h3 className="text-2xl">My events</h3>
+              <button
+                onClick={() => setModalOpen(true)}
+                className="flex items-center rounded ml-2 bg-teal-600 text-white p-2"
+              >
+                New <AiFillPlusSquare className="ml-3 text-white" />
+              </button>
+            </div>
+            <UserEvents uid={uid} />
           </div>
-          <UserEvents uid={uid} />
+
           <EventModal
             openModal={modalOpen}
             handleCloseModal={() => setModalOpen(false)}

@@ -24,17 +24,14 @@ const Events = () => {
         const eventsData: IEvent[] = eventsSnapshot.docs.map((doc) => ({
           id: doc.id,
           bookTitle: doc.data().bookTitle,
+          bookAuthor: doc.data().bookAuthor,
           city: doc.data().city,
           participants: doc.data().participants,
           date: doc.data().date,
           coverUrl: doc.data().coverUrl,
         }));
 
-        setEvents(
-          eventsData.filter(
-            (event) => event.date && event.date.toDate() > new Date()
-          )
-        );
+        setEvents(eventsData.filter((event) => event.date));
       } catch (error) {
         console.error('Error fetching events:', error);
       }
@@ -60,8 +57,9 @@ const Events = () => {
               onChange={(e) => setQuery(e.target.value)}
             /> */}
           </div>
-          <div className="user-data flex flex-col ">
-            <div className="flex flex-col items-center justify-center max-w-md my-2">
+          <div className="flex items-center flex-col ">
+            <h3>upcoming</h3>
+            <div className="flex flex-col items-center justify-center w-full my-2">
               {events.map((event) => (
                 <EventCard event={event} key={event.id} />
               ))}

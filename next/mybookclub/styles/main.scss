@@ -1,5 +1,12 @@
 .wrapper {
   min-height: 80vh;
+  overflow-x: hidden;
+}
+
+p {
+  white-space: normal;
+  word-break: break-all;
+  word-break: break-word;
 }
 
 .hero,
@@ -40,8 +47,14 @@
 }
 
 .modal {
-  scrollbar-width: none;
-  ::-webkit-scrollbar {
-    display: none;
-  }
+  overflow-y: scroll;
+}
+
+.modal::-webkit-scrollbar {
+  width: 0.4em;
+  background-color: transparent;
+}
+
+.modal::-webkit-scrollbar-thumb {
+  background-color: transparent;
 }

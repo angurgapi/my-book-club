@@ -62,7 +62,6 @@ export const AuthProvider: FC<Props> = ({ children }) => {
   useEffect(() => {
     const unListen = onAuthStateChanged(getFirebaseAuth, (userAuth) => {
       if (!userAuth) return;
-      console.log('userAuth', userAuth);
       dispatch(
         setUser({
           // events: [...userAuth.events] || [],
@@ -76,7 +75,6 @@ export const AuthProvider: FC<Props> = ({ children }) => {
       );
 
       onSnapshot(doc(db, 'users', userAuth.uid), (doc) => {
-        console.log('on snapshot!', userAuth.uid, db);
         const userData: DocumentData | undefined = doc.data();
         console.log(userData);
         if (!userData) return;

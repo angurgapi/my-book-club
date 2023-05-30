@@ -3,7 +3,7 @@ import { AiFillCloseCircle } from 'react-icons/ai';
 import { IconButton, Modal } from '@mui/material';
 
 import EventForm from './EventForm';
-import EventFormik from './EventFormik';
+import EventFormik from './EventForm';
 
 type Props = {
   openModal: boolean;
@@ -24,7 +24,7 @@ export const EventModal: FC<Props> = ({ openModal, handleCloseModal }) => {
       className="p-3 md:p-5"
     >
       <>
-        <div className="modal m-auto bg-white relative p-2 rounded top-3 w-fit min-w-[300px] max-h-[80vh] overflow-y-auto">
+        <div className="modal m-auto bg-white relative p-2 rounded top-3 w-fit min-w-[300px] max-h-[80vh]">
           <IconButton
             onClick={handleCloseModal}
             sx={{
@@ -36,8 +36,9 @@ export const EventModal: FC<Props> = ({ openModal, handleCloseModal }) => {
             <AiFillCloseCircle className="text-slate-500" />
           </IconButton>
           <h3 className="mt-2 text-center text-2xl">New event</h3>
-          {/* <EventForm /> */}
-          <EventFormik />
+          <div className="modal">
+            <EventForm onSaveEvent={handleCloseModal} />
+          </div>
         </div>
       </>
     </Modal>

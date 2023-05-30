@@ -1,6 +1,11 @@
 import React, { useEffect, useState, SyntheticEvent, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 
 import { useAuth } from '@/hooks/useAuth';
 import { IUserData } from '@/types/user';
@@ -29,6 +34,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     invalidPassword: false,
     wrongPassword: false,
     userNotFound: false,
+    alreadyInUseEmail: false,
   });
 
   const [value, setValue] = useState(0);
@@ -50,34 +56,86 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     });
   };
 
-  const handleSubmit = () => {
-    console.log(mode);
-  };
-  const handleLogin = async (e: SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(getFirebaseAuth);
 
-    await signInWithEmailAndPassword(
-      getFirebaseAuth,
-      userData.email,
-      userData.password
-    )
-      .then((userCredential) => {
-        console.log(userCredential);
-        router.push('/dashboard');
-      })
-      .catch((error) => {
-        error.code === 'auth/user-not-found' &&
-          setAuthData({ ...authData, userNotFound: true });
-        error.code === 'auth/wrong-password' &&
-          setAuthData({ ...authData, wrongPassword: true });
-      });
+    if (mode === 'register') {
+      await createUserWithEmailAndPassword(
+        getFirebaseAuth,
+        userData.email,
+        userData.password
+      )
+        .then(async (userCredential: any) => {
+          const user = userCredential.user;
+
+          await updateProfile(user, {
+            displayName: userData.displayName,
+          });
+
+          try {
+            await setDoc(doc(db, 'users', user.uid), {
+              uid: user.uid,
+              displayName: user.displayName || '',
+              email: user.email,
+              password: userData.password,
+              photoURL: user.photoURL,
+              createdAt:
+                user.metadata.creationTime &&
+                +new Date(user.metadata.creationTime).getTime(),
+            });
+          } catch (e) {
+            console.error('Error adding document: ', e);
+          }
+        })
+        .catch((error) => {
+          error.code === 'auth/invalid-email' &&
+            setAuthData({ ...authData, invalidEmail: true });
+          error.code === 'auth/email-already-in-use' &&
+            setAuthData({ ...authData, alreadyInUseEmail: true });
+          error.code === 'auth/weak-password' &&
+            setAuthData({ ...authData, invalidPassword: true });
+        });
+    } else {
+      await signInWithEmailAndPassword(
+        getFirebaseAuth,
+        userData.email,
+        userData.password
+      )
+        .then((userCredential) => {
+          console.log(userCredential);
+          router.push('/dashboard');
+        })
+        .catch((error) => {
+          error.code === 'auth/user-not-found' &&
+            setAuthData({ ...authData, userNotFound: true });
+          error.code === 'auth/wrong-password' &&
+            setAuthData({ ...authData, wrongPassword: true });
+        });
+    }
   };
   return (
     <form
       className="w-full flex flex-col justify-center"
       onSubmit={handleSubmit}
     >
+      {mode === 'register' && (
+        <>
+          <label htmlFor="displayName">User name</label>
+          <div className="w-full relative">
+            <input
+              type="text"
+              name="displayName"
+              className="border px-10 py-2 mb-3 rounded-md w-full"
+              required
+              value={userData.displayName}
+              onChange={(e) =>
+                setUserData({ ...userData, displayName: e.target.value })
+              }
+            />
+            <HiMail className=" absolute left-4 top-3 text-gray-300 text-xl" />
+          </div>
+        </>
+      )}
       <label htmlFor="email">Email address</label>
       <div className="w-full relative">
         <input
@@ -104,12 +162,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
         />
         <AiTwotoneLock className=" absolute left-4 top-3 text-gray-300 text-xl" />
       </div>
-
       <button
         type="submit"
         className="bg-[#FFD95A] p-3 font-medium hover:bg-[#C07F00] hover:text-[#FFF8DE] mb-3 rounded-md"
       >
-        SIGN IN
+        {mode === 'register' ? 'Create account' : 'Log in'}
       </button>
     </form>
   );

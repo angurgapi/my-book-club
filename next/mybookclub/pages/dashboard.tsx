@@ -3,7 +3,8 @@ import { useRouter } from 'next/router';
 import PageHead from '@/components/global/Head';
 import Loader from '@/components/global/Loader';
 import DefaultLayout from '../layouts/default';
-
+import Image from 'next/image';
+import placeholder from '@/images/avatar-placeholder.webp';
 import { BsFillPencilFill } from 'react-icons/bs';
 import { AiFillPlusSquare } from 'react-icons/ai';
 import { IoMdCheckmarkCircle } from 'react-icons/io';
@@ -15,15 +16,20 @@ import { setUser, removeUser } from '@/store/reducers/UserSlice';
 import { useAppDispatch } from '@/hooks/redux';
 import UserEvents from '@/components/events/UserEvents';
 import { EventModal } from '@/components/events/EventModal';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const Dashboard = () => {
-  const { uid, displayName } = useAppSelector((state) => state.user);
+  const { uid, displayName, photoURL } = useAppSelector((state) => state.user);
   const { db, getFirebaseAuth } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState(displayName || '');
   const [edit, setEdit] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const getAvatarUrl = () => {
+    return photoURL || placeholder;
+  };
 
   const changeUpdateMode = () => {
     edit ? handleUpdateProfile() : setEdit(true);
@@ -62,10 +68,18 @@ const Dashboard = () => {
     <DefaultLayout>
       <PageHead pageTitle="Dashboard" />
       {!loading && (
-        <div className="p-2 md:p-5 text-center">
+        <div className="p-[24px] md:p-5 text-center">
           <h2 className="text-3xl">Welcome to dashboard</h2>
-          <div className="user-data flex flex-col ">
-            <div className="flex flex-col items-center justify-center md:flex-row my-2">
+
+          <div className="w-fit content-center grid grid-cols-1 md:grid-cols-3 gap-2">
+            <Image
+              src={getAvatarUrl()}
+              alt="userPic"
+              width={100}
+              height={100}
+              className="rounded m-auto"
+            />
+            <div className="flex flex-col items-start justify-center my-2">
               <label htmlFor="name" className="mr-2">
                 Username
               </label>
@@ -91,10 +105,14 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
+            <button
+              className="my-2 flex flex-col rounded p-2 items-center text-slate-500 border-solid border-2 border-teal-600"
+              onClick={logOut}
+            >
+              <LogoutIcon />
+              Log out
+            </button>
           </div>
-          <button className="my-2 text-slate-500" onClick={logOut}>
-            Log out
-          </button>
 
           <div className="flex flex-col justify-center items-center bg-slate-100 p-3">
             <div className="flex items-center">

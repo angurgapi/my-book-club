@@ -24,17 +24,17 @@ export const eventsSlice = createSlice({
         );
       }
 
-      if (state.sortEventsBy === 'likes') {
-        state.events = action.payload.sort(
-          (a, b) => b.likes.length - a.likes.length
-        );
-      }
+      // if (state.sortEventsBy === 'likes') {
+      //   state.events = action.payload.sort(
+      //     (a, b) => b.likes.length - a.likes.length
+      //   );
+      // }
 
-      if (state.sortEventsBy === 'controversial') {
-        state.events = action.payload.sort(
-          (a, b) => b.comments.length - a.comments.length
-        );
-      }
+      // if (state.sortEventsBy === 'controversial') {
+      //   state.events = action.payload.sort(
+      //     (a, b) => b.comments.length - a.comments.length
+      //   );
+      // }
     },
 
     removeEvents(state) {
@@ -51,19 +51,19 @@ export const eventsSlice = createSlice({
       state.events = state.events.sort((a, b) => +a.createdAt - +b.createdAt);
     },
 
-    setEventsByLikes(state) {
-      state.sortEventsBy = 'likes';
-      state.events = state.events.sort(
-        (a, b) => b.likes.length - a.likes.length
-      );
-    },
+    // setEventsByLikes(state) {
+    //   state.sortEventsBy = 'likes';
+    //   state.events = state.events.sort(
+    //     (a, b) => b.likes.length - a.likes.length
+    //   );
+    // },
 
-    setEventsByControversial(state) {
-      state.sortEventsBy = 'controversial';
-      state.events = state.events.sort(
-        (a, b) => b.comments.length - a.comments.length
-      );
-    },
+    // setEventsByControversial(state) {
+    //   state.sortEventsBy = 'controversial';
+    //   state.events = state.events.sort(
+    //     (a, b) => b.comments.length - a.comments.length
+    //   );
+    // },
   },
 });
 
@@ -72,8 +72,8 @@ export const {
   removeEvents,
   setEventsByNewest,
   setEventsByOldest,
-  setEventsByLikes,
-  setEventsByControversial,
+  // setEventsByLikes,
+  // setEventsByControversial,
 } = eventsSlice.actions;
 
 export const eventsReducer = eventsSlice.reducer;

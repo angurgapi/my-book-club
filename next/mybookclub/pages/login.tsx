@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PageHead from '@/components/global/Head';
 import { LoginForm } from '@/components/auth/LoginForm';
+import { RegistrationForm } from '@/components/auth/RegForm';
 
 const AuthPage = () => {
   const [currentTab, setCurrentTab] = useState('login');
@@ -34,7 +35,11 @@ const AuthPage = () => {
                 <LoginForm />
               </div>
             )}
-            {currentTab === 'register' && <div>reg</div>}
+            {currentTab === 'register' && (
+              <div>
+                <RegistrationForm />
+              </div>
+            )}
           </div>
         </div>
         <div className="login md:w-[40%] h-[100vh] relative" />

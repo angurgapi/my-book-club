@@ -6,7 +6,6 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Macondo', sans-serif;
 }
 
 tr:nth-child(even) {
@@ -23,6 +22,10 @@ td {
   border: 1px solid #ddd;
   border-collapse: collapse;
   padding: 10px;
+}
+
+main {
+  background-color: rgb(245, 246, 255);
 }
 
 @font-face {

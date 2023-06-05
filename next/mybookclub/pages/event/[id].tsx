@@ -25,6 +25,9 @@ import cover from '@/images/cover.jpg';
 import { useAppSelector } from '@/hooks/redux';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/router';
+import dayjs from 'dayjs';
+import Link from 'next/link';
+import EditIcon from '@mui/icons-material/Edit';
 
 // import ShareEventModal from "../../../components/ShareEventModal";
 // import ErrorPage from "../../../components/ErrorPage";
@@ -42,8 +45,14 @@ export async function getServerSideProps(context) {
   if (docSnap.exists()) {
     const event = docSnap.data() as IEvent;
     event.id = docId;
+
     return {
-      props: { event },
+      props: {
+        event: {
+          ...event,
+          date: event.date.seconds,
+        },
+      },
     };
   } else {
     console.log('No such document!');
@@ -59,13 +68,24 @@ export default function EventPage({ event }: EventProps) {
   const [participantsLength, setParticipantsLength] = useState(
     event.participants.length
   );
+
   // const [click, setClick] = useState(firebaseEvent.disableRegistration);
   // const [showModal, setShowModal] = useState(false);
   // const [disableRegModal, setDisableRegModal] = useState(false);
   // const openModal = () => setShowModal(true);
   // const closeModal = () => setShowModal(false);
+
+  const getFormattedDate = () => {
+    return dayjs.unix(event.date).format('MMM DD hh:mm a');
+  };
+
   const getImgSrc = () => {
     return event.coverUrl || cover;
+  };
+
+  const isOwnEvent = () => {
+    console.log();
+    return event.hostId === uid;
   };
 
   const attendEvent = async () => {
@@ -86,7 +106,6 @@ export default function EventPage({ event }: EventProps) {
   const unattendEvent = async () => {
     if (uid && event.participants.includes(uid)) {
       const docRef = doc(db, 'events', event.id);
-      let participantsList = event.participants.filter((user) => user !== uid);
       event.participants.splice(event.participants.indexOf(uid), 1);
       await updateDoc(docRef, {
         participants: event.participants,
@@ -104,7 +123,7 @@ export default function EventPage({ event }: EventProps) {
           {event.bookTitle} by {event.bookAuthor}
         </h1>
         <div className="flex flex-col mt-4 w-full max-w-[800px] justify-start items-center">
-          <div className="relative w-full h-[300px]">
+          <div className="relative w-full aspect-[16/7]">
             <Image
               className="rounded"
               src={getImgSrc()}
@@ -116,11 +135,22 @@ export default function EventPage({ event }: EventProps) {
                 You are attending
               </div>
             )}
+            {isOwnEvent() && (
+              <Link
+                className="btn absolute top-2 right-2 w-fit btn bg-teal-500 text-white"
+                href={`/event/edit/${event.id}`}
+              >
+                <EditIcon />
+                edit
+              </Link>
+            )}
           </div>
 
-          <div className="p-3 md:col-span-2 flex flex-col w-full justify-start items-center md:items-start">
+          <div className="p-3 md:col-span-2 flex flex-col w-full justify-start items-start">
             {event.description && (
-              <span className="text-justify">{event.description}</span>
+              <span className="text-justify italic text-emerald-700">
+                {event.description}
+              </span>
               //   <Accordion className="w-full">
               //     <AccordionSummary
               //       expandIcon={<ExpandMoreIcon />}
@@ -139,16 +169,19 @@ export default function EventPage({ event }: EventProps) {
               <span className="col-span-2">{event.city}</span>
               <span className="text-teal-800">location </span>
               <span className="col-span-2">{event.location}</span>
-              <span className="text-teal-800">date </span>
-              <span className="col-span-2">{event.date}</span>
-              <span className="text-teal-800">time </span>
-              <span className="col-span-2">{event.time}</span>
+              <span className="text-teal-800">date/time </span>
+              <span className="col-span-2">{getFormattedDate()}</span>
               <span className="text-teal-800">attendees </span>
               <span className="col-span-2">
                 {participantsLength || 'nobody yet'}
               </span>
+              <span className="text-teal-800">capacity </span>
+              {event.capacity && (
+                <span className="col-span-2">{event.capacity} ppl</span>
+              )}
+              {!event.capacity && <span className="col-span-2">no limit</span>}
             </div>
-            {!attending && event.hostId !== uid && (
+            {!attending && !isOwnEvent && (
               <button
                 className="mt-3 p-2 bg-teal-500 text-white rounded w-fit"
                 onClick={attendEvent}

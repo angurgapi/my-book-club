@@ -11,7 +11,7 @@ const Navbar = () => {
 
   const [hamburger, setHamburger] = useState(false);
   return (
-    <nav className="w-full h-[10vh] z-50 flex items-center flex-wrap justify-between sticky top-0 bg-teal-500 px-[20px]">
+    <nav className="w-full h-[10vh] z-50 flex items-center text-[#4f79db] flex-wrap justify-between sticky top-0 bg-white px-[20px]">
       <Link href="/" className="flex">
         <Image
           className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
@@ -20,14 +20,12 @@ const Navbar = () => {
           width={22}
           height={22}
         />
-        <span className="mx-[16px] text-xl font-bold text-amber-300">
-          my book club
-        </span>
+        <span className="mx-[16px] text-xl font-bold">my book club</span>
       </Link>
       <div className="md:flex items-center justify-between hidden space-x-8">
         <Link
           href="/events"
-          className="text-lg text-amber-400 font-semibold hover:text-white"
+          className="text-lg text-slate-400 font-semibold hover:text-slate-300"
         >
           events
         </Link>
@@ -35,7 +33,7 @@ const Navbar = () => {
           <>
             <Link
               href="/login"
-              className="text-lg text-amber-400 font-semibold hover:text-white"
+              className="text-lg text-slate-400 font-semibold hover:text-slate-300"
             >
               login
             </Link>
@@ -44,7 +42,7 @@ const Navbar = () => {
         {isAuth && (
           <Link
             href="/dashboard"
-            className="text-lg text-amber-400 font-semibold hover:text-white"
+            className="text-lg text-slate-400 font-semibold hover:text-slate-300"
           >
             {displayName}
           </Link>
@@ -52,7 +50,7 @@ const Navbar = () => {
       </div>
       <div className="md:hidden block">
         <button
-          className="text-4xl text-[#C07F00] cursor-pointer hover:text-white"
+          className="text-4xl text-[#C07F00] cursor-pointer hover:text-slate-300"
           onClick={() => setHamburger(true)}
         >
           <Image

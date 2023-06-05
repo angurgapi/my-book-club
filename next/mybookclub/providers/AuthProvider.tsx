@@ -67,7 +67,7 @@ export const AuthProvider: FC<Props> = ({ children }) => {
           // events: [...userAuth.events] || [],
           // createdAt: userAuth.createdAt || [],
           displayName: userAuth.displayName,
-          // photoURL: userAuth.photoURL,
+          photoURL: userAuth.photoURL,
           // images: [...userAuth.images],
           uid: userAuth.uid,
           isAuth: true,

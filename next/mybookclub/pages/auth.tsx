@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PageHead from '@/components/global/Head';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegistrationForm } from '@/components/auth/RegForm';
+import { Card, CardContent } from '@mui/material';
 
 const AuthPage = () => {
   const [currentTab, setCurrentTab] = useState('login');
@@ -10,7 +11,9 @@ const AuthPage = () => {
     <div>
       <PageHead pageTitle="Sign in/Sign up" />
       <main className="w-full flex items-center justify-between min-h-[100vh]">
-        <div className="md:w-[60%] w-full flex flex-col items-center justify-start min-h-[100vh] px-[30px] py-[30px] relative">
+        <div className="md:w-[60%] bg-[#fffade] w-full flex flex-col items-center justify-center min-h-[100vh] px-[30px] py-[30px] relative">
+          {/* <Card>
+            <CardContent> */}
           <div className="flex my-3">
             <button
               className={`tab-btn mx-2 ${
@@ -41,6 +44,8 @@ const AuthPage = () => {
               </div>
             )}
           </div>
+          {/* </CardContent>
+          </Card> */}
         </div>
         <div className="login md:w-[40%] h-[100vh] relative" />
       </main>

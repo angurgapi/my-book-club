@@ -7,10 +7,12 @@ import { useRouter } from 'next/router';
 import { doc, runTransaction, setDoc } from 'firebase/firestore';
 import { signInWithPopup } from 'firebase/auth';
 import { useAuth } from '@/hooks/useAuth';
+import { setUser } from '@/store/reducers/UserSlice';
+import { useAppDispatch } from '@/hooks/redux';
 
 const ProvidersAuth = () => {
   const { getFirebaseAuth, db, googleProvider, facebookProvider } = useAuth();
-
+  const router = useRouter();
   const handleFacebookLogin = () => {
     signInWithPopup(getFirebaseAuth, facebookProvider)
       .then(async (result) => {
@@ -54,6 +56,7 @@ const ProvidersAuth = () => {
     signInWithPopup(getFirebaseAuth, googleProvider)
       .then(async (result) => {
         const user = result.user;
+        console.log('google auth response', user);
         const docRef = doc(db, 'users', user.uid);
 
         try {
@@ -67,7 +70,7 @@ const ProvidersAuth = () => {
                   displayName: user.displayName || '',
                   email: user.email,
                   password: null,
-                  photoURL: user.photoURL?.slice(0, -6),
+                  photoURL: user.photoURL,
                   events: [],
                   createdAt:
                     user.metadata.creationTime &&
@@ -78,6 +81,7 @@ const ProvidersAuth = () => {
               }
             }
           });
+          router.push('/dashboard');
         } catch (e) {
           console.log('runTransaction Auth failed: ', e);
         }

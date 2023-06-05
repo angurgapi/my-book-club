@@ -1,22 +1,28 @@
 import React, { useState, SyntheticEvent } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { TextField, Button, Container, IconButton } from '@mui/material';
+import { TextField, FormControlLabel, Checkbox } from '@mui/material';
 import ImageIcon from '@mui/icons-material/Image';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { DatePicker, DesktopTimePicker } from '@mui/x-date-pickers';
+import {
+  DatePicker,
+  DesktopTimePicker,
+  DateTimePicker,
+} from '@mui/x-date-pickers';
 import { DateValidationError } from '@mui/x-date-pickers/models';
 import dayjs from 'dayjs';
 import { useAppSelector } from '@/hooks/redux';
 import Image from 'next/image';
+import ImageCrop from './ImageCrop';
 
 import { saveEvent } from '@/utils/eventApi';
 
 const EventForm = ({ onSaveEvent }) => {
   const { uid } = useAppSelector((state) => state.user);
 
-  const [previewImg, setPreviewImage] = useState('');
-
+  // const [previewImg, setPreviewImage] = useState('');
+  const [imgSrc, setImgSrc] = useState(null);
+  const [paidEvent, setPaidEvent] = useState(false);
   const [error, setError] = React.useState<DateValidationError | null>(null);
 
   const validationSchema = Yup.object({
@@ -24,7 +30,7 @@ const EventForm = ({ onSaveEvent }) => {
     bookAuthor: Yup.string().required('Title is required'),
     date: Yup.date().required('Date is required'),
     //   .min(new Date(), 'Date must be in the future'),
-    time: Yup.string().required('Time is required'),
+    // time: Yup.string().required('Time is required'),
     city: Yup.string().required('City is required'),
     location: Yup.string().required('Location is required'),
     description: Yup.string(),
@@ -39,20 +45,38 @@ const EventForm = ({ onSaveEvent }) => {
 
   //     return errors;
   //   };
+  const openFileInput = () => {
+    document.getElementById('fileInput').click();
+  };
+
+  const onFileChange = (file: File) => {
+    // console.log(file);
+    const reader = new FileReader();
+    if (file) {
+      reader.readAsDataURL(file);
+      reader.onload = (readerEvent) => {
+        formik.setFieldValue('coverUrl', readerEvent.target?.result);
+      };
+      // setPreviewImage(URL.createObjectURL(file));
+    } else {
+      formik.setFieldValue('coverUrl', null);
+    }
+  };
 
   const formik = useFormik({
     initialValues: {
       bookTitle: '',
       bookAuthor: '',
-      date: dayjs(),
-      time: dayjs(),
+      date: dayjs().add(2, 'hour'),
       city: '',
       location: '',
       coverUrl: '',
       fee: 0,
+      currency: '',
       description: '',
       participants: [],
       registrationOpen: true,
+      capacity: 5,
     },
 
     validationSchema,
@@ -62,11 +86,21 @@ const EventForm = ({ onSaveEvent }) => {
         hostId: uid,
         ...values,
       };
-      //   eventData.time = eventData.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
+
       await saveEvent(eventData);
       onSaveEvent();
     },
   });
+
+  const onImageSelect = (e) => {
+    if (e.target.files[0]) {
+      const reader = new FileReader();
+      reader.addEventListener('load', () =>
+        setImgSrc(reader.result?.toString() || '')
+      );
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
 
   const handleImageChange = (event: React.SyntheticEvent) => {
     const reader = new FileReader();
@@ -80,13 +114,8 @@ const EventForm = ({ onSaveEvent }) => {
     }
   };
 
-  const openFileInput = () => {
-    document.getElementById('fileInput').click();
-  };
-
   const clearFile = () => {
     formik.setFieldValue('coverUrl', '');
-    setPreviewImage('');
   };
 
   return (
@@ -111,12 +140,11 @@ const EventForm = ({ onSaveEvent }) => {
           helperText={formik.touched.bookAuthor && formik.errors.bookAuthor}
         />
 
-        <DatePicker
-          label="Date"
+        <DateTimePicker
+          label="Date/time"
+          onChange={(value) => formik.setFieldValue('date', value)}
           disablePast
           value={formik.values.date}
-          onChange={(value) => formik.setFieldValue('date', value?.toString())}
-          onError={(newError) => setError(newError)}
           slotProps={{
             textField: {
               error: formik.errors.date,
@@ -125,13 +153,6 @@ const EventForm = ({ onSaveEvent }) => {
                 : '',
             },
           }}
-        />
-
-        <DesktopTimePicker
-          label="Time"
-          value={formik.values.time}
-          onChange={(value) => formik.setFieldValue('time', value)}
-          format="HH:mm"
         />
 
         <TextField
@@ -153,40 +174,54 @@ const EventForm = ({ onSaveEvent }) => {
         />
 
         <TextField
-          id="fee"
-          label="Fee"
+          id="capacity"
+          label="Capacity, ppl"
           type="number"
-          value={formik.values.fee}
+          value={formik.values.capacity}
           onChange={formik.handleChange}
-          error={formik.touched.fee && Boolean(formik.errors.fee)}
-          helperText={formik.touched.fee && formik.errors.fee}
+          error={formik.touched.capacity && Boolean(formik.errors.capacity)}
+          helperText={formik.touched.capacity && formik.errors.capacity}
         />
-
-        <input
-          type="file"
-          id="fileInput"
-          name="coverUrl"
-          accept="image/png, image/gif, image/jpeg, image/webp, image/jpg"
-          onChange={handleImageChange}
-          className="hidden"
-        />
-        <Button
-          size="medium"
-          onClick={openFileInput}
-          variant="contained"
-          color="primary"
-          startIcon={<ImageIcon />}
-        >
-          Add picture
-        </Button>
       </div>
-      <div className="w-full mt-3">
-        {previewImg && (
-          <div className="w-full h-[200px] max-h-[200px] relative">
+      <div className="flex flex-col w-full mt-3">
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={paidEvent}
+              onChange={() => setPaidEvent(!paidEvent)}
+            />
+          }
+          label="Entrance fee"
+        />
+        {paidEvent && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <TextField
+              id="fee"
+              label="Fee"
+              type="number"
+              value={formik.values.fee}
+              onChange={formik.handleChange}
+              error={formik.touched.fee && Boolean(formik.errors.fee)}
+              helperText={formik.touched.fee && formik.errors.fee}
+            />
+            <TextField
+              id="currency"
+              label="Currency"
+              type="text"
+              value={formik.values.currency}
+              onChange={formik.handleChange}
+              error={formik.touched.currency && Boolean(formik.errors.currency)}
+              helperText={formik.touched.currency && formik.errors.currency}
+            />
+          </div>
+        )}
+
+        {/* {previewImg && (
+          <div className="w-full h-[200px] max-h-[200px] mb-3">
             <Image
-              fill
+              height={150}
+              width={300}
               alt="event cover"
-              className="w-full h-full"
               src={previewImg}
             />
             <button
@@ -196,23 +231,52 @@ const EventForm = ({ onSaveEvent }) => {
               <DeleteIcon />
             </button>
           </div>
-        )}
-        <TextField
-          multiline
-          className="w-full"
-          label="Description"
-          id="description"
-          minRows={3}
-          value={formik.values.description}
-          onChange={formik.handleChange}
-          error={
-            formik.touched.description && Boolean(formik.errors.description)
-          }
-        />
+        )} */}
+        <div className="mt-2">
+          <TextField
+            className="w-full"
+            multiline
+            label="Description"
+            id="description"
+            minRows={3}
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            error={
+              formik.touched.description && Boolean(formik.errors.description)
+            }
+          />
+        </div>
+        <div className="mt-2 flex flex-col">
+          <input
+            type="file"
+            id="fileInput"
+            name="coverUrl"
+            accept="image/*"
+            onChange={onImageSelect}
+            className="hidden"
+          />
+          <button
+            type="button"
+            className="text-xl bg-teal-700 text-white p-3 rounded mb-2 w-full"
+            onClick={openFileInput}
+          >
+            Upload cover picture
+          </button>
+          {imgSrc && (
+            <ImageCrop
+              onFileChange={onFileChange}
+              imgSrc={imgSrc}
+              className="w-full max-w-[300px]"
+            />
+          )}
+        </div>
       </div>
-      <Button type="submit" variant="contained" color="primary">
+      <button
+        className="text-xl w-full mt-3 bg-teal-500 rounded p-4"
+        type="submit"
+      >
         Submit
-      </Button>
+      </button>
     </form>
     // </Container>
   );

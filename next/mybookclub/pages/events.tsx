@@ -6,36 +6,49 @@ import Loader from '@/components/global/Loader';
 import EventCard from '@/components/events/EventCard';
 import DefaultLayout from '../layouts/default';
 import { IEvent } from '@/types/event';
+import { getUpcomingEvents } from '@/utils/eventApi';
 
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  where,
+} from 'firebase/firestore';
+import dayjs from 'dayjs';
 
 const Events = () => {
   const [events, setEvents] = useState<IEvent[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // const fetchEvents = async () => {
+    //   setLoading(true);
+    //   try {
+    //     const db = getFirestore();
+    //     const eventsCollection = collection(db, 'events');
+    //     const eventsSnapshot = await getDocs(eventsCollection); // Fetch the documents from the collection
+
+    //     const eventsData: IEvent[] = eventsSnapshot.docs.map((doc) => ({
+    //       id: doc.id,
+    //       bookTitle: doc.data().bookTitle,
+    //       bookAuthor: doc.data().bookAuthor,
+    //       city: doc.data().city,
+    //       participants: doc.data().participants,
+    //       date: doc.data().date,
+    //       time: doc.data().time,
+    //       coverUrl: doc.data().coverUrl,
+    //     }));
+
+    //     setEvents(eventsData);
+    //   } catch (error) {
+    //     console.error('Error fetching events:', error);
+    //   }
+    //   setLoading(false);
+    // };
     const fetchEvents = async () => {
-      setLoading(true);
-      try {
-        const db = getFirestore();
-        const eventsCollection = collection(db, 'events');
-        const eventsSnapshot = await getDocs(eventsCollection); // Fetch the documents from the collection
-
-        const eventsData: IEvent[] = eventsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          bookTitle: doc.data().bookTitle,
-          bookAuthor: doc.data().bookAuthor,
-          city: doc.data().city,
-          participants: doc.data().participants,
-          date: doc.data().date,
-          coverUrl: doc.data().coverUrl,
-        }));
-
-        setEvents(eventsData.filter((event) => event.date));
-      } catch (error) {
-        console.error('Error fetching events:', error);
-      }
-      setLoading(false);
+      const upcomingEvents: IEvent[] = await getUpcomingEvents();
+      setEvents(upcomingEvents);
     };
 
     fetchEvents();
@@ -46,7 +59,7 @@ const Events = () => {
       <PageHead pageTitle="Events" />
       {!loading && (
         <div className="p-2 md:p-5 text-center">
-          <h2 className="text-xl">Bookclub events</h2>
+          <h2 className="text-2xl">Upcoming events</h2>
           <div className="flex">
             {/* <input
               type="text"
@@ -58,12 +71,13 @@ const Events = () => {
             /> */}
           </div>
           <div className="flex items-center flex-col ">
-            <h3>upcoming</h3>
-            <div className="flex flex-col items-center justify-center w-full my-2">
-              {events.map((event) => (
-                <EventCard event={event} key={event.id} />
-              ))}
-            </div>
+            {events && (
+              <div className="flex flex-col items-center justify-center w-full my-2">
+                {events.map((event) => (
+                  <EventCard event={event} key={event.id} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

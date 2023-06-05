@@ -13,6 +13,7 @@ import { IAuthData } from '@/types/auth';
 
 import { HiMail } from 'react-icons/hi';
 import { AiTwotoneLock } from 'react-icons/ai';
+import { toast } from 'react-toastify';
 
 interface AuthFormProps {
   mode: string;
@@ -29,32 +30,56 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     photoURL: '',
   });
 
-  const [authData, setAuthData] = useState<IAuthData>({
-    invalidEmail: false,
-    invalidPassword: false,
-    wrongPassword: false,
-    userNotFound: false,
-    alreadyInUseEmail: false,
-  });
+  // const [authData, setAuthData] = useState<IAuthData>({
+  //   invalidEmail: false,
+  //   invalidPassword: false,
+  //   wrongPassword: false,
+  //   userNotFound: false,
+  //   alreadyInUseEmail: false,
+  // });
 
   const [value, setValue] = useState(0);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-    setAuthData({
-      ...authData,
-      invalidEmail: false,
-      invalidPassword: false,
-      wrongPassword: false,
-      userNotFound: false,
-    });
-    setUserData({
-      email: '',
-      password: '',
-      displayName: '',
-      photoURL: '',
+  const sendErrorToast = (message: string) => {
+    toast.error(message, {
+      position: 'top-right',
+      autoClose: 5000,
+      closeOnClick: true,
+      pauseOnHover: true,
+      theme: 'light',
     });
   };
+
+  const logExistingUser = async (email: string, password: string) => {
+    await signInWithEmailAndPassword(getFirebaseAuth, email, password)
+      .then((userCredential) => {
+        console.log(userCredential);
+        router.push('/dashboard');
+      })
+      .catch((error) => {
+        error.code === 'auth/user-not-found' &&
+          sendErrorToast('There is no user with these credentials!');
+        error.code === 'auth/wrong-password' &&
+          sendErrorToast('The password is wrong!');
+      });
+  };
+
+  // const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  //   setValue(newValue);
+  //   setAuthData({
+  //     ...authData,
+  //     invalidEmail: false,
+  //     invalidPassword: false,
+  //     wrongPassword: false,
+  //     userNotFound: false,
+  //   });
+  //   setUserData({
+  //     email: '',
+  //     password: '',
+  //     displayName: '',
+  //     photoURL: '',
+  //   });
+  // };
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -83,34 +108,36 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
                 user.metadata.creationTime &&
                 +new Date(user.metadata.creationTime).getTime(),
             });
+            logExistingUser(userData.email, userData.password);
           } catch (e) {
             console.error('Error adding document: ', e);
           }
         })
         .catch((error) => {
           error.code === 'auth/invalid-email' &&
-            setAuthData({ ...authData, invalidEmail: true });
+            sendErrorToast('Invald email!');
           error.code === 'auth/email-already-in-use' &&
-            setAuthData({ ...authData, alreadyInUseEmail: true });
+            sendErrorToast('This email is already in use!');
           error.code === 'auth/weak-password' &&
-            setAuthData({ ...authData, invalidPassword: true });
+            sendErrorToast('Password chosen is too insecure!');
         });
     } else {
-      await signInWithEmailAndPassword(
-        getFirebaseAuth,
-        userData.email,
-        userData.password
-      )
-        .then((userCredential) => {
-          console.log(userCredential);
-          router.push('/dashboard');
-        })
-        .catch((error) => {
-          error.code === 'auth/user-not-found' &&
-            setAuthData({ ...authData, userNotFound: true });
-          error.code === 'auth/wrong-password' &&
-            setAuthData({ ...authData, wrongPassword: true });
-        });
+      logExistingUser(userData.email, userData.password);
+      // await signInWithEmailAndPassword(
+      //   getFirebaseAuth,
+      //   userData.email,
+      //   userData.password
+      // )
+      //   .then((userCredential) => {
+      //     console.log(userCredential);
+      //     router.push('/dashboard');
+      //   })
+      //   .catch((error) => {
+      //     error.code === 'auth/user-not-found' &&
+      //       setAuthData({ ...authData, userNotFound: true });
+      //     error.code === 'auth/wrong-password' &&
+      //       setAuthData({ ...authData, wrongPassword: true });
+      //   });
     }
   };
   return (

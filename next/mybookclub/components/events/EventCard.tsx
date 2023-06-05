@@ -13,12 +13,7 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
-  // const formattedDate = event.date
-  //   ? event.date.toDate().toLocaleDateString()
-  //   : 'not set';
-  // const formattedTime = event.date
-  //   ? dayjs(event.date.seconds).format('HH:mm')
-  //   : 'not set';
+  const formattedDate = dayjs.unix(event.date).format('MMM-DD hh:mm a');
 
   const getImgSrc = event.coverUrl || cover;
 
@@ -33,12 +28,9 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         </h3>
         <div className="flex items-center">
           <BsFillCalendarDateFill className="text-teal-500 mr-2" />
-          <span>{event.date}</span>
+          <span>{formattedDate}</span>
         </div>
-        <div className="flex items-center">
-          <FaRegClock className="text-teal-500 mr-2" />
-          <span>{event.time}</span>
-        </div>
+
         <div className="flex items-center">
           <ImLocation2 className="text-teal-500 mr-2" />
           <span> {event.city}</span>

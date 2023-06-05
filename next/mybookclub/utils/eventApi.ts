@@ -22,10 +22,12 @@ import {
   orderBy,
   arrayUnion,
   getFirestore,
+  Timestamp,
 } from '@firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 import { IEvent } from '@/types/event';
+import dayjs from 'dayjs';
 
 export const saveEvent = async (eventData: IEvent) => {
   console.log(eventData);
@@ -62,6 +64,7 @@ export const getHostedEvents = async (uid: string) => {
     const hostedEventsCollection = query(
       collection(db, 'events'),
       where('hostId', '==', uid),
+      where('date', '>', Timestamp.now()),
       orderBy('date', 'desc')
     );
 
@@ -73,8 +76,7 @@ export const getHostedEvents = async (uid: string) => {
       bookAuthor: doc.data().bookAuthor,
       city: doc.data().city,
       participants: doc.data().participants,
-      date: doc.data().date,
-      time: doc.data().time,
+      date: doc.data().date.seconds,
       coverUrl: doc.data().coverUrl,
       fee: doc.data().fee,
       registrationOpen: doc.data().registrationOpen,
@@ -91,6 +93,7 @@ export const getAttendedEvents = async (uid: string) => {
     const attendedEventsCollection = query(
       collection(db, 'events'),
       where('participants', 'array-contains', uid),
+      where('date', '>', Timestamp.now()),
       orderBy('date', 'desc')
     );
 
@@ -102,12 +105,41 @@ export const getAttendedEvents = async (uid: string) => {
       bookAuthor: doc.data().bookAuthor,
       city: doc.data().city,
       participants: doc.data().participants,
-      date: doc.data().date,
-      time: doc.data().time,
+      date: doc.data().date.seconds,
       coverUrl: doc.data().coverUrl,
       fee: doc.data().fee,
       registrationOpen: doc.data().registrationOpen,
     }));
+    return eventsData;
+  } catch (error) {
+    console.error('Error fetching events:', error);
+  }
+};
+
+export const getUpcomingEvents = async (): Promise<IEvent[] | undefined> => {
+  try {
+    const db = getFirestore();
+    const nowTimestamp = Timestamp.now();
+    const attendedEventsCollection = query(
+      collection(db, 'events'),
+      where('date', '>', nowTimestamp),
+      orderBy('date', 'asc')
+    );
+
+    const eventsSnapshot = await getDocs(attendedEventsCollection); // Fetch the documents from the collection
+
+    const eventsData: IEvent[] = eventsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      bookTitle: doc.data().bookTitle,
+      bookAuthor: doc.data().bookAuthor,
+      city: doc.data().city,
+      participants: doc.data().participants,
+      date: doc.data().date.seconds,
+      coverUrl: doc.data().coverUrl,
+      fee: doc.data().fee,
+      registrationOpen: doc.data().registrationOpen,
+    }));
+
     return eventsData;
   } catch (error) {
     console.error('Error fetching events:', error);

@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "pages/_app.tsx", "use": "@vercel/next" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "pages/_app.tsx" }
+  ]
+}

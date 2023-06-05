@@ -3,20 +3,20 @@ import { IComment } from './comment';
 import { Timestamp } from 'firebase/firestore';
 
 export interface IEvent {
-  // author: IUser;
-  // createdAt: string;
-  // eventDate: string;
-  // description: string;
-  // comments: IComment[];
-  // images: string[];
-  // id: string;
-  date: Timestamp;
   bookTitle: string;
+  bookAuthor: string;
+  date: Timestamp;
+  description: string;
   city: string;
-  id: string;
+  location: string;
+  id?: string;
   participants: string[];
   coverUrl: string;
   hostId: string;
+  fee: number;
+  currency: string;
+  capacity: number;
+  registrationOpen: boolean;
 }
 
 export interface IEventsState {

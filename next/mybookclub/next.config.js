@@ -7,6 +7,7 @@ const nextConfig = {
       'firebasestorage.googleapis.com',
       'encrypted-tbn0.gstatic.com',
       'my-book-club-a097a.appspot.com',
+      'www.facebook.com',
     ],
   },
   sassOptions: {

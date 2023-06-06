@@ -1,10 +1,6 @@
 import DefaultLayout from '@/layouts/default';
 import PageHead from '@/components/global/Head';
-
-import { useRouter } from 'next/router';
-import { useAppSelector } from '@/hooks/redux';
-import { useEffect } from 'react';
-import { Card, CardContent } from '@mui/material';
+import { Card, CardContent, Typography } from '@mui/material';
 
 const PrivacyPolicy = () => {
   return (
@@ -13,16 +9,19 @@ const PrivacyPolicy = () => {
       <div className="flex flex-col p-2 items-center mt-4">
         <Card>
           <CardContent>
-            <h2>Privacy Policy </h2>
+            <Typography variant="h3" gutterBottom>
+              Privacy Policy
+            </Typography>
+
             <p>
               This Privacy Policy governs the manner in which MyBookClub
               collects, uses, maintains, and discloses information collected
-              from users (referred to as "User(s)") of the MyBookClub. Personal
-              Information 1.1 Collection of Personal Information We may collect
-              personal identification information from Users in various ways,
-              including but not limited to: When Users register an account using
-              Facebook, Google, or email authentication. When Users create or
-              participate in events. 1.2 Types of Personal Information The
+              from users (referred to as &quot;User(s)&quot;) of the MyBookClub.
+              Personal Information 1.1 Collection of Personal Information We may
+              collect personal identification information from Users in various
+              ways, including but not limited to: When Users register an account
+              using Facebook, Google, or email authentication. When Users create
+              or participate in events. 1.2 Types of Personal Information The
               personal information that we may collect can include, but is not
               limited to: Name Email address Profile picture Any additional
               information voluntarily provided by the User during the
@@ -53,9 +52,10 @@ const PrivacyPolicy = () => {
               If you do not agree to this policy, please do not use our
               website/app. 5.2 Changes to the Privacy Policy We reserve the
               right to update or modify this Privacy Policy at any time. We will
-              notify Users of any changes by updating the "Last Updated" date at
-              the top of this page. It is the responsibility of the User to
-              review this Privacy Policy periodically for any changes.
+              notify Users of any changes by updating the &quot;Last
+              Updated&quot; date at the top of this page. It is the
+              responsibility of the User to review this Privacy Policy
+              periodically for any changes.
             </p>
           </CardContent>
         </Card>

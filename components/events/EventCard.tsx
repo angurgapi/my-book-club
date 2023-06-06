@@ -1,8 +1,10 @@
 import React from 'react';
 import { IEvent } from '@/types/event';
-import { BsFillCalendarDateFill } from 'react-icons/bs';
-import { FaRegClock } from 'react-icons/fa';
-import { ImLocation2 } from 'react-icons/im';
+
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import PublicIcon from '@mui/icons-material/Public';
+
 import Image from 'next/image';
 import dayjs from 'dayjs';
 import Link from 'next/link';
@@ -13,6 +15,9 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
+  // const formattedDate = dayjs
+  //   .unix(event.date.toMillis() / 1000)
+  //   .format('MMM-DD hh:mm a');
   const formattedDate = dayjs.unix(event.date).format('MMM-DD hh:mm a');
 
   const getImgSrc = event.coverUrl || cover;
@@ -27,12 +32,12 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           {event.bookTitle} | {event.bookAuthor}
         </h3>
         <div className="flex items-center">
-          <BsFillCalendarDateFill className="text-teal-500 mr-2" />
+          <CalendarMonthIcon className="text-teal-500 mr-2" />
           <span>{formattedDate}</span>
         </div>
 
         <div className="flex items-center">
-          <ImLocation2 className="text-teal-500 mr-2" />
+          <LocationOnIcon className="text-teal-500 mr-2" />
           <span> {event.city}</span>
         </div>
       </div>

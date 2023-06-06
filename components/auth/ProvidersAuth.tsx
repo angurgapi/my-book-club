@@ -1,14 +1,16 @@
 import React from 'react';
-import { FcGoogle } from 'react-icons/fc';
-import { GrFacebook } from 'react-icons/gr';
-
 import { useRouter } from 'next/router';
 
 import { doc, runTransaction, setDoc } from 'firebase/firestore';
 import { signInWithPopup } from 'firebase/auth';
+
 import { useAuth } from '@/hooks/useAuth';
 import { setUser } from '@/store/reducers/UserSlice';
 import { useAppDispatch } from '@/hooks/redux';
+
+import GoogleIcon from '@mui/icons-material/Google';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import { IconButton } from '@mui/material';
 
 const ProvidersAuth = () => {
   const { getFirebaseAuth, db, googleProvider, facebookProvider } = useAuth();
@@ -22,24 +24,24 @@ const ProvidersAuth = () => {
         try {
           await runTransaction(db, async (transaction) => {
             const sfDoc = await transaction.get(docRef);
-
-            if (!sfDoc.exists()) {
-              try {
-                await setDoc(docRef, {
-                  uid: user.uid,
-                  displayName: user.displayName || '',
-                  email: user.email,
-                  password: null,
-                  photoURL: user.photoURL,
-                  events: [],
-                  createdAt:
-                    user.metadata.creationTime &&
-                    +new Date(user.metadata.creationTime).getTime(),
-                });
-              } catch (e) {
-                console.error('Error adding document: ', e);
-              }
-            }
+            console.log(sfDoc.exists());
+            // if (!sfDoc.exists()) {
+            //   try {
+            //     await setDoc(docRef, {
+            //       uid: user.uid,
+            //       displayName: user.displayName || '',
+            //       email: user.email,
+            //       password: null,
+            //       photoURL: user.photoURL,
+            //       events: [],
+            //       createdAt:
+            //         user.metadata.creationTime &&
+            //         +new Date(user.metadata.creationTime).getTime(),
+            //     });
+            //   } catch (e) {
+            //     console.error('Error adding document: ', e);
+            //   }
+            // }
           });
         } catch (e) {
           console.log('runTransaction Auth failed: ', e);
@@ -96,12 +98,12 @@ const ProvidersAuth = () => {
   return (
     <div className="flex justify-start items-center">
       Enter with
-      <button onClick={handleFacebookLogin}>
-        <GrFacebook className="mx-2 text-[#3b5998]" />
-      </button>
-      <button onClick={handleGoogleLogin}>
-        <FcGoogle />
-      </button>
+      <IconButton onClick={handleFacebookLogin}>
+        <FacebookIcon className="mx-2 text-[#3b5998]" />
+      </IconButton>
+      <IconButton onClick={handleGoogleLogin}>
+        <GoogleIcon className="text-[#4285F4]" />
+      </IconButton>
     </div>
   );
 };

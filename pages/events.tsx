@@ -16,6 +16,7 @@ import {
   where,
 } from 'firebase/firestore';
 import dayjs from 'dayjs';
+import { Typography } from '@mui/material';
 
 const Events = () => {
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -59,7 +60,9 @@ const Events = () => {
       <PageHead pageTitle="Events" />
       {!loading && (
         <div className="p-2 md:p-5 text-center">
-          <h2 className="text-2xl">Upcoming events</h2>
+          <Typography variant="h3" gutterBottom>
+            Upcoming events
+          </Typography>
           <div className="flex">
             {/* <input
               type="text"

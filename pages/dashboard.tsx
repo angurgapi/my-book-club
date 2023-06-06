@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
+import Link from 'next/link';
+
 import PageHead from '@/components/global/Head';
 import Loader from '@/components/global/Loader';
 import DefaultLayout from '../layouts/default';
-import Image from 'next/image';
+import UserEvents from '@/components/events/UserEvents';
 import placeholder from '@/images/avatar-placeholder.webp';
-import { BsFillPencilFill } from 'react-icons/bs';
-// import { AiFillPlusSquare } from 'react-icons/ai';
+
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import EditIcon from '@mui/icons-material/Edit';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { IoMdCheckmarkCircle } from 'react-icons/io';
+
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useAppSelector, useAppDispatch } from '@/hooks/redux';
 import { useAuth } from '@/hooks/useAuth';
 import { updateProfile, signOut } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { setUser, removeUser } from '@/store/reducers/UserSlice';
-
-import UserEvents from '@/components/events/UserEvents';
-import LogoutIcon from '@mui/icons-material/Logout';
-import Link from 'next/link';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
+import { Button } from '@mui/material';
 
 const Dashboard = () => {
   const { uid, displayName, photoURL } = useAppSelector((state) => state.user);
@@ -112,12 +113,8 @@ const Dashboard = () => {
                         className="absolute right-4 top-3 text-gray-300 text-xl"
                         onClick={changeUpdateMode}
                       >
-                        {edit && (
-                          <IoMdCheckmarkCircle className="text-lime-600" />
-                        )}
-                        {!edit && (
-                          <BsFillPencilFill className="text-teal-500" />
-                        )}
+                        {edit && <CheckCircleIcon className="text-lime-600" />}
+                        {!edit && <EditIcon className="text-teal-500" />}
                       </button>
                     </div>
                   </div>
@@ -129,12 +126,20 @@ const Dashboard = () => {
               <div className="flex items-center">
                 {' '}
                 <h3 className="text-2xl">My events</h3>
-                <Link
+                {/* <Link
                   href="/event/create"
                   className="btn ml-2 bg-teal-600 text-white p-2"
                 >
                   <AddCircleOutlineIcon className="mr-2 text-white" /> New
-                </Link>
+                </Link> */}
+                <Button
+                  component={Link}
+                  href="/event/create"
+                  variant="contained"
+                  color="primary"
+                >
+                  <AddCircleOutlineIcon className="mr-2 text-white" /> New
+                </Button>
                 {/* <button
                 onClick={() => setModalOpen(true)}
                 className="flex items-center rounded ml-2 bg-teal-600 text-white p-2"

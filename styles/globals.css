@@ -6,6 +6,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: 'Como';
 }
 
 tr:nth-child(even) {
@@ -27,12 +28,14 @@ td {
 main {
   background-color: rgb(245, 246, 255);
 }
+p {
+  white-space: normal;
+  word-break: break-all;
+  word-break: break-word;
+}
 
-@font-face {
-  font-family: 'Macondo';
-  src: url('../assets/fonts/Macondo.ttf');
-  font-weight: 400;
-  font-style: normal;
+a {
+  text-decoration: none !important;
 }
 
 @font-face {
@@ -40,4 +43,11 @@ main {
   src: url('../assets/fonts/Sigmar.ttf');
   font-weight: 400;
   font-style: normal;
+}
+
+@font-face {
+  font-family: 'Como';
+  font-weight: 600;
+  font-style: normal;
+  src: url('../assets/fonts/Como-Medium.ttf');
 }

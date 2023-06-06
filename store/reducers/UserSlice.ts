@@ -3,12 +3,12 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IUserState, IUser } from '@/types/user';
 
 const initialState = {
-  events: null,
-  createdAt: null,
-  displayName: null,
-  photoURL: null,
-  images: null,
-  uid: null,
+  events: [],
+  createdAt: '',
+  displayName: '',
+  email: '',
+  photoURL: '',
+  uid: '',
   isAuth: false,
 } as IUserState;
 
@@ -21,18 +21,16 @@ export const userSlice = createSlice({
       state.createdAt = action.payload.createdAt || state.createdAt;
       state.displayName = action.payload.displayName || state.displayName;
       state.photoURL = action.payload.photoURL || state.photoURL;
-      state.images = action.payload.images || state.images;
       state.uid = action.payload.uid || state.uid;
       state.isAuth = action.payload.isAuth || state.isAuth;
     },
 
     removeUser(state) {
-      state.events = null;
-      state.createdAt = null;
-      state.displayName = null;
-      state.photoURL = null;
-      state.images = null;
-      state.uid = null;
+      state.events = [];
+      state.createdAt = '';
+      state.displayName = '';
+      state.photoURL = '';
+      state.uid = '';
       state.isAuth = false;
     },
   },

@@ -19,6 +19,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { removeUser } from '@/store/reducers/UserSlice';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/router';
+import { AddCircleOutline } from '@mui/icons-material';
 
 function Header() {
   const { getFirebaseAuth } = useAuth();
@@ -51,13 +52,14 @@ function Header() {
   };
 
   const logOut = () => {
+    handleCloseUserMenu();
     signOut(getFirebaseAuth);
     dispatch(removeUser());
     router.push('/');
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="sticky" sx={{ bgcolor: 'white' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
@@ -76,7 +78,7 @@ function Header() {
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
-              color="inherit"
+              sx={{ pl: 0 }}
             >
               <MenuIcon />
             </IconButton>
@@ -103,33 +105,40 @@ function Header() {
               </MenuItem>
             </Menu>
           </Box>
-          {/* <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} /> */}
+
           <Typography
-            variant="h5"
             noWrap
             component="a"
             href=""
             sx={{
-              mr: 2,
               display: { xs: 'flex', md: 'none' },
               flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
             }}
           >
-            <Image src="/svg/logo2.svg" alt="logo" height={20} width={120} />
+            <Image src="/svg/logo2.svg" alt="logo" height={36} width={130} />
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            <Link color="inherit" href="/events">
-              events
-            </Link>
-          </Box>
+          {/* <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}> */}
+          <Link
+            sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}
+            href="/events"
+          >
+            events
+          </Link>
+
+          {/* </Box> */}
 
           {isAuth ? (
             <Box sx={{ flexGrow: 0 }}>
+              <Toolbar sx={{ backgroundColor: '#0b074a', mr: 1 }}>
+                <Link
+                  className="flex"
+                  href="/event/create"
+                  sx={{ display: 'flex', height: '100%', color: '#fff' }}
+                >
+                  <AddCircleOutline />{' '}
+                  <span className="hidden md:flex ml-2">New event</span>
+                </Link>
+              </Toolbar>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <Avatar alt="userpic" src={photoURL || ''} />
@@ -152,17 +161,28 @@ function Header() {
                 onClose={handleCloseUserMenu}
               >
                 <MenuItem onClick={handleCloseUserMenu}>
-                  <Link href="/dashboard">Dashboard</Link>
+                  <Link href="/dashboard/profile">Dashboard</Link>
                 </MenuItem>
                 <MenuItem onClick={handleCloseUserMenu}>
-                  <Button onClick={logOut}>Log out</Button>
+                  <Link href="/dashboard/events">My events</Link>
                 </MenuItem>
+
+                <Button
+                  sx={{
+                    pl: '16px',
+                    '&:hover': {
+                      color: '#898791',
+                      background: 'none',
+                    },
+                  }}
+                  onClick={logOut}
+                >
+                  Log out
+                </Button>
               </Menu>
             </Box>
           ) : (
-            <Link color="inherit" href="/auth">
-              log in
-            </Link>
+            <Link href="/auth">log in</Link>
           )}
         </Toolbar>
       </Container>

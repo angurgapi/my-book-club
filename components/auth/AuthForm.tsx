@@ -11,8 +11,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { IUserData } from '@/types/user';
 import { IAuthData } from '@/types/auth';
 
-import { HiMail } from 'react-icons/hi';
-import { AiTwotoneLock } from 'react-icons/ai';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import Person2Icon from '@mui/icons-material/Person2';
+
 import { toast } from 'react-toastify';
 
 interface AuthFormProps {
@@ -159,7 +161,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
                 setUserData({ ...userData, displayName: e.target.value })
               }
             />
-            <HiMail className=" absolute left-4 top-3 text-gray-300 text-xl" />
+            <Person2Icon className=" absolute left-4 top-3 text-gray-300 text-xl" />
           </div>
         </>
       )}
@@ -173,7 +175,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
           value={userData.email}
           onChange={(e) => setUserData({ ...userData, email: e.target.value })}
         />
-        <HiMail className=" absolute left-4 top-3 text-gray-300 text-xl" />
+        <MailOutlineIcon className=" absolute left-4 top-3 text-gray-300 text-xl" />
       </div>
       <label htmlFor="password">Password</label>
       <div className="w-full relative">
@@ -187,7 +189,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
           className="border px-10 py-2 mb-4 rounded-md w-full"
           required
         />
-        <AiTwotoneLock className=" absolute left-4 top-3 text-gray-300 text-xl" />
+        <VpnKeyIcon className=" absolute left-4 top-3 text-gray-300 text-xl" />
       </div>
       <button
         type="submit"

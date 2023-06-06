@@ -28,6 +28,7 @@ import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import EditIcon from '@mui/icons-material/Edit';
+import { Card, CardContent } from '@mui/material';
 
 // import ShareEventModal from "../../../components/ShareEventModal";
 // import ErrorPage from "../../../components/ErrorPage";
@@ -119,17 +120,12 @@ export default function EventPage({ event }: EventProps) {
     <DefaultLayout>
       <PageHead pageTitle={event.bookTitle} />
       <div className="flex flex-col p-2 items-center mt-4">
-        <h1 className="text-center text-2xl">
+        <Typography variant="h3" gutterBottom>
           {event.bookTitle} by {event.bookAuthor}
-        </h1>
-        <div className="flex flex-col mt-4 w-full max-w-[800px] justify-start items-center">
-          <div className="relative w-full aspect-[16/7]">
-            <Image
-              className="rounded"
-              src={getImgSrc()}
-              fill
-              alt="book cover"
-            />
+        </Typography>
+        <Card className="w-full md:min-w-[500px] mb-4">
+          <div className="relative w-full md:min-w-[500px] aspect-[16/7]">
+            <Image src={getImgSrc()} fill alt="book cover" />
             {attending && (
               <div className="absolute bottom-2 right-2 bg-amber-400 text-black rounded p-2 w-fit">
                 You are attending
@@ -145,25 +141,7 @@ export default function EventPage({ event }: EventProps) {
               </Link>
             )}
           </div>
-
-          <div className="p-3 md:col-span-2 flex flex-col w-full justify-start items-start">
-            {event.description && (
-              <span className="text-justify italic text-emerald-700">
-                {event.description}
-              </span>
-              //   <Accordion className="w-full">
-              //     <AccordionSummary
-              //       expandIcon={<ExpandMoreIcon />}
-              //       aria-controls="panel1a-content"
-              //       id="panel1a-header"
-              //     >
-              //       <Typography><span>Event details</span></Typography>
-              //     </AccordionSummary>
-              //     <AccordionDetails>
-              //       <Typography>{event.description}</Typography>
-              //     </AccordionDetails>
-              //   </Accordion>
-            )}
+          <CardContent>
             <div className="grid md:grid-cols-3 auto-cols-max gap-2 mt-3">
               <span className="text-teal-800">city</span>
               <span className="col-span-2">{event.city}</span>
@@ -197,8 +175,13 @@ export default function EventPage({ event }: EventProps) {
                 Leave event
               </button>
             )}
-          </div>
-        </div>
+            {event.description && (
+              <div className="bg-slate-100 mt-3 p-2 rounded">
+                <span className="text-justify italic">{event.description}</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </DefaultLayout>
   );

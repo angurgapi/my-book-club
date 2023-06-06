@@ -8,16 +8,16 @@ import { Card, CardContent } from '@mui/material';
 
 const CreateEvent = () => {
   const router = useRouter();
-  const { isAuth } = useAppSelector((state) => state.user);
+  const { isAuth, uid } = useAppSelector((state) => state.user);
 
   useEffect(() => {
     if (!isAuth) {
-      router.push('/');
+      router.push('/auth');
     }
-  }, []);
+  }, [isAuth, router]);
 
   const onSaveEvent = () => {
-    router.push('/dashboard');
+    router.push('/dashboard/events');
   };
   return (
     isAuth && (
@@ -27,7 +27,7 @@ const CreateEvent = () => {
           <Card>
             <CardContent>
               <h2>New event</h2>
-              <EventForm onSaveEvent={onSaveEvent} />
+              <EventForm uid={uid} onSaveEvent={onSaveEvent} />
             </CardContent>
           </Card>
         </div>

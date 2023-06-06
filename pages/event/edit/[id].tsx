@@ -8,24 +8,24 @@ import { useEffect } from 'react';
 
 const CreateEvent = () => {
   const router = useRouter();
-  const { isAuth } = useAppSelector((state) => state.user);
+  const { isAuth, uid } = useAppSelector((state) => state.user);
 
   useEffect(() => {
     if (!isAuth) {
-      router.push('/');
+      router.push('/auth');
     }
-  }, []);
+  }, [isAuth, router]);
   const { eventId } = router.query;
   console.log(eventId);
   const onSaveEvent = () => {
-    router.push('/dashboard');
+    router.push('/dashboard/events');
   };
   return (
     isAuth && (
       <DefaultLayout>
         <PageHead pageTitle="Edit book club meeting" />
         <div className="flex flex-col p-2 items-center mt-4">
-          <EventForm onSaveEvent={onSaveEvent} />
+          <EventForm onSaveEvent={onSaveEvent} uid={uid} />
         </div>
       </DefaultLayout>
     )

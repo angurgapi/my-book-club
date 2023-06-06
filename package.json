@@ -44,7 +44,6 @@
   },
   "devDependencies": {
     "@emailjs/browser": "^3.11.0",
-    "@types/fabric": "^5.3.3",
-    "react-icons": "^4.8.0"
+    "@types/fabric": "^5.3.3"
   }
 }

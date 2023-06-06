@@ -1,6 +1,4 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-
-// import { settingsReducer } from './reducers/SettingsSlice';
 import { userReducer } from './reducers/UserSlice';
 import { eventsReducer } from './reducers/EventsSlice';
 
@@ -28,7 +26,7 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage,
-  blacklist: ['users'],
+  // blacklist: ['users'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

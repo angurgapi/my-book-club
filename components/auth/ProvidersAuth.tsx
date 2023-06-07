@@ -25,23 +25,23 @@ const ProvidersAuth = () => {
           await runTransaction(db, async (transaction) => {
             const sfDoc = await transaction.get(docRef);
             console.log(sfDoc.exists());
-            // if (!sfDoc.exists()) {
-            //   try {
-            //     await setDoc(docRef, {
-            //       uid: user.uid,
-            //       displayName: user.displayName || '',
-            //       email: user.email,
-            //       password: null,
-            //       photoURL: user.photoURL,
-            //       events: [],
-            //       createdAt:
-            //         user.metadata.creationTime &&
-            //         +new Date(user.metadata.creationTime).getTime(),
-            //     });
-            //   } catch (e) {
-            //     console.error('Error adding document: ', e);
-            //   }
-            // }
+            if (!sfDoc.exists()) {
+              try {
+                await setDoc(docRef, {
+                  uid: user.uid,
+                  displayName: user.displayName || '',
+                  email: user.email,
+                  password: null,
+                  photoURL: user.photoURL,
+                  events: [],
+                  createdAt:
+                    user.metadata.creationTime &&
+                    +new Date(user.metadata.creationTime).getTime(),
+                });
+              } catch (e) {
+                console.error('Error adding document: ', e);
+              }
+            }
           });
         } catch (e) {
           console.log('runTransaction Auth failed: ', e);
@@ -83,7 +83,7 @@ const ProvidersAuth = () => {
               }
             }
           });
-          router.push('/dashboard');
+          router.push('/dashboard/profile');
         } catch (e) {
           console.log('runTransaction Auth failed: ', e);
         }

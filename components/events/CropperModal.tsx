@@ -15,7 +15,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 type Props = {
   openModal: boolean;
   handleCloseModal: () => void;
-  onFileChange: () => void;
+  onFileChange: (file: Blob) => void;
   imgSrc: string;
 };
 

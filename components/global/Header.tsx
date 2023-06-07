@@ -128,7 +128,7 @@ function Header() {
           {/* </Box> */}
 
           {isAuth ? (
-            <Box sx={{ flexGrow: 0 }}>
+            <>
               <Toolbar sx={{ backgroundColor: '#0b074a', mr: 1 }}>
                 <Link
                   className="flex"
@@ -139,48 +139,50 @@ function Header() {
                   <span className="hidden md:flex ml-2">New event</span>
                 </Link>
               </Toolbar>
-              <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="userpic" src={photoURL || ''} />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                <MenuItem onClick={handleCloseUserMenu}>
-                  <Link href="/dashboard/profile">Dashboard</Link>
-                </MenuItem>
-                <MenuItem onClick={handleCloseUserMenu}>
-                  <Link href="/dashboard/events">My events</Link>
-                </MenuItem>
-
-                <Button
-                  sx={{
-                    pl: '16px',
-                    '&:hover': {
-                      color: '#898791',
-                      background: 'none',
-                    },
+              <Box sx={{ flexGrow: 0 }}>
+                <Tooltip title="Open settings">
+                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                    <Avatar alt="userpic" src={photoURL || ''} />
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  sx={{ mt: '45px' }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
                   }}
-                  onClick={logOut}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}
                 >
-                  Log out
-                </Button>
-              </Menu>
-            </Box>
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    <Link href="/dashboard/profile">Dashboard</Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    <Link href="/dashboard/events">My events</Link>
+                  </MenuItem>
+
+                  <Button
+                    sx={{
+                      pl: '16px',
+                      '&:hover': {
+                        color: '#898791',
+                        background: 'none',
+                      },
+                    }}
+                    onClick={logOut}
+                  >
+                    Log out
+                  </Button>
+                </Menu>
+              </Box>
+            </>
           ) : (
             <Link href="/auth">log in</Link>
           )}

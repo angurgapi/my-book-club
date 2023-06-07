@@ -10,12 +10,14 @@ import { doc, setDoc } from 'firebase/firestore';
 import { useAuth } from '@/hooks/useAuth';
 import { IUserData } from '@/types/user';
 import { IAuthData } from '@/types/auth';
+import { setUser } from '@/store/reducers/UserSlice';
 
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import Person2Icon from '@mui/icons-material/Person2';
 
 import { toast } from 'react-toastify';
+import { useAppDispatch } from '@/hooks/redux';
 
 interface AuthFormProps {
   mode: string;
@@ -24,6 +26,7 @@ interface AuthFormProps {
 const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
   const { getFirebaseAuth, db } = useAuth();
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const [userData, setUserData] = useState<IUserData>({
     displayName: '',
@@ -56,7 +59,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     await signInWithEmailAndPassword(getFirebaseAuth, email, password)
       .then((userCredential) => {
         console.log(userCredential);
-        router.push('/dashboard');
+        router.push('/dashboard/profile');
       })
       .catch((error) => {
         error.code === 'auth/user-not-found' &&
@@ -104,12 +107,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
               uid: user.uid,
               displayName: user.displayName || '',
               email: user.email,
-              password: userData.password,
+              // password: userData.password,
               photoURL: user.photoURL,
               createdAt:
                 user.metadata.creationTime &&
                 +new Date(user.metadata.creationTime).getTime(),
             });
+
+            dispatch(setUser(user));
             logExistingUser(userData.email, userData.password);
           } catch (e) {
             console.error('Error adding document: ', e);

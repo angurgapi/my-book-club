@@ -12,7 +12,7 @@ import UserEvents from '@/components/events/UserEvents';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { Button } from '@mui/material';
 
-const DashboardEvents = () => {
+const AttendedEvents = () => {
   const { uid } = useAppSelector((state) => state.user);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -23,7 +23,7 @@ const DashboardEvents = () => {
       {!loading && (
         <div className="p-[24px] md:p-5 text-center">
           <div className="flex items-center justify-center mb-3">
-            <h2 className="text-3xl">My events</h2>
+            <h2 className="text-3xl">Events to attend</h2>
             <Button
               component={Link}
               href="/event/create"
@@ -36,7 +36,6 @@ const DashboardEvents = () => {
 
           <div className="flex flex-col md:flex-row items-center md:items-start">
             <div className="flex flex-col w-full justify-center items-center bg-slate-100 p-3">
-              <div className="flex items-center"></div>
               <UserEvents uid={uid} />
             </div>
           </div>
@@ -47,4 +46,4 @@ const DashboardEvents = () => {
   );
 };
 
-export default DashboardEvents;
+export default AttendedEvents;

@@ -17,6 +17,7 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action: PayloadAction<IUser>) {
+      console.log(action);
       state.events = action.payload.events || state.events;
       state.createdAt = action.payload.createdAt || state.createdAt;
       state.displayName = action.payload.displayName || state.displayName;

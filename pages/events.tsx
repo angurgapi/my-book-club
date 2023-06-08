@@ -23,33 +23,11 @@ const Events = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // const fetchEvents = async () => {
-    //   setLoading(true);
-    //   try {
-    //     const db = getFirestore();
-    //     const eventsCollection = collection(db, 'events');
-    //     const eventsSnapshot = await getDocs(eventsCollection); // Fetch the documents from the collection
-
-    //     const eventsData: IEvent[] = eventsSnapshot.docs.map((doc) => ({
-    //       id: doc.id,
-    //       bookTitle: doc.data().bookTitle,
-    //       bookAuthor: doc.data().bookAuthor,
-    //       city: doc.data().city,
-    //       participants: doc.data().participants,
-    //       date: doc.data().date,
-    //       time: doc.data().time,
-    //       coverUrl: doc.data().coverUrl,
-    //     }));
-
-    //     setEvents(eventsData);
-    //   } catch (error) {
-    //     console.error('Error fetching events:', error);
-    //   }
-    //   setLoading(false);
-    // };
     const fetchEvents = async () => {
-      const upcomingEvents: IEvent[] = await getUpcomingEvents();
-      setEvents(upcomingEvents);
+      setLoading(true);
+      const eventsData = await getUpcomingEvents();
+      setEvents(eventsData as IEvent[]);
+      setLoading(false);
     };
 
     fetchEvents();

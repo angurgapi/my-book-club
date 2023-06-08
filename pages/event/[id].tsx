@@ -123,9 +123,14 @@ export default function EventPage({ event }: EventProps) {
         <Typography variant="h3" gutterBottom>
           {event.bookTitle} by {event.bookAuthor}
         </Typography>
-        <Card className="w-full md:min-w-[500px] mb-4">
-          <div className="relative w-full md:min-w-[500px] aspect-[16/7]">
-            <Image src={getImgSrc()} fill alt="book cover" />
+        <Card className="w-full md:max-w-[800px] mb-4">
+          <div className="relative w-full  aspect-[18/4]">
+            <Image
+              src={getImgSrc()}
+              fill
+              alt="book cover"
+              style={{ objectFit: 'cover' }}
+            />
             {attending && (
               <div className="absolute bottom-2 right-2 bg-amber-400 text-black rounded p-2 w-fit">
                 You are attending

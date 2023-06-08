@@ -117,15 +117,23 @@ function Header() {
           >
             <Image src="/svg/logo2.svg" alt="logo" height={36} width={130} />
           </Typography>
-          {/* <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}> */}
-          <Link
-            sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}
-            href="/events"
+          <Box
+            sx={{
+              flexGrow: 1,
+              pr: '20px',
+              display: { xs: 'none', md: 'flex' },
+            }}
+            justifyContent="end"
           >
-            events
-          </Link>
-
-          {/* </Box> */}
+            <Link
+              sx={{
+                align: 'right',
+              }}
+              href="/events"
+            >
+              events
+            </Link>
+          </Box>
 
           {isAuth ? (
             <>
@@ -165,7 +173,12 @@ function Header() {
                     <Link href="/dashboard/profile">Dashboard</Link>
                   </MenuItem>
                   <MenuItem onClick={handleCloseUserMenu}>
-                    <Link href="/dashboard/events">My events</Link>
+                    <Link href="/dashboard/events/hosting">Hosted events</Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    <Link href="/dashboard/events/attending">
+                      Events to attend
+                    </Link>
                   </MenuItem>
 
                   <Button

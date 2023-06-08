@@ -15,8 +15,9 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 type Props = {
   openModal: boolean;
   handleCloseModal: () => void;
-  onFileChange: (file: Blob) => void;
+  onCropApply: (file: Blob) => void;
   imgSrc: string;
+  cropAspect?: number;
 };
 
 function centerAspectCrop(
@@ -42,8 +43,9 @@ function centerAspectCrop(
 export const CropperModal: FC<Props> = ({
   openModal,
   handleCloseModal,
-  onFileChange,
+  onCropApply,
   imgSrc,
+  cropAspect,
 }) => {
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -53,9 +55,8 @@ export const CropperModal: FC<Props> = ({
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [scale, setScale] = useState(1);
   const [rotate, setRotate] = useState(0);
-  // const [aspect, setAspect] = useState<number | undefined>(16 / 7);
 
-  const aspect = 16 / 7;
+  const aspect = cropAspect || 18 / 4;
 
   const applyCrop = () => {
     console.log('apply');
@@ -125,7 +126,7 @@ export const CropperModal: FC<Props> = ({
       if (!blob) {
         throw new Error('Failed to create blob');
       }
-      onFileChange(blob);
+      onCropApply(blob);
       console.log('emit crop to parent');
     });
   }
@@ -150,59 +151,59 @@ export const CropperModal: FC<Props> = ({
       className="p-3 md:p-5 flex items-center"
     >
       <>
-        <div className="modal m-auto bg-white relative p-2 rounded w-fit min-w-[300px] max-h-[80vh]">
+        <div className="m-auto bg-white relative p-2 rounded w-fit min-w-[300px] max-h-[80vh]">
+          {/* <div className="modal"> */}
           <h3 className="mt-2 text-center text-2xl">Crop image</h3>
-          <div className="modal">
-            <div className="image-crop flex flex-col justify-center">
-              {imgSrc && (
-                <div className="crop-container m-auto flex flex-col">
-                  <ReactCrop
-                    crop={crop}
-                    onChange={(_, percentCrop) => setCrop(percentCrop)}
-                    onComplete={(c) => setCompletedCrop(c)}
-                    aspect={aspect}
-                  >
-                    {/* <img
+          <div className="image-crop flex flex-col justify-center">
+            {imgSrc && (
+              <div className="crop-container m-auto flex flex-col">
+                <ReactCrop
+                  crop={crop}
+                  onChange={(_, percentCrop) => setCrop(percentCrop)}
+                  onComplete={(c) => setCompletedCrop(c)}
+                  aspect={aspect}
+                >
+                  {/* <img
               ref={imgRef}
               alt="Crop me"
               src={imgSrc}
               //   style={{ transform: `scale(${scale}) rotate(${rotate}deg)` }}
               onLoad={onImageLoad}
             /> */}
-                    <Image
-                      ref={imgRef}
-                      alt="Crop me"
-                      src={imgSrc}
-                      onLoad={onImageLoad}
-                      width="300"
-                      height="150"
-                    />
-                  </ReactCrop>
+                  <Image
+                    ref={imgRef}
+                    alt="Crop me"
+                    src={imgSrc}
+                    onLoad={onImageLoad}
+                    width="300"
+                    height="200"
+                  />
+                </ReactCrop>
 
-                  {!!completedCrop && (
-                    <canvas
-                      ref={previewCanvasRef}
-                      className="hidden"
-                      style={{
-                        border: '1px solid black',
-                        objectFit: 'contain',
-                        width: completedCrop.width,
-                        height: completedCrop.height,
-                      }}
-                    />
-                  )}
-                  <button
-                    className="m-auto w-fit flex p-2 mt-2 rounded border-2 border-teal-500"
-                    onClick={applyCrop}
-                    type="button"
-                  >
-                    <CheckCircleIcon className="text-emerald-400 mr-2" /> apply
-                  </button>
-                </div>
-              )}
-            </div>
+                {!!completedCrop && (
+                  <canvas
+                    ref={previewCanvasRef}
+                    className="hidden"
+                    style={{
+                      border: '1px solid black',
+                      objectFit: 'contain',
+                      width: completedCrop.width,
+                      height: completedCrop.height,
+                    }}
+                  />
+                )}
+                <button
+                  className="m-auto w-fit flex p-2 mt-2 rounded border-2 border-teal-500"
+                  onClick={applyCrop}
+                  type="button"
+                >
+                  <CheckCircleIcon className="text-emerald-400 mr-2" /> apply
+                </button>
+              </div>
+            )}
           </div>
         </div>
+        {/* </div> */}
       </>
     </Modal>
   );

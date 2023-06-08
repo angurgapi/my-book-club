@@ -6,16 +6,16 @@ export interface IEvent {
   bookTitle: string;
   bookAuthor: string;
   date: Timestamp;
-  description: string;
+  description?: string;
   city: string;
-  location: string;
+  location?: string;
   id?: string;
   participants: string[];
   coverUrl: string;
-  hostId: string;
+  hostId?: string;
   fee: number;
-  currency: string;
-  capacity: number;
+  currency?: string;
+  capacity?: number;
   registrationOpen: boolean;
 }
 

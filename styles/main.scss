@@ -1,12 +1,19 @@
 .wrapper {
-  min-height: calc(100vh - 64px - 74px);
+  // min-height: calc(100vh - 64px - 74px);
+  flex-grow: 1;
+  // min-height: 100vh;
+  height: 100%;
   overflow-x: hidden;
   &__content {
+    // flex-grow: 1;
     width: 100%;
     &--sided {
       max-width: 1100px;
       padding-top: 30px;
       margin: 0 auto;
+      @media (min-width: 600px) {
+        padding: 30px 24px;
+      }
     }
   }
 }

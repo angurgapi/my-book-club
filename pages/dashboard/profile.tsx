@@ -12,13 +12,19 @@ import placeholder from '@/images/avatar-placeholder.webp';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import EditIcon from '@mui/icons-material/Edit';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useAppSelector, useAppDispatch } from '@/hooks/redux';
 import { useAuth } from '@/hooks/useAuth';
 import { updateProfile, signOut } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
+import {
+  getStorage,
+  getDownloadURL,
+  ref,
+  uploadString,
+} from 'firebase/storage';
+
 import { setUser, removeUser } from '@/store/reducers/UserSlice';
 import {
   Avatar,
@@ -28,37 +34,91 @@ import {
   InputAdornment,
   Typography,
 } from '@mui/material';
-
-import { Search as SearchIcon } from '@mui/icons-material';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import { CropperModal } from '@/components/events/CropperModal';
 
 const DashboardProfile = () => {
   const user = useAppSelector((state) => state.user);
   const { db, getFirebaseAuth } = useAuth();
+  const [imgSrc, setImgSrc] = useState('');
+  const [profilePic, setProfilePic] = useState('');
+  const [cropperOpen, setCropperOpen] = useState(false);
 
   //   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState(user.displayName || '');
   const [edit, setEdit] = useState(false);
 
-  const getAvatarUrl = () => {
-    return user.photoURL || placeholder;
+  const dispatch = useAppDispatch();
+
+  const openFileInput = () => {
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
+  const onImageSelect = (e) => {
+    if (e.target.files[0]) {
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        const preview = reader.result?.toString() || '';
+        console.log(preview);
+        if (preview) {
+          setImgSrc(preview);
+          setCropperOpen(true);
+        }
+      });
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
+  const onCropApply = (file: Blob) => {
+    console.log(file);
+    const reader = new FileReader();
+    if (file) {
+      reader.readAsDataURL(file);
+      reader.onload = (readerEvent) => {
+        setProfilePic(readerEvent.target?.result);
+        console.log('profilePic', profilePic);
+        handleUpdateAvatar();
+
+        setCropperOpen(false);
+      };
+    }
+  };
+
+  const handleUpdateAvatar = async () => {
+    if (profilePic) {
+      const storage = getStorage();
+      const imageRef = ref(storage, `users/${user.uid}/image`);
+      const docRef = doc(db, 'users', user.uid);
+      await uploadString(imageRef, profilePic, 'data_url').then(async () => {
+        const downloadURL = await getDownloadURL(imageRef);
+
+        await updateDoc(doc(db, 'users', docRef.id), {
+          photoURL: downloadURL,
+        });
+        dispatch(
+          setUser({
+            ...user,
+            photoURL: downloadURL,
+          })
+        );
+      });
+    }
   };
 
   const changeUpdateMode = () => {
     edit ? handleUpdateProfile() : setEdit(true);
   };
-  const dispatch = useAppDispatch();
-  const router = useRouter();
 
-  const logOut = () => {
-    signOut(getFirebaseAuth);
-    dispatch(removeUser());
-    router.push('/');
-  };
+  //   const router = useRouter();
 
   const handleUpdateProfile = async () => {
     if (!user.uid || !getFirebaseAuth.currentUser) return;
     if (userName?.trim().length === 0) {
-      console.log('enter something');
+      setUserName(user.displayName || '');
+      setEdit(false);
       return;
     }
 
@@ -67,7 +127,7 @@ const DashboardProfile = () => {
     });
 
     const docRef = doc(db, 'users', user.uid);
-    await setDoc(docRef, { displayName: userName?.trim() }, { merge: true });
+    await updateDoc(docRef, { displayName: userName?.trim() });
     dispatch(
       setUser({
         ...user,
@@ -85,44 +145,47 @@ const DashboardProfile = () => {
             <Typography variant="h3" gutterBottom>
               My profile
             </Typography>
-            <div className="flex flex-col md:flex-row items-center md:items-start">
-              <Avatar
-                variant="rounded"
-                alt="userpic"
-                src={user.photoURL || ''}
-                sx={{ width: 100, height: 100, mb: 3 }}
-              />
-              <div className="flex flex-col items-start justify-start md:ml-2">
+            <div className="flex flex-col md:flex-row items-start md:items-start">
+              <div className="relative h-[100px] w-[100px]">
+                <input
+                  type="file"
+                  id="fileInput"
+                  name="coverUrl"
+                  accept="image/*"
+                  onChange={onImageSelect}
+                  className="hidden"
+                />
+                <Image fill alt="userpic" src={user.photoURL || placeholder} />
+                <IconButton
+                  aria-label="Upload avatar picture"
+                  color="primary"
+                  className="bg-white"
+                  onClick={openFileInput}
+                >
+                  <CameraAltIcon />
+                </IconButton>
+              </div>
+              <div className="flex flex-col items-start justify-start md:ml-5">
                 <label htmlFor="name" className="mr-2">
                   Username
                 </label>
-                {/* <div className="max-w-[300px] h-[42px]">
-                  <div className="w-full h-full relative">
-                    <input
-                      type="text"
-                      name="name"
-                      className="w-full border px-2 py-2 mb-3 rounded-md"
-                      required
-                      disabled={!edit}
-                      value={userName}
-                      onChange={(e) => setUserName(e.target.value)}
-                    />
 
-                    <button
-                      className="absolute right-4 top-3 text-gray-300 text-xl"
-                      onClick={changeUpdateMode}
-                    >
-                      {edit && <CheckCircleIcon className="text-lime-600" />}
-                      {!edit && <EditIcon className="text-teal-500" />}
-                    </button>
-                  </div>
-                </div> */}
                 <Input
-                  placeholder="Search"
+                  placeholder="username"
+                  disabled={!edit}
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  sx={{
+                    input: { color: 'primary.main' },
+                    '& .MuiInputBase-input.Mui-disabled': {
+                      WebkitTextFillColor: '#000',
+                    },
+                  }}
                   endAdornment={
                     <InputAdornment position="end">
-                      <IconButton>
-                        <SearchIcon />
+                      <IconButton onClick={changeUpdateMode}>
+                        {edit && <CheckCircleIcon className="text-lime-600" />}
+                        {!edit && <EditIcon className="text-teal-500" />}
                       </IconButton>
                     </InputAdornment>
                   }
@@ -131,6 +194,13 @@ const DashboardProfile = () => {
             </div>
           </CardContent>
         </Card>
+        <CropperModal
+          openModal={cropperOpen}
+          cropAspect={1 / 1}
+          handleCloseModal={() => setCropperOpen(false)}
+          onCropApply={onCropApply}
+          imgSrc={imgSrc}
+        />
       </div>
     </ProfileLayout>
   );

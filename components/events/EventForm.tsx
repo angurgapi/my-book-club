@@ -2,16 +2,22 @@ import React, { useState, SyntheticEvent } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
-import { TextField, FormControlLabel, Checkbox } from '@mui/material';
+import {
+  TextField,
+  FormControlLabel,
+  Checkbox,
+  IconButton,
+} from '@mui/material';
 
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CropIcon from '@mui/icons-material/Crop';
+
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateValidationError } from '@mui/x-date-pickers/models';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import { CropperModal } from './CropperModal';
-import ImageCrop from './ImageCrop';
 import { Timestamp } from 'firebase/firestore';
 import { saveEvent } from '@/utils/eventApi';
 import Loader from '../global/Loader';
@@ -111,7 +117,7 @@ const EventForm: React.FC<EventFormProps> = ({ onSaveEvent, uid }) => {
     }
   };
 
-  const onFileChange = (file: File) => {
+  const onCropApply = (file: File) => {
     // console.log(file);
     const reader = new FileReader();
     if (file) {
@@ -127,18 +133,6 @@ const EventForm: React.FC<EventFormProps> = ({ onSaveEvent, uid }) => {
       formik.setFieldValue('coverUrl', null);
     }
   };
-
-  // const handleImageChange = (event: React.SyntheticEvent) => {
-  //   const reader = new FileReader();
-  //   if (event.target.files[0]) {
-  //     reader.readAsDataURL(event.target.files[0]);
-
-  //     reader.onload = (readerEvent) => {
-  //       formik.setFieldValue('coverUrl', readerEvent.target?.result);
-  //     };
-  //     setPreviewImage(URL.createObjectURL(event.currentTarget.files[0]));
-  //   }
-  // };
 
   const clearFile = () => {
     setPreviewImg(null);
@@ -299,34 +293,33 @@ const EventForm: React.FC<EventFormProps> = ({ onSaveEvent, uid }) => {
               <CameraAltIcon className="mr-2" /> Upload cover picture
             </button>
             {previewImg && (
-              <div className="img-preview relative">
+              <div className="img-preview relative aspect-[18/4]">
                 <Image
-                  className="m-auto aspect-[16/7]"
+                  className="m-auto aspect-[18/4]"
                   src={previewImg}
-                  height={150}
-                  width={300}
+                  fill
                   style={{ objectFit: 'cover' }}
                   alt="event cover"
                 />
-                <div className="m-auto w-fit img-preview__controls flex justify-between">
-                  <button
+                <div className="m-auto w-full absolute img-preview__controls flex justify-center bottom-2">
+                  <IconButton
+                    size="small"
                     type="button"
-                    className=""
+                    sx={{ backgroundColor: '#fff' }}
                     onClick={() => setModalOpen(true)}
                   >
-                    crop
-                  </button>
-                  <button type="button" className="ml-3" onClick={clearFile}>
-                    delete
-                  </button>
+                    <CropIcon />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    type="button"
+                    sx={{ backgroundColor: '#fff', ml: 2 }}
+                    onClick={clearFile}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
                 </div>
               </div>
-
-              // <ImageCrop
-              //   onFileChange={onFileChange}
-              //   imgSrc={imgSrc}
-              //   className="w-full max-w-[300px]"
-              // />
             )}
           </div>
         </div>
@@ -340,7 +333,7 @@ const EventForm: React.FC<EventFormProps> = ({ onSaveEvent, uid }) => {
       <CropperModal
         openModal={modalOpen}
         handleCloseModal={() => setModalOpen(false)}
-        onFileChange={onFileChange}
+        onCropApply={onCropApply}
         imgSrc={imgSrc}
       />
     </>

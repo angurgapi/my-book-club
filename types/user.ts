@@ -5,7 +5,6 @@ export interface IUser {
   createdAt?: string;
   displayName: string;
   email: string;
-  // password?: string;
   photoURL: string;
   uid: string;
   isAuth?: boolean;
@@ -14,9 +13,8 @@ export interface IUser {
 export interface IUserState {
   events: IEvent[];
   createdAt: string;
-  displayName: string | null;
+  displayName: string;
   email: string;
-  // password?: string | null;
   photoURL: string;
   uid: string;
   isAuth?: boolean;

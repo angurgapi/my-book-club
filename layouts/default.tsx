@@ -14,7 +14,7 @@ const DefaultLayout: React.FC<LayoutProps> = ({
   return (
     <>
       <Header />
-      <main className="wrapper flex flex-col">
+      <main className="wrapper flex flex-col ">
         <div
           className={
             'wrapper__content' + (landing ? '' : ' wrapper__content--sided')

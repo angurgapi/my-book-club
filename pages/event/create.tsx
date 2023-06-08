@@ -17,7 +17,7 @@ const CreateEvent = () => {
   }, [isAuth, router]);
 
   const onSaveEvent = () => {
-    router.push('/dashboard/events');
+    router.push('/dashboard/events/hosting');
   };
   return (
     isAuth && (

@@ -8,6 +8,7 @@ const nextConfig = {
       'encrypted-tbn0.gstatic.com',
       'my-book-club-a097a.appspot.com',
       'www.facebook.com',
+      'lh3.googleusercontent.com',
     ],
   },
   sassOptions: {

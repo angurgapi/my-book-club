@@ -140,13 +140,16 @@ function Header() {
               <Toolbar sx={{ backgroundColor: '#0b074a', mr: 1 }}>
                 <Link
                   className="flex"
-                  href="/event/create"
+                  href="/dashboard/events/create"
                   sx={{ display: 'flex', height: '100%', color: '#fff' }}
                 >
                   <AddCircleOutline />{' '}
                   <span className="hidden md:flex ml-2">New event</span>
                 </Link>
               </Toolbar>
+              <span className="hidden md:block mr-2 text-slate-500">
+                {displayName}
+              </span>
               <Box sx={{ flexGrow: 0 }}>
                 <Tooltip title="Open settings">
                   <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

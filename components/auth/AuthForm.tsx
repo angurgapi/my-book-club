@@ -69,23 +69,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
       });
   };
 
-  // const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-  //   setValue(newValue);
-  //   setAuthData({
-  //     ...authData,
-  //     invalidEmail: false,
-  //     invalidPassword: false,
-  //     wrongPassword: false,
-  //     userNotFound: false,
-  //   });
-  //   setUserData({
-  //     email: '',
-  //     password: '',
-  //     displayName: '',
-  //     photoURL: '',
-  //   });
-  // };
-
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 

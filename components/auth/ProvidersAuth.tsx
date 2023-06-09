@@ -11,10 +11,13 @@ import { useAppDispatch } from '@/hooks/redux';
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import { IconButton } from '@mui/material';
+import { IUser } from '@/types/user';
 
 const ProvidersAuth = () => {
   const { getFirebaseAuth, db, googleProvider, facebookProvider } = useAuth();
   const router = useRouter();
+  const dispatch = useAppDispatch();
+
   const handleFacebookLogin = () => {
     signInWithPopup(getFirebaseAuth, facebookProvider)
       .then(async (result) => {
@@ -31,7 +34,6 @@ const ProvidersAuth = () => {
                   uid: user.uid,
                   displayName: user.displayName || '',
                   email: user.email,
-                  password: null,
                   photoURL: user.photoURL,
                   events: [],
                   createdAt:
@@ -63,9 +65,9 @@ const ProvidersAuth = () => {
 
         try {
           await runTransaction(db, async (transaction) => {
-            const sfDoc = await transaction.get(docRef);
-
-            if (!sfDoc.exists()) {
+            const docSnap = await transaction.get(docRef);
+            console.log(docSnap.exists());
+            if (!docSnap.exists()) {
               try {
                 await setDoc(docRef, {
                   uid: user.uid,
@@ -81,6 +83,9 @@ const ProvidersAuth = () => {
               } catch (e) {
                 console.error('Error adding document: ', e);
               }
+            } else {
+              dispatch(setUser(docSnap.data() as IUser));
+              console.log('docsnap data:', docSnap.data());
             }
           });
           router.push('/dashboard/profile');

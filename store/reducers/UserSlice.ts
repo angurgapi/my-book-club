@@ -24,6 +24,7 @@ export const userSlice = createSlice({
       state.photoURL = action.payload.photoURL || state.photoURL;
       state.uid = action.payload.uid || state.uid;
       state.isAuth = action.payload.isAuth || state.isAuth;
+      state.email = action.payload.email || state.email;
     },
 
     removeUser(state) {
@@ -33,6 +34,7 @@ export const userSlice = createSlice({
       state.photoURL = '';
       state.uid = '';
       state.isAuth = false;
+      state.email = '';
     },
   },
 });

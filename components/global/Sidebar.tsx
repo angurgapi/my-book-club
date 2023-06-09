@@ -1,10 +1,13 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { List, ListItem, Divider, Icon } from '@mui/material';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import EventAvailableIcon from '@mui/icons-material/EventAvailable';
-import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import { List, ListItem } from '@mui/material';
+import {
+  AddCircleOutline,
+  SupervisorAccount,
+  EventAvailable,
+  AccountCircle,
+} from '@mui/icons-material';
 
 const Sidebar = () => {
   const router = useRouter();
@@ -13,17 +16,22 @@ const Sidebar = () => {
     {
       url: '/dashboard/profile',
       title: 'Profile',
-      icon: <AccountCircleIcon />,
+      icon: <AccountCircle />,
     },
     {
       url: '/dashboard/events/attending',
       title: 'Attending',
-      icon: <EventAvailableIcon />,
+      icon: <EventAvailable />,
     },
     {
       url: '/dashboard/events/hosting',
       title: 'Hosting',
-      icon: <SupervisorAccountIcon />,
+      icon: <SupervisorAccount />,
+    },
+    {
+      url: '/dashboard/events/create',
+      title: 'New event',
+      icon: <AddCircleOutline />,
     },
   ];
   return (

@@ -30,6 +30,8 @@ import Link from 'next/link';
 import EditIcon from '@mui/icons-material/Edit';
 import { Card, CardContent } from '@mui/material';
 
+import { getEventById } from '@/utils/eventApi';
+
 // import ShareEventModal from "../../../components/ShareEventModal";
 // import ErrorPage from "../../../components/ErrorPage";
 
@@ -37,26 +39,17 @@ interface EventProps {
   event: IEvent;
 }
 
-export async function getServerSideProps(context) {
-  const db = getFirestore();
+export async function getServerSideProps(context: any) {
   const docId = context.query.id;
-  const docRef = doc(db, 'events', docId);
-  const docSnap = await getDoc(docRef);
-
-  if (docSnap.exists()) {
-    const event = docSnap.data() as IEvent;
-    event.id = docId;
-
+  try {
+    const event = await getEventById(docId);
     return {
       props: {
-        event: {
-          ...event,
-          date: event.date.seconds,
-        },
+        event,
       },
     };
-  } else {
-    console.log('No such document!');
+  } catch (e) {
+    console.log(e);
   }
 }
 

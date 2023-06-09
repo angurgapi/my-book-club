@@ -52,9 +52,25 @@ export const saveEvent = async (eventData: IEvent) => {
     }
 
     console.log('Event saved successfully');
-    getHostedEvents(eventData.hostId);
+    // getHostedEvents(eventData.hostId);
   } catch (error) {
     console.error('Error saving event:', error);
+  }
+};
+
+export const getEventById = async (id: string) => {
+  const db = getFirestore();
+  const docRef = doc(db, 'events', id);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    const event = docSnap.data() as IEvent;
+    event.id = id;
+    return {
+      ...event,
+      date: event.date.seconds,
+    };
+  } else {
+    console.log('No such document!');
   }
 };
 

@@ -1,4 +1,5 @@
 import React, { useState, SyntheticEvent } from 'react';
+import { ChangeEvent } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -29,8 +30,8 @@ interface EventFormProps {
 const EventForm: React.FC<EventFormProps> = ({ onSaveEvent, uid }) => {
   // const { uid } = useAppSelector((state) => state.user);
   // const [previewImg, setPreviewImage] = useState('');
-  const [imgSrc, setImgSrc] = useState(null);
-  const [previewImg, setPreviewImg] = useState(null);
+  const [imgSrc, setImgSrc] = useState('');
+  const [previewImg, setPreviewImg] = useState('');
   const [paidEvent, setPaidEvent] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -90,26 +91,6 @@ const EventForm: React.FC<EventFormProps> = ({ onSaveEvent, uid }) => {
     },
   });
 
-  const onImageSelect = (e) => {
-    if (e.target.files[0]) {
-      const reader = new FileReader();
-      reader.addEventListener(
-        'load',
-        () => {
-          const preview = reader.result?.toString() || '';
-          if (preview) {
-            setImgSrc(preview);
-            setPreviewImg(preview);
-            setModalOpen(true);
-          }
-        }
-        // setImgSrc(reader.result?.toString() || '')
-        // setPreviewImg(reader.result?.toString() || '')
-      );
-      reader.readAsDataURL(e.target.files[0]);
-    }
-  };
-
   const openFileInput = () => {
     const fileInput = document.getElementById('fileInput');
     if (fileInput) {
@@ -117,26 +98,51 @@ const EventForm: React.FC<EventFormProps> = ({ onSaveEvent, uid }) => {
     }
   };
 
-  const onCropApply = (file: File) => {
-    // console.log(file);
-    const reader = new FileReader();
-    if (file) {
-      // formik.setFieldValue('coverUrl', file);
+  const toDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = (readerEvent) => {
-        formik.setFieldValue('coverUrl', readerEvent.target?.result);
-        setPreviewImg(readerEvent.target?.result);
-        setModalOpen(false);
-      };
-      // setPreviewImage(URL.createObjectURL(file));
+      reader.onload = () => resolve(reader.result?.toString() || '');
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const onImageSelect = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      try {
+        const preview = await toDataUrl(e.target.files[0]);
+        setImgSrc(preview);
+        setPreviewImg(preview);
+        setModalOpen(true);
+      } catch (error) {
+        console.log('Error: ', error);
+      }
+    }
+  };
+
+  const onCropApply = (file: any) => {
+    if (file) {
+      formik.setFieldValue('coverUrl', file);
+      setPreviewImg(file);
+      setModalOpen(false);
+
+      // toDataUrl(file)
+      //   .then((dataUrl) => {
+      //     formik.setFieldValue('coverUrl', dataUrl);
+      //     setPreviewImg(dataUrl);
+      //     setModalOpen(false);
+      //   })
+      //   .catch((error) => {
+      //     console.log('Error: ', error);
+      //   });
     } else {
       formik.setFieldValue('coverUrl', null);
     }
   };
 
   const clearFile = () => {
-    setPreviewImg(null);
-    setImgSrc(null);
+    setPreviewImg('');
+    setImgSrc('');
     formik.setFieldValue('coverUrl', '');
   };
 
@@ -175,7 +181,7 @@ const EventForm: React.FC<EventFormProps> = ({ onSaveEvent, uid }) => {
             value={formik.values.date}
             slotProps={{
               textField: {
-                error: formik.errors.date,
+                error: Boolean(formik.errors.date),
                 helperText: formik.errors.date
                   ? 'Date cannot be in the past'
                   : '',

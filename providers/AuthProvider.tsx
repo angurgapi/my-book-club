@@ -64,12 +64,12 @@ export const AuthProvider: FC<Props> = ({ children }) => {
       if (!userAuth) return;
       dispatch(
         setUser({
-          // events: [...userAuth.events] || [],
+          events: [],
           // createdAt: userAuth.createdAt || [],
-          displayName: userAuth.displayName,
-          photoURL: userAuth.photoURL,
-          // images: [...userAuth.images],
-          uid: userAuth.uid,
+          displayName: userAuth.displayName || '',
+          photoURL: userAuth.photoURL || '',
+          email: userAuth.email || '',
+          uid: userAuth.uid || '',
           isAuth: true,
         })
       );

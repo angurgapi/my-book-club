@@ -25,7 +25,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       href={`/event/${event.id}`}
       className="flex flex-col md:flex-row justify-between w-full mb-2 shadow-lg hover:shadow-md"
     >
-      <div className="md:w-[60%] w-full flex flex-col items-start rounded-md w-full bg-white p-2">
+      <div className="md:w-[50%] w-full flex flex-col items-start rounded-md w-full bg-white p-2">
         <Typography gutterBottom variant="h5" component="p">
           {event.bookTitle} | {event.bookAuthor}
         </Typography>
@@ -53,7 +53,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           />
         )}
       </div>
-      <div className="md:w-[40%] w-full max-h-[300px] relative min-h-[150px]">
+      <div className="md:w-[50%] w-full max-h-[300px] relative min-h-[150px]">
         <Image src={getImgSrc} fill alt="bookcover" />
       </div>
     </Link>

@@ -15,7 +15,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 type Props = {
   openModal: boolean;
   handleCloseModal: () => void;
-  onCropApply: (file: Blob) => void;
+  onCropApply: (file: any) => void;
   imgSrc: string;
   cropAspect?: number;
 };
@@ -122,13 +122,16 @@ export const CropperModal: FC<Props> = ({
     );
 
     ctx.restore();
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        throw new Error('Failed to create blob');
-      }
-      onCropApply(blob);
-      console.log('emit crop to parent');
-    });
+    // canvas.toBlob((blob) => {
+    //   if (!blob) {
+    //     throw new Error('Failed to create blob');
+    //   }
+    //   console.log(typeof blob);
+    //   onCropApply(blob);
+    //   console.log('emit crop to parent');
+    // });
+    const dataUrl = canvas.toDataURL();
+    onCropApply(dataUrl);
   }
 
   function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {

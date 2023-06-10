@@ -5,7 +5,8 @@ import { Timestamp } from 'firebase/firestore';
 export interface IEvent {
   bookTitle: string;
   bookAuthor: string;
-  date: Timestamp;
+  // date: Timestamp;
+  date: number;
   description?: string;
   city: string;
   location?: string;

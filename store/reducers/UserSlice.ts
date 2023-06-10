@@ -3,7 +3,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IUserState, IUser } from '@/types/user';
 
 const initialState = {
-  events: [],
   createdAt: '',
   displayName: '',
   email: '',
@@ -17,8 +16,6 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action: PayloadAction<IUser>) {
-      console.log(action);
-      state.events = action.payload.events || state.events;
       state.createdAt = action.payload.createdAt || state.createdAt;
       state.displayName = action.payload.displayName || state.displayName;
       state.photoURL = action.payload.photoURL || state.photoURL;
@@ -28,7 +25,6 @@ export const userSlice = createSlice({
     },
 
     removeUser(state) {
-      state.events = [];
       state.createdAt = '';
       state.displayName = '';
       state.photoURL = '';

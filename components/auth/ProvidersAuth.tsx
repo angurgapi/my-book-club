@@ -35,7 +35,6 @@ const ProvidersAuth = () => {
                   displayName: user.displayName || '',
                   email: user.email,
                   photoURL: user.photoURL,
-                  events: [],
                   createdAt:
                     user.metadata.creationTime &&
                     +new Date(user.metadata.creationTime).getTime(),
@@ -75,7 +74,6 @@ const ProvidersAuth = () => {
                   email: user.email,
                   password: null,
                   photoURL: user.photoURL,
-                  events: [],
                   createdAt:
                     user.metadata.creationTime &&
                     +new Date(user.metadata.creationTime).getTime(),

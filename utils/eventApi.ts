@@ -63,11 +63,12 @@ export const getEventById = async (id: string) => {
   const docRef = doc(db, 'events', id);
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
-    const event = docSnap.data() as IEvent;
+    const event = docSnap.data();
+    const epoch = event.date.seconds * 1000;
     event.id = id;
     return {
       ...event,
-      date: event.date.seconds,
+      date: dayjs.unix(epoch / 1000).format('MMM DD hh:mm a'),
     };
   } else {
     console.log('No such document!');

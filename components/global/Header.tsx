@@ -55,7 +55,7 @@ function Header() {
     handleCloseUserMenu();
     signOut(getFirebaseAuth);
     dispatch(removeUser());
-    router.push('/');
+    // router.push('/');
   };
 
   return (

@@ -10,11 +10,11 @@ const CreateEvent = () => {
   const router = useRouter();
   const { isAuth, uid } = useAppSelector((state) => state.user);
 
-  useEffect(() => {
-    if (!isAuth) {
-      router.push('/auth');
-    }
-  }, [isAuth, router]);
+  // useEffect(() => {
+  //   if (!isAuth) {
+  //     router.push('/auth');
+  //   }
+  // }, [isAuth, router]);
 
   const onSaveEvent = () => {
     router.push('/dashboard/events/hosting');

@@ -33,7 +33,6 @@ import { CropperModal } from '@/components/events/CropperModal';
 
 const DashboardProfile = () => {
   const user = useAppSelector((state) => state.user);
-  console.log('user', user);
   const { getFirebaseAuth } = useAuth();
 
   const [imgSrc, setImgSrc] = useState('');
@@ -110,7 +109,7 @@ const DashboardProfile = () => {
   const logout = async () => {
     await signOut(getFirebaseAuth);
     dispatch(removeUser());
-    router.push('/');
+    // router.push('/');
   };
   return (
     <ProfileLayout>

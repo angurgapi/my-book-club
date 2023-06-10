@@ -1,7 +1,6 @@
 import { IEvent } from './event';
 
 export interface IUser {
-  events: IEvent[];
   createdAt?: string;
   displayName: string;
   email: string;
@@ -11,7 +10,6 @@ export interface IUser {
 }
 
 export interface IUserState {
-  events: IEvent[];
   createdAt: string;
   displayName: string;
   email: string;

@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // import Link from "next/link";
 // import Attendees from "../../../components/Attendees";
+import emailjs from '@emailjs/browser';
 // import { useRouter } from "next/router";
 import {
   doc,
@@ -63,14 +64,11 @@ export default function EventPage({ event }: EventProps) {
     event.participants.length
   );
 
-  // const [click, setClick] = useState(firebaseEvent.disableRegistration);
-  // const [showModal, setShowModal] = useState(false);
-  // const [disableRegModal, setDisableRegModal] = useState(false);
-  // const openModal = () => setShowModal(true);
-  // const closeModal = () => setShowModal(false);
-
   const getFormattedDate = () => {
-    return dayjs.unix(event.date).format('MMM DD hh:mm a');
+    return event.date;
+    // console.log(event.date);
+    // const epoch = event.date * 1000;
+    // return dayjs.unix(epoch / 1000).format('MMM DD hh:mm a');
   };
 
   const getImgSrc = () => {
@@ -78,8 +76,30 @@ export default function EventPage({ event }: EventProps) {
   };
 
   const isOwnEvent = () => {
-    console.log();
     return event.hostId === uid;
+  };
+
+  const canRegister = () => {
+    return !isOwnEvent() && event.registrationOpen && !attending;
+  };
+
+  const sendEmail = (eventDetails: IEvent) => {
+    console.log(eventDetails.toDate());
+    // emailjs
+    //   .send(
+    //     process.env.NEXT_PUBLIC_SERVICE_ID,
+    //     process.env.NEXT_PUBLIC_TEMPLATE_ID,
+    //     eventDetails,
+    //     process.env.NEXT_PUBLIC_MAILER_KEY
+    //   )
+    //   .then(
+    //     (result) => {
+    //       console.log(result);
+    //     },
+    //     (error) => {
+    //       console.log(error);
+    //     }
+    //   );
   };
 
   const attendEvent = async () => {
@@ -94,6 +114,7 @@ export default function EventPage({ event }: EventProps) {
       setParticipantsLength(participantsLength + 1);
       event.participants.push(uid);
       setAttending(true);
+      sendEmail(event);
     }
   };
 
@@ -108,6 +129,7 @@ export default function EventPage({ event }: EventProps) {
       setParticipantsLength(participantsLength - 1);
     }
   };
+
   if (!event.bookTitle) return <ErrorPage />;
   return (
     <DefaultLayout>
@@ -157,7 +179,7 @@ export default function EventPage({ event }: EventProps) {
               )}
               {!event.capacity && <span className="col-span-2">no limit</span>}
             </div>
-            {!attending && !isOwnEvent && (
+            {canRegister() && (
               <button
                 className="mt-3 p-2 bg-teal-500 text-white rounded w-fit"
                 onClick={attendEvent}

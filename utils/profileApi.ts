@@ -13,7 +13,7 @@ const sendErrorToast = (message: string) => {
     position: 'top-right',
     autoClose: 5000,
     closeOnClick: true,
-    pauseOnHover: true,
+    hideProgressBar: true,
     theme: 'light',
   });
 };
@@ -23,7 +23,7 @@ const sendSuccessToast = (message: string) => {
     position: 'top-right',
     autoClose: 5000,
     closeOnClick: true,
-    pauseOnHover: true,
+    hideProgressBar: true,
     theme: 'light',
   });
 };

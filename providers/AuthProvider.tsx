@@ -62,22 +62,21 @@ export const AuthProvider: FC<Props> = ({ children }) => {
   useEffect(() => {
     const unListen = onAuthStateChanged(getFirebaseAuth, (userAuth) => {
       if (!userAuth) return;
-      dispatch(
-        setUser({
-          events: [],
-          // createdAt: userAuth.createdAt || [],
-          displayName: userAuth.displayName || '',
-          photoURL: userAuth.photoURL || '',
-          email: userAuth.email || '',
-          uid: userAuth.uid || '',
-          isAuth: true,
-        })
-      );
 
       onSnapshot(doc(db, 'users', userAuth.uid), (doc) => {
         const userData: DocumentData | undefined = doc.data();
         console.log(userData);
         if (!userData) return;
+        dispatch(
+          setUser({
+            // createdAt: userAuth.createdAt || [],
+            displayName: userData.displayName || '',
+            photoURL: userData.photoURL || '',
+            email: userData.email || '',
+            uid: userData.uid || '',
+            isAuth: true,
+          })
+        );
 
         // Realtime Database
         // const userRef = ref(rdb, `users/${userData.uid}`);

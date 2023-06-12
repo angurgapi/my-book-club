@@ -90,3 +90,14 @@
     }
   }
 }
+
+.event-data {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-gap: 20px;
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    grid-gap: 12px;
+  }
+}

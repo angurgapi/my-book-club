@@ -133,33 +133,80 @@ export const getAttendedEvents = async (uid: string) => {
   }
 };
 
-export const getUpcomingEvents = async (): Promise<IEvent[] | undefined> => {
-  try {
-    const db = getFirestore();
-    const nowTimestamp = Timestamp.now();
-    const attendedEventsCollection = query(
+export const getUpcomingEvents = async (
+  queryString: string
+): Promise<IEvent[]> => {
+  const db = getFirestore();
+  let eventsCollectionQuery = query(
+    collection(db, 'events'),
+    where('date', '>', Timestamp.now()),
+    orderBy('date', 'asc')
+  );
+
+  if (queryString.length > 0) {
+    eventsCollectionQuery = query(
       collection(db, 'events'),
-      where('date', '>', nowTimestamp),
+      where('date', '>', Timestamp.now()),
+      where('city', '==', queryString),
       orderBy('date', 'asc')
     );
+  }
+  try {
+    // const db = getFirestore();
+    // const nowTimestamp = Timestamp.now();
+    // const attendedEventsCollection = query(
+    //   collection(db, 'events'),
+    //   where('date', '>', nowTimestamp),
+    //   orderBy('date', 'asc')
+    // );
 
-    const eventsSnapshot = await getDocs(attendedEventsCollection); // Fetch the documents from the collection
+    // const eventsSnapshot = await getDocs(attendedEventsCollection); // Fetch the documents from the collection
 
-    const eventsData: IEvent[] = eventsSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      bookTitle: doc.data().bookTitle,
-      bookAuthor: doc.data().bookAuthor,
-      city: doc.data().city,
-      participants: doc.data().participants,
-      date: doc.data().date,
-      coverUrl: doc.data().coverUrl,
-      fee: doc.data().fee,
-      currency: doc.data().currency,
-      registrationOpen: doc.data().registrationOpen,
-    }));
+    // const eventsData: IEvent[] = eventsSnapshot.docs.map((doc) => ({
+    //   id: doc.id,
+    //   bookTitle: doc.data().bookTitle,
+    //   bookAuthor: doc.data().bookAuthor,
+    //   city: doc.data().city,
+    //   participants: doc.data().participants,
+    //   date: doc.data().date.seconds,
+    //   coverUrl: doc.data().coverUrl,
+    //   fee: doc.data().fee,
+    //   currency: doc.data().currency,
+    //   registrationOpen: doc.data().registrationOpen,
+    //   hostId: doc.data().hostId,
+    // }));
 
-    return eventsData;
+    // return eventsData;
+    const querySnapshot = await getDocs(eventsCollectionQuery);
+    const events: IEvent[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const eventData = doc.data() as IEvent;
+      events.push(eventData);
+    });
+
+    return events;
   } catch (error) {
     console.error('Error fetching events:', error);
+    return [];
+  }
+};
+
+export const toggleAttendee = async (
+  uid: string,
+  attendees: string[],
+  eventId: string
+) => {
+  const db = getFirestore();
+  const docRef = doc(db, 'events', eventId);
+  const newAttendeesList = attendees.includes(uid)
+    ? attendees.filter((attendee) => attendee !== uid)
+    : [...attendees, uid];
+  try {
+    await updateDoc(docRef, {
+      participants: newAttendeesList,
+    });
+  } catch (e) {
+    console.log(e);
   }
 };

@@ -8,28 +8,29 @@ import DefaultLayout from '../layouts/default';
 import { IEvent } from '@/types/event';
 import { getUpcomingEvents } from '@/utils/eventApi';
 
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore';
-import dayjs from 'dayjs';
-import { Typography } from '@mui/material';
+import { Typography, Input, InputAdornment, IconButton } from '@mui/material';
+import { Clear, Search } from '@mui/icons-material';
 
 const Events = () => {
   const [events, setEvents] = useState<IEvent[]>([]);
   const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState('');
+
+  const fetchEvents = async () => {
+    try {
+      const upcomingEvents = await getUpcomingEvents(query);
+      setEvents(upcomingEvents);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
+  };
+
+  const clearSearch = () => {
+    setQuery('');
+    fetchEvents();
+  };
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      setLoading(true);
-      const eventsData = await getUpcomingEvents();
-      setEvents(eventsData as IEvent[]);
-      setLoading(false);
-    };
-
     fetchEvents();
   }, []);
 
@@ -41,15 +42,34 @@ const Events = () => {
           <Typography variant="h3" gutterBottom>
             Upcoming events
           </Typography>
-          <div className="flex">
-            {/* <input
+          <div className="flex w-full items-center justify-end">
+            <span className="mr-2">Search by city</span>
+            <Input
               type="text"
               name="name"
-              className="w-full border px-2 py-2 mb-3 rounded-md"
               required
-              value={queryString}
+              value={query}
+              sx={{ width: 250 }}
               onChange={(e) => setQuery(e.target.value)}
-            /> */}
+              onKeyDown={(e) => (e.key === 'Enter' ? fetchEvents() : null)}
+              endAdornment={
+                <InputAdornment position="end">
+                  {query && (
+                    <IconButton disableRipple onClick={clearSearch}>
+                      <Clear />
+                    </IconButton>
+                  )}
+                  <IconButton
+                    color="primary"
+                    onClick={() => {
+                      fetchEvents();
+                    }}
+                  >
+                    <Search />
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
           </div>
           <div className="flex items-center flex-col ">
             {events && (

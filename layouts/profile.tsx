@@ -24,7 +24,7 @@ const ProfileLayout: React.FC<LayoutProps> = ({ children }) => {
   useEffect(() => {
     if (!isAuth) {
       console.log('heh user logged out!');
-      router.replace('/');
+      router.replace('/auth');
     }
   }, [isAuth, router]);
 
@@ -32,10 +32,14 @@ const ProfileLayout: React.FC<LayoutProps> = ({ children }) => {
     <>
       <Header />
       <main className="wrapper flex flex-col">
-        <div className="wrapper__content wrapper__content--sided profile-page">
-          {!isMobile && <Sidebar />}
-          <>{children}</>
-        </div>
+        {isAuth ? (
+          <div className="wrapper__content wrapper__content--sided profile-page">
+            {!isMobile && <Sidebar />}
+            {children}
+          </div>
+        ) : (
+          <span>...redirecting to main</span>
+        )}
       </main>
       <Footer />
     </>

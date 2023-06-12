@@ -13,8 +13,10 @@ export interface IEvent {
   id?: string;
   participants: string[];
   coverUrl: string;
-  hostId?: string;
-  fee: number;
+  hostId: string;
+  hostName?: string;
+  hostAvatar?: string;
+  fee?: number;
   currency?: string;
   capacity?: number;
   registrationOpen: boolean;

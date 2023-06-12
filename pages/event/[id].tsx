@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import ErrorPage from '@/components/global/Error';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
+
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // import Link from "next/link";
@@ -31,10 +29,7 @@ import Link from 'next/link';
 import EditIcon from '@mui/icons-material/Edit';
 import { Card, CardContent } from '@mui/material';
 
-import { getEventById } from '@/utils/eventApi';
-
-// import ShareEventModal from "../../../components/ShareEventModal";
-// import ErrorPage from "../../../components/ErrorPage";
+import { getEventById, toggleAttendee } from '@/utils/eventApi';
 
 interface EventProps {
   event: IEvent;
@@ -55,7 +50,7 @@ export async function getServerSideProps(context: any) {
 }
 
 export default function EventPage({ event }: EventProps) {
-  const { uid } = useAppSelector((state) => state.user);
+  const { uid, email } = useAppSelector((state) => state.user);
   const db = getFirestore();
   const [attending, setAttending] = useState(
     Array.isArray(event.participants) && uid && event.participants.includes(uid)
@@ -63,13 +58,6 @@ export default function EventPage({ event }: EventProps) {
   const [participantsLength, setParticipantsLength] = useState(
     event.participants.length
   );
-
-  const getFormattedDate = () => {
-    return event.date;
-    // console.log(event.date);
-    // const epoch = event.date * 1000;
-    // return dayjs.unix(epoch / 1000).format('MMM DD hh:mm a');
-  };
 
   const getImgSrc = () => {
     return event.coverUrl || cover;
@@ -84,49 +72,38 @@ export default function EventPage({ event }: EventProps) {
   };
 
   const sendEmail = (eventDetails: IEvent) => {
-    console.log(eventDetails.toDate());
-    // emailjs
-    //   .send(
-    //     process.env.NEXT_PUBLIC_SERVICE_ID,
-    //     process.env.NEXT_PUBLIC_TEMPLATE_ID,
-    //     eventDetails,
-    //     process.env.NEXT_PUBLIC_MAILER_KEY
-    //   )
-    //   .then(
-    //     (result) => {
-    //       console.log(result);
-    //     },
-    //     (error) => {
-    //       console.log(error);
-    //     }
-    //   );
+    emailjs
+      .send(
+        process.env.NEXT_PUBLIC_SERVICE_ID,
+        process.env.NEXT_PUBLIC_TEMPLATE_ID,
+        { ...eventDetails, attendeeEmail: email },
+        process.env.NEXT_PUBLIC_MAILER_KEY
+      )
+      .then(
+        (result) => {
+          console.log(result);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
   };
 
-  const attendEvent = async () => {
-    const docRef = doc(db, 'events', event.id);
-    if (uid && !event.participants.includes(uid)) {
-      let participantsList = Array.isArray(event.participants)
-        ? [...event.participants, uid]
-        : [uid];
-      await updateDoc(docRef, {
-        participants: participantsList,
-      });
-      setParticipantsLength(participantsLength + 1);
-      event.participants.push(uid);
-      setAttending(true);
-      sendEmail(event);
-    }
-  };
-
-  const unattendEvent = async () => {
-    if (uid && event.participants.includes(uid)) {
-      const docRef = doc(db, 'events', event.id);
-      event.participants.splice(event.participants.indexOf(uid), 1);
-      await updateDoc(docRef, {
-        participants: event.participants,
-      });
-      setAttending(false);
-      setParticipantsLength(participantsLength - 1);
+  const toggleAttendEvent = async (addNew: boolean) => {
+    try {
+      await toggleAttendee(uid, event.participants, event.id);
+      if (addNew) {
+        setParticipantsLength(participantsLength + 1);
+        event.participants.push(uid);
+        setAttending(true);
+        sendEmail(event);
+      } else {
+        event.participants.splice(event.participants.indexOf(uid), 1);
+        setAttending(false);
+        setParticipantsLength(participantsLength - 1);
+      }
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -162,27 +139,27 @@ export default function EventPage({ event }: EventProps) {
             )}
           </div>
           <CardContent>
-            <div className="grid md:grid-cols-3 auto-cols-max gap-2 mt-3">
-              <span className="text-teal-800">city</span>
-              <span className="col-span-2">{event.city}</span>
-              <span className="text-teal-800">location </span>
-              <span className="col-span-2">{event.location}</span>
-              <span className="text-teal-800">date/time </span>
-              <span className="col-span-2">{getFormattedDate()}</span>
-              <span className="text-teal-800">attendees </span>
-              <span className="col-span-2">
-                {participantsLength || 'nobody yet'}
-              </span>
-              <span className="text-teal-800">capacity </span>
+            <div className="event-data">
+              <p className="text-teal-800">city</p>
+              <p className="text-xl">{event.city}</p>
+              <p className="text-teal-800">location </p>
+              <p className="text-xl">{event.location}</p>
+              <p className="text-teal-800">date/time </p>
+              <p className="text-xl">{event.date}</p>
+              <p className="text-teal-800">attendees </p>
+              <p className="text-xl">{participantsLength || 'nobody yet'}</p>
+              <p className="text-teal-800">capacity </p>
               {event.capacity && (
-                <span className="col-span-2">{event.capacity} ppl</span>
+                <p className="text-xl">{event.capacity} ppl</p>
               )}
-              {!event.capacity && <span className="col-span-2">no limit</span>}
+              {!event.capacity && <p className="text-xl">no limit</p>}
             </div>
             {canRegister() && (
               <button
                 className="mt-3 p-2 bg-teal-500 text-white rounded w-fit"
-                onClick={attendEvent}
+                onClick={() => {
+                  toggleAttendEvent(true);
+                }}
               >
                 Attend
               </button>
@@ -190,7 +167,9 @@ export default function EventPage({ event }: EventProps) {
             {attending && (
               <button
                 className="mt-3 p-2 bg-teal-500 text-white rounded w-fit"
-                onClick={unattendEvent}
+                onClick={() => {
+                  toggleAttendEvent(false);
+                }}
               >
                 Leave event
               </button>

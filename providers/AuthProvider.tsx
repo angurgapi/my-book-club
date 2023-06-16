@@ -59,61 +59,6 @@ export const AuthProvider: FC<Props> = ({ children }) => {
   const facebookProvider = new FacebookAuthProvider();
   const rdb = getDatabase();
 
-  useEffect(() => {
-    const unListen = onAuthStateChanged(getFirebaseAuth, (userAuth) => {
-      if (!userAuth) return;
-
-      onSnapshot(doc(db, 'users', userAuth.uid), (doc) => {
-        const userData: DocumentData | undefined = doc.data();
-        console.log(userData);
-        if (!userData) return;
-        dispatch(
-          setUser({
-            // createdAt: userAuth.createdAt || [],
-            displayName: userData.displayName || '',
-            photoURL: userData.photoURL || '',
-            email: userData.email || '',
-            uid: userData.uid || '',
-            isAuth: true,
-          })
-        );
-
-        // Realtime Database
-        // const userRef = ref(rdb, `users/${userData.uid}`);
-
-        // const connectedRef = ref(rdb, '.info/connected');
-
-        // onValue(connectedRef, (snap) => {
-        //   if (snap.val() === true) {
-        //     set(userRef, {
-        //       events: [...userData.events],
-        //       createdAt: userData.createdAt,
-        //       displayName: userData.displayName,
-        //       email: userData.email,
-        //       password: userData.password,
-        //       photoURL: userData.photoURL,
-        //       images: [...userData.images],
-        //       uid: userData.uid,
-        //       isOnline: true,
-        //     });
-        //   }
-        // });
-
-        const usersRef = ref(rdb, 'users');
-
-        onValue(usersRef, (snapshot) => {
-          const data = snapshot.val();
-          setUsersRdb(data);
-        });
-      });
-    });
-
-    return () => {
-      unListen();
-    };
-    // eslint-disable-next-line
-  }, []);
-
   const values = useMemo(
     () => ({
       getFirebaseAuth,

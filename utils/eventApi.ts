@@ -41,7 +41,6 @@ export const saveEvent = async (eventData: IEvent) => {
       await uploadString(imageRef, eventData.coverUrl, 'data_url').then(
         async () => {
           const downloadURL = await getDownloadURL(imageRef);
-
           await updateDoc(doc(db, 'events', docRef.id), {
             coverUrl: downloadURL,
           });
@@ -152,36 +151,11 @@ export const getUpcomingEvents = async (
     );
   }
   try {
-    // const db = getFirestore();
-    // const nowTimestamp = Timestamp.now();
-    // const attendedEventsCollection = query(
-    //   collection(db, 'events'),
-    //   where('date', '>', nowTimestamp),
-    //   orderBy('date', 'asc')
-    // );
-
-    // const eventsSnapshot = await getDocs(attendedEventsCollection); // Fetch the documents from the collection
-
-    // const eventsData: IEvent[] = eventsSnapshot.docs.map((doc) => ({
-    //   id: doc.id,
-    //   bookTitle: doc.data().bookTitle,
-    //   bookAuthor: doc.data().bookAuthor,
-    //   city: doc.data().city,
-    //   participants: doc.data().participants,
-    //   date: doc.data().date.seconds,
-    //   coverUrl: doc.data().coverUrl,
-    //   fee: doc.data().fee,
-    //   currency: doc.data().currency,
-    //   registrationOpen: doc.data().registrationOpen,
-    //   hostId: doc.data().hostId,
-    // }));
-
-    // return eventsData;
     const querySnapshot = await getDocs(eventsCollectionQuery);
     const events: IEvent[] = [];
 
     querySnapshot.forEach((doc) => {
-      const eventData = doc.data() as IEvent;
+      const eventData = { id: doc.id, ...doc.data() } as IEvent;
       events.push(eventData);
     });
 
@@ -210,3 +184,39 @@ export const toggleAttendee = async (
     console.log(e);
   }
 };
+
+export const subscribeRdb = () => {
+  const db = getFirestore();
+  const eventsRef = ref(db, 'events');
+
+  // const userRef = ref(rdb, `users/${userData.uid}`);
+
+  // const connectedRef = ref(rdb, '.info/connected');
+
+  // onValue(connectedRef, (snap) => {
+  //   if (snap.val() === true) {
+  //     set(userRef, {
+  //       events: [...userData.events],
+  //       createdAt: userData.createdAt,
+  //       displayName: userData.displayName,
+  //       email: userData.email,
+  //       password: userData.password,
+  //       photoURL: userData.photoURL,
+  //       images: [...userData.images],
+  //       uid: userData.uid,
+  //       isOnline: true,
+  //     });
+  //   }
+  // });
+};
+
+// export const getEventHost = async (uid: string) => {
+//   const db = getFirestore();
+//   const hostRef = doc(db, 'users', uid);
+//   try {
+//     const hostData = await getDoc(hostRef);
+//     return hostData.data();
+//   } catch (e) {
+//     console.log(e);
+//   }
+// };

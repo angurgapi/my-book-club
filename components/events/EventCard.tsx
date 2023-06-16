@@ -16,7 +16,7 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
-  console.log(event.date);
+  // console.log(event.date);
   const formattedDate = dayjs.unix(event.date).format('MMM DD hh:mm a');
 
   const getImgSrc = event.coverUrl || cover;
@@ -30,6 +30,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         <Typography gutterBottom variant="h5" component="p">
           {event.bookTitle} | {event.bookAuthor}
         </Typography>
+        <div>id:{event.id}</div>
         <div className="flex items-center mt-2">
           <CalendarMonthIcon className="text-teal-500 mr-2" />
           <span>{formattedDate}</span>

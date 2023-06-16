@@ -22,12 +22,21 @@ import { CropperModal } from './CropperModal';
 import { Timestamp } from 'firebase/firestore';
 import { saveEvent } from '@/utils/eventApi';
 import Loader from '../global/Loader';
+import { IEvent } from '@/types/event';
 
 interface EventFormProps {
   onSaveEvent: () => void;
   uid: string;
+  isEdit?: boolean;
+  oldEvent?: IEvent;
 }
-const EventForm: React.FC<EventFormProps> = ({ onSaveEvent, uid }) => {
+const EventForm: React.FC<EventFormProps> = ({
+  onSaveEvent,
+  uid,
+  isEdit,
+  oldEvent,
+}) => {
+  console.log(oldEvent);
   // const { uid } = useAppSelector((state) => state.user);
   // const [previewImg, setPreviewImage] = useState('');
   const [imgSrc, setImgSrc] = useState('');
@@ -58,8 +67,8 @@ const EventForm: React.FC<EventFormProps> = ({ onSaveEvent, uid }) => {
 
   const formik = useFormik({
     initialValues: {
-      bookTitle: '',
-      bookAuthor: '',
+      bookTitle: oldEvent ? oldEvent.bookTitle : '',
+      bookAuthor: oldEvent ? oldEvent.bookAuthor : '',
       date: dayjs().add(2, 'hour'),
       city: '',
       location: '',
@@ -125,16 +134,6 @@ const EventForm: React.FC<EventFormProps> = ({ onSaveEvent, uid }) => {
       formik.setFieldValue('coverUrl', file);
       setPreviewImg(file);
       setModalOpen(false);
-
-      // toDataUrl(file)
-      //   .then((dataUrl) => {
-      //     formik.setFieldValue('coverUrl', dataUrl);
-      //     setPreviewImg(dataUrl);
-      //     setModalOpen(false);
-      //   })
-      //   .catch((error) => {
-      //     console.log('Error: ', error);
-      //   });
     } else {
       formik.setFieldValue('coverUrl', null);
     }

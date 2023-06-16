@@ -29,7 +29,7 @@ import Link from 'next/link';
 import EditIcon from '@mui/icons-material/Edit';
 import { Card, CardContent } from '@mui/material';
 
-import { getEventById, toggleAttendee } from '@/utils/eventApi';
+import { getEventById, toggleAttendee, getEventHost } from '@/utils/eventApi';
 
 interface EventProps {
   event: IEvent;
@@ -50,10 +50,14 @@ export async function getServerSideProps(context: any) {
 }
 
 export default function EventPage({ event }: EventProps) {
-  const { uid, email } = useAppSelector((state) => state.user);
+  const { uid, email, isAuth } = useAppSelector((state) => state.user);
+
   const db = getFirestore();
+
   const [attending, setAttending] = useState(
-    Array.isArray(event.participants) && uid && event.participants.includes(uid)
+    Array.isArray(event.participants) &&
+      isAuth &&
+      event.participants.includes(uid)
   );
   const [participantsLength, setParticipantsLength] = useState(
     event.participants.length
@@ -68,7 +72,7 @@ export default function EventPage({ event }: EventProps) {
   };
 
   const canRegister = () => {
-    return !isOwnEvent() && event.registrationOpen && !attending;
+    return isAuth && !isOwnEvent() && event.registrationOpen && !attending;
   };
 
   const sendEmail = (eventDetails: IEvent) => {

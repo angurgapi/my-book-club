@@ -7,6 +7,7 @@ import EventCard from '@/components/events/EventCard';
 import DefaultLayout from '../layouts/default';
 import { IEvent } from '@/types/event';
 import { getUpcomingEvents } from '@/utils/eventApi';
+import { subscribeRdb } from '@/utils/eventsRdb';
 
 import { Typography, Input, InputAdornment, IconButton } from '@mui/material';
 import { Clear, Search } from '@mui/icons-material';
@@ -32,6 +33,7 @@ const Events = () => {
 
   useEffect(() => {
     fetchEvents();
+    subscribeRdb();
   }, []);
 
   return (

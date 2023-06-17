@@ -10,7 +10,7 @@ export interface IEvent {
   description?: string;
   city: string;
   location?: string;
-  id?: string;
+  id: string;
   participants: string[];
   coverUrl: string;
   hostId: string;
@@ -26,3 +26,5 @@ export interface IEventsState {
   sortEventsBy: 'newest' | 'oldest' | 'likes' | 'controversial';
   events: IEvent[];
 }
+
+export interface IEventFormData extends Omit<IEvent, 'id'> {}

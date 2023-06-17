@@ -42,7 +42,6 @@ interface IContext {
   googleProvider: GoogleAuthProvider;
   facebookProvider: FacebookAuthProvider;
   rdb: Database;
-  usersRdb: any;
 }
 
 export const AuthContext = createContext<IContext>({} as IContext);
@@ -67,10 +66,9 @@ export const AuthProvider: FC<Props> = ({ children }) => {
       googleProvider,
       facebookProvider,
       rdb,
-      usersRdb,
     }),
     // eslint-disable-next-line
-    [getFirebaseAuth, db, storage, rdb, usersRdb]
+    [getFirebaseAuth, db, storage, rdb]
   );
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

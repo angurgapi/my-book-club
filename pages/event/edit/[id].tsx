@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 
 import { getEventById } from '@/utils/eventApi';
 import { IEvent } from '@/types/event';
+import dayjs from 'dayjs';
 // import { useParams } from 'react-router-dom';
 interface EventProps {
   eventData: IEvent;

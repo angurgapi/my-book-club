@@ -36,7 +36,6 @@ const EventForm: React.FC<EventFormProps> = ({
   isEdit,
   oldEvent,
 }) => {
-  console.log(oldEvent);
   // const { uid } = useAppSelector((state) => state.user);
   // const [previewImg, setPreviewImage] = useState('');
   const [imgSrc, setImgSrc] = useState('');
@@ -69,7 +68,7 @@ const EventForm: React.FC<EventFormProps> = ({
     initialValues: {
       bookTitle: oldEvent ? oldEvent.bookTitle : '',
       bookAuthor: oldEvent ? oldEvent.bookAuthor : '',
-      date: dayjs().add(2, 'hour'),
+      date: oldEvent ? dayjs(oldEvent.date) : dayjs().add(2, 'hour'),
       city: '',
       location: '',
       coverUrl: '',
@@ -88,7 +87,7 @@ const EventForm: React.FC<EventFormProps> = ({
       let eventData = {
         hostId: uid,
         ...values,
-        date: Timestamp.fromMillis(values.date.valueOf()),
+        date: values.date.valueOf(),
       };
       try {
         await saveEvent(eventData);

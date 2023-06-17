@@ -26,16 +26,19 @@ import {
 } from '@firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
-import { IEvent } from '@/types/event';
+import { IEvent, IEventFormData } from '@/types/event';
 import dayjs from 'dayjs';
 
-export const saveEvent = async (eventData: IEvent) => {
-  console.log(eventData);
+export const saveEvent = async (eventData: IEventFormData) => {
+  // eventData.date = Timestamp.fromMillis(eventData.date.valueOf()),
   const db = getFirestore();
   const storage = getStorage();
 
   try {
-    const docRef = await addDoc(collection(db, 'events'), eventData);
+    const docRef = await addDoc(collection(db, 'events'), {
+      ...eventData,
+      date: Timestamp.fromMillis(eventData.date.valueOf()),
+    });
     const imageRef = ref(storage, `events/${docRef.id}/image`);
     if (eventData.coverUrl) {
       await uploadString(imageRef, eventData.coverUrl, 'data_url').then(
@@ -57,18 +60,22 @@ export const saveEvent = async (eventData: IEvent) => {
   }
 };
 
-export const getEventById = async (id: string) => {
+export const getEventById = async (id: string): Promise<IEvent | undefined> => {
   const db = getFirestore();
   const docRef = doc(db, 'events', id);
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
-    const event = docSnap.data();
-    const epoch = event.date.seconds * 1000;
-    event.id = id;
-    return {
-      ...event,
-      date: dayjs.unix(epoch / 1000).format('MMM DD hh:mm a'),
-    };
+    const event = {
+      ...docSnap.data(),
+      date: docSnap.data().date.toMillis(),
+    } as IEvent;
+    event.id = docSnap.id;
+    console.log(typeof event.date);
+    // return {
+    //   ...event,
+    //   date: event.date.toMillis(),
+    // };
+    return event;
   } else {
     console.log('No such document!');
   }
@@ -185,38 +192,13 @@ export const toggleAttendee = async (
   }
 };
 
-export const subscribeRdb = () => {
+export const getEventHost = async (uid: string) => {
   const db = getFirestore();
-  const eventsRef = ref(db, 'events');
-
-  // const userRef = ref(rdb, `users/${userData.uid}`);
-
-  // const connectedRef = ref(rdb, '.info/connected');
-
-  // onValue(connectedRef, (snap) => {
-  //   if (snap.val() === true) {
-  //     set(userRef, {
-  //       events: [...userData.events],
-  //       createdAt: userData.createdAt,
-  //       displayName: userData.displayName,
-  //       email: userData.email,
-  //       password: userData.password,
-  //       photoURL: userData.photoURL,
-  //       images: [...userData.images],
-  //       uid: userData.uid,
-  //       isOnline: true,
-  //     });
-  //   }
-  // });
+  const hostRef = doc(db, 'users', uid);
+  try {
+    const hostData = await getDoc(hostRef);
+    return hostData.data();
+  } catch (e) {
+    console.log(e);
+  }
 };
-
-// export const getEventHost = async (uid: string) => {
-//   const db = getFirestore();
-//   const hostRef = doc(db, 'users', uid);
-//   try {
-//     const hostData = await getDoc(hostRef);
-//     return hostData.data();
-//   } catch (e) {
-//     console.log(e);
-//   }
-// };

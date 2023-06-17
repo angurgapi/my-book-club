@@ -27,29 +27,37 @@ import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import EditIcon from '@mui/icons-material/Edit';
-import { Card, CardContent } from '@mui/material';
+import { Card, CardActions, CardContent } from '@mui/material';
 
 import { getEventById, toggleAttendee, getEventHost } from '@/utils/eventApi';
+import { IUser } from '@/types/user';
+import { EventHostCard } from '@/components/events/EventHostCard';
 
 interface EventProps {
   event: IEvent;
+  host: IUser;
 }
 
 export async function getServerSideProps(context: any) {
   const docId = context.query.id;
   try {
     const event = await getEventById(docId);
+    let host = null;
+    if (event) {
+      host = await getEventHost(event.hostId);
+    }
     return {
       props: {
         event,
+        host,
       },
     };
   } catch (e) {
-    console.log(e);
+    console.log('no such event', e);
   }
 }
 
-export default function EventPage({ event }: EventProps) {
+export default function EventPage({ event, host }: EventProps) {
   const { uid, email, isAuth } = useAppSelector((state) => state.user);
 
   const db = getFirestore();
@@ -63,6 +71,10 @@ export default function EventPage({ event }: EventProps) {
     event.participants.length
   );
 
+  console.log(host);
+
+  const formattedDate = dayjs(event.date).format('MMM DD hh:mm a');
+
   const getImgSrc = () => {
     return event.coverUrl || cover;
   };
@@ -75,23 +87,23 @@ export default function EventPage({ event }: EventProps) {
     return isAuth && !isOwnEvent() && event.registrationOpen && !attending;
   };
 
-  const sendEmail = (eventDetails: IEvent) => {
-    emailjs
-      .send(
-        process.env.NEXT_PUBLIC_SERVICE_ID,
-        process.env.NEXT_PUBLIC_TEMPLATE_ID,
-        { ...eventDetails, attendeeEmail: email },
-        process.env.NEXT_PUBLIC_MAILER_KEY
-      )
-      .then(
-        (result) => {
-          console.log(result);
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
-  };
+  // const sendEmail = (eventDetails: IEvent) => {
+  //   emailjs
+  //     .send(
+  //       process.env.NEXT_PUBLIC_SERVICE_ID,
+  //       process.env.NEXT_PUBLIC_TEMPLATE_ID,
+  //       { ...eventDetails, attendeeEmail: email },
+  //       process.env.NEXT_PUBLIC_MAILER_KEY
+  //     )
+  //     .then(
+  //       (result) => {
+  //         console.log(result);
+  //       },
+  //       (error) => {
+  //         console.log(error);
+  //       }
+  //     );
+  // };
 
   const toggleAttendEvent = async (addNew: boolean) => {
     try {
@@ -100,7 +112,7 @@ export default function EventPage({ event }: EventProps) {
         setParticipantsLength(participantsLength + 1);
         event.participants.push(uid);
         setAttending(true);
-        sendEmail(event);
+        // sendEmail(event);
       } else {
         event.participants.splice(event.participants.indexOf(uid), 1);
         setAttending(false);
@@ -149,7 +161,7 @@ export default function EventPage({ event }: EventProps) {
               <p className="text-teal-800">location </p>
               <p className="text-xl">{event.location}</p>
               <p className="text-teal-800">date/time </p>
-              <p className="text-xl">{event.date}</p>
+              <p className="text-xl">{formattedDate}</p>
               <p className="text-teal-800">attendees </p>
               <p className="text-xl">{participantsLength || 'nobody yet'}</p>
               <p className="text-teal-800">capacity </p>
@@ -157,7 +169,20 @@ export default function EventPage({ event }: EventProps) {
                 <p className="text-xl">{event.capacity} ppl</p>
               )}
               {!event.capacity && <p className="text-xl">no limit</p>}
+              {/* <p>host: {host.displayName}</p> */}
+              <p className="text-teal-800">Hosted by</p>
+              <div className="w-fit">
+                <EventHostCard hostData={host} />
+              </div>
             </div>
+
+            {event.description && (
+              <div className="bg-slate-100 mt-3 p-2 rounded">
+                <span className="text-justify italic">{event.description}</span>
+              </div>
+            )}
+          </CardContent>
+          <CardActions>
             {canRegister() && (
               <button
                 className="mt-3 p-2 bg-teal-500 text-white rounded w-fit"
@@ -178,12 +203,8 @@ export default function EventPage({ event }: EventProps) {
                 Leave event
               </button>
             )}
-            {event.description && (
-              <div className="bg-slate-100 mt-3 p-2 rounded">
-                <span className="text-justify italic">{event.description}</span>
-              </div>
-            )}
-          </CardContent>
+            {!event.registrationOpen && <span>Registration is closed</span>}
+          </CardActions>
         </Card>
       </div>
     </DefaultLayout>

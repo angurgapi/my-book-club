@@ -8,7 +8,6 @@ import ReactCrop, {
   PixelCrop,
 } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { useDebounceEffect } from '@/utils/useDebounceEffect';
 import Image from 'next/image';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 

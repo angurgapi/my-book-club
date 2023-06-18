@@ -27,10 +27,15 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       className="flex flex-col md:flex-row justify-between w-full mb-2 shadow-lg hover:shadow-md"
     >
       <div className="md:w-[50%] w-full flex flex-col items-start rounded-md w-full bg-white p-2">
-        <Typography gutterBottom variant="h5" component="p">
+        <Typography
+          gutterBottom
+          variant="h5"
+          component="p"
+          className="event-card-title"
+        >
           {event.bookTitle} | {event.bookAuthor}
         </Typography>
-        <div>id:{event.id}</div>
+
         <div className="flex items-center mt-2">
           <CalendarMonthIcon className="text-teal-500 mr-2" />
           <span>{formattedDate}</span>

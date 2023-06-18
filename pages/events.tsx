@@ -18,9 +18,12 @@ const Events = () => {
   const [query, setQuery] = useState('');
 
   const fetchEvents = async () => {
+    console.log(query);
     try {
+      setLoading(true);
       const upcomingEvents = await getUpcomingEvents(query);
       setEvents(upcomingEvents);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching events:', error);
     }
@@ -28,7 +31,8 @@ const Events = () => {
 
   const clearSearch = () => {
     setQuery('');
-    fetchEvents();
+    console.log('query cleared: ', query);
+    // fetchEvents();
   };
 
   useEffect(() => {

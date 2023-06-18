@@ -60,7 +60,7 @@ function Header() {
 
   return (
     <AppBar position="sticky" sx={{ bgcolor: 'white' }}>
-      <Container maxWidth="xl">
+      <Container maxWidth="xl" sx={{ pl: { xs: 1 }, pr: { xs: 1 } }}>
         <Toolbar disableGutters>
           <Typography
             noWrap
@@ -78,7 +78,7 @@ function Header() {
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
-              sx={{ pl: 0 }}
+              sx={{ p: 1 }}
             >
               <MenuIcon />
             </IconButton>
@@ -137,7 +137,14 @@ function Header() {
 
           {isAuth ? (
             <>
-              <Toolbar sx={{ backgroundColor: '#0b074a', mr: 1 }}>
+              <Toolbar
+                sx={{
+                  backgroundColor: '#0b074a',
+                  mr: { xs: 0.5, md: 1 },
+                  pl: { xs: 1 },
+                  pr: { xs: 1 },
+                }}
+              >
                 <Link
                   className="flex"
                   href="/dashboard/events/create"
@@ -147,14 +154,25 @@ function Header() {
                   <span className="hidden md:flex ml-2">New event</span>
                 </Link>
               </Toolbar>
-              <span className="hidden md:block mr-2 text-slate-500">
-                {displayName}
-              </span>
+
               <Box sx={{ flexGrow: 0 }}>
                 <Tooltip title="Open settings">
-                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Button
+                    onClick={handleOpenUserMenu}
+                    sx={{
+                      p: 0,
+                      textTransform: 'none',
+                      '&:hover': {
+                        backgroundColor: 'white',
+                        textDecoration: 'underline',
+                      },
+                    }}
+                  >
+                    <span className="hidden md:block mr-2 text-slate-500">
+                      {displayName}
+                    </span>
                     <Avatar alt="userpic" src={photoURL || ''} />
-                  </IconButton>
+                  </Button>
                 </Tooltip>
                 <Menu
                   sx={{ mt: '45px' }}

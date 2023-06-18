@@ -35,21 +35,16 @@ import { EventHostCard } from '@/components/events/EventHostCard';
 
 interface EventProps {
   event: IEvent;
-  host: IUser;
 }
 
 export async function getServerSideProps(context: any) {
   const docId = context.query.id;
   try {
     const event = await getEventById(docId);
-    let host = null;
-    if (event) {
-      host = await getEventHost(event.hostId);
-    }
+
     return {
       props: {
         event,
-        host,
       },
     };
   } catch (e) {
@@ -57,9 +52,8 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-export default function EventPage({ event, host }: EventProps) {
+export default function EventPage({ event }: EventProps) {
   const { uid, email, isAuth } = useAppSelector((state) => state.user);
-
   const db = getFirestore();
 
   const [attending, setAttending] = useState(
@@ -67,11 +61,21 @@ export default function EventPage({ event, host }: EventProps) {
       isAuth &&
       event.participants.includes(uid)
   );
+
+  const [host, setHost] = useState<IUser | undefined>(undefined);
+
   const [participantsLength, setParticipantsLength] = useState(
     event.participants.length
   );
 
-  console.log(host);
+  useEffect(() => {
+    const fetchHostData = async () => {
+      const hostData = await getEventHost(event.hostId);
+      setHost(hostData as IUser);
+    };
+
+    fetchHostData();
+  }, [event.hostId]);
 
   const formattedDate = dayjs(event.date).format('MMM DD hh:mm a');
 
@@ -169,11 +173,15 @@ export default function EventPage({ event, host }: EventProps) {
                 <p className="text-xl">{event.capacity} ppl</p>
               )}
               {!event.capacity && <p className="text-xl">no limit</p>}
-              {/* <p>host: {host.displayName}</p> */}
-              <p className="text-teal-800">Hosted by</p>
-              <div className="w-fit">
-                <EventHostCard hostData={host} />
-              </div>
+
+              {host && (
+                <>
+                  <p className="text-teal-800">Hosted by</p>
+                  <div className="w-fit">
+                    <EventHostCard hostData={host} />
+                  </div>
+                </>
+              )}
             </div>
 
             {event.description && (

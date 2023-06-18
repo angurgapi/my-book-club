@@ -45,6 +45,13 @@ const HostedEvents = () => {
             <Card className="w-full">
               <CardContent>
                 <span>There is no upcoming events you are hosting</span>
+                <br />
+                <Link
+                  className="text-teal-700 text-xl"
+                  href="/dashboard/events/create"
+                >
+                  Organize one
+                </Link>
               </CardContent>
             </Card>
           )}

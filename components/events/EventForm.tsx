@@ -20,9 +20,9 @@ import dayjs from 'dayjs';
 import Image from 'next/image';
 import { CropperModal } from './CropperModal';
 import { Timestamp } from 'firebase/firestore';
-import { saveEvent } from '@/utils/eventApi';
+import { saveEvent, updateEvent } from '@/utils/eventApi';
 import Loader from '../global/Loader';
-import { IEvent } from '@/types/event';
+import { IEvent, IEventFormData } from '@/types/event';
 
 interface EventFormProps {
   onSaveEvent: () => void;
@@ -38,8 +38,10 @@ const EventForm: React.FC<EventFormProps> = ({
 }) => {
   // const { uid } = useAppSelector((state) => state.user);
   // const [previewImg, setPreviewImage] = useState('');
-  const [imgSrc, setImgSrc] = useState('');
-  const [previewImg, setPreviewImg] = useState('');
+  const [imgSrc, setImgSrc] = useState(oldEvent ? oldEvent.coverUrl : '');
+  const [previewImg, setPreviewImg] = useState(
+    oldEvent ? oldEvent.coverUrl : ''
+  );
   const [paidEvent, setPaidEvent] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -69,15 +71,15 @@ const EventForm: React.FC<EventFormProps> = ({
       bookTitle: oldEvent ? oldEvent.bookTitle : '',
       bookAuthor: oldEvent ? oldEvent.bookAuthor : '',
       date: oldEvent ? dayjs(oldEvent.date) : dayjs().add(2, 'hour'),
-      city: '',
-      location: '',
-      coverUrl: '',
-      fee: 0,
-      currency: '',
-      description: '',
-      participants: [],
+      city: oldEvent ? oldEvent.city : '',
+      location: oldEvent ? oldEvent.location : '',
+      coverUrl: oldEvent ? oldEvent.coverUrl : '',
+      fee: oldEvent ? oldEvent.fee : 0,
+      currency: oldEvent ? oldEvent.currency : '',
+      description: oldEvent ? oldEvent.description : '',
+      participants: oldEvent ? oldEvent.participants : [],
       registrationOpen: true,
-      capacity: 5,
+      capacity: oldEvent ? oldEvent.capacity : 5,
     },
 
     validationSchema,
@@ -89,11 +91,20 @@ const EventForm: React.FC<EventFormProps> = ({
         ...values,
         date: values.date.valueOf(),
       };
-      try {
-        await saveEvent(eventData);
-        onSaveEvent();
-      } catch (e) {
-        console.log(e);
+      if (!oldEvent) {
+        try {
+          await saveEvent(eventData as IEventFormData);
+          onSaveEvent();
+        } catch (e) {
+          console.log(e);
+        }
+      } else {
+        try {
+          await updateEvent(oldEvent.id, eventData);
+          onSaveEvent();
+        } catch (e) {
+          console.log(e);
+        }
       }
       setLoading(false);
     },

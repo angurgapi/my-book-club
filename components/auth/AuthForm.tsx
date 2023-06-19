@@ -5,7 +5,7 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
 } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 import { useAuth } from '@/hooks/useAuth';
 import { IUser, IUserData } from '@/types/user';
@@ -47,29 +47,23 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
   };
 
   const logExistingUser = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(getFirebaseAuth, email, password)
-      .then(({ user }) => {
-        // console.log(user);
-        console.log(user.displayName, 'user has logged in');
-        const userDetails = {
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          event: [],
-          uid: user.uid,
-          isAuth: true,
-        };
-
-        dispatch(setUser(userDetails as IUser));
-
-        router.push('/dashboard/profile');
-      })
-      .catch((error) => {
-        error.code === 'auth/user-not-found' &&
-          sendErrorToast('There is no user with these credentials!');
-        error.code === 'auth/wrong-password' &&
-          sendErrorToast('The password is wrong!');
-      });
+    try {
+      const { user } = await signInWithEmailAndPassword(
+        getFirebaseAuth,
+        email,
+        password
+      );
+      const userDetails = await getDoc(doc(db, 'users', user.uid));
+      dispatch(setUser({ ...userDetails.data(), isAuth: true } as IUser));
+      router.push('/dashboard/profile');
+    } catch (error) {
+      if (error.code === 'auth/user-not-found') {
+        sendErrorToast('There is no user with these credentials!');
+      }
+      if (error.code === 'auth/wrong-password') {
+        sendErrorToast('The password is wrong!');
+      }
+    }
   };
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {

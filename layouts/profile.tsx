@@ -4,7 +4,6 @@ import Header from '@/components/global/Header';
 import Sidebar from '@/components/global/Sidebar';
 
 import { useMediaQuery, useTheme } from '@mui/material';
-import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { useAppSelector } from '@/hooks/redux';
@@ -17,16 +16,14 @@ const ProfileLayout: React.FC<LayoutProps> = ({ children }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // const { getFirebaseAuth } = useAuth();
   const router = useRouter();
   const { isAuth } = useAppSelector((state) => state.user);
 
-  // useEffect(() => {
-  //   if (!isAuth) {
-  //     console.log('heh user logged out!');
-  //     router.replace('/auth');
-  //   }
-  // }, [isAuth, router]);
+  useEffect(() => {
+    if (!isAuth) {
+      router.replace('/auth');
+    }
+  }, [isAuth, router]);
 
   return (
     <>

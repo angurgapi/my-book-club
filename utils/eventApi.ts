@@ -29,26 +29,29 @@ import { getStorage } from 'firebase/storage';
 import { IEvent, IEventFormData } from '@/types/event';
 import dayjs from 'dayjs';
 
+const addEventCover = async (picUrl: string, eventId: string) => {
+  const storage = getStorage();
+  const imageRef = ref(storage, `events/${eventId}/image`);
+  await uploadString(imageRef, picUrl, 'data_url').then(async () => {
+    const downloadURL = await getDownloadURL(imageRef);
+    return downloadURL;
+  });
+};
 export const saveEvent = async (eventData: IEventFormData) => {
   // eventData.date = Timestamp.fromMillis(eventData.date.valueOf()),
   const db = getFirestore();
-  const storage = getStorage();
 
   try {
     const docRef = await addDoc(collection(db, 'events'), {
       ...eventData,
       date: Timestamp.fromMillis(eventData.date.valueOf()),
     });
-    const imageRef = ref(storage, `events/${docRef.id}/image`);
+
     if (eventData.coverUrl) {
-      await uploadString(imageRef, eventData.coverUrl, 'data_url').then(
-        async () => {
-          const downloadURL = await getDownloadURL(imageRef);
-          await updateDoc(doc(db, 'events', docRef.id), {
-            coverUrl: downloadURL,
-          });
-        }
-      );
+      const downloadURL = await addEventCover(eventData.coverUrl, docRef.id);
+      await updateDoc(doc(db, 'events', docRef.id), {
+        coverUrl: downloadURL,
+      });
     } else {
       console.log('No cover picture provided');
     }
@@ -57,6 +60,27 @@ export const saveEvent = async (eventData: IEventFormData) => {
     // getHostedEvents(eventData.hostId);
   } catch (error) {
     console.error('Error saving event:', error);
+  }
+};
+
+export const updateEvent = async (id: string, eventData: IEventFormData) => {
+  const db = getFirestore();
+  const docRef = doc(db, 'events', id);
+  try {
+    if (eventData.coverUrl) {
+      const downloadURL = await addEventCover(eventData.coverUrl, id);
+      await updateDoc(doc(db, 'events', docRef.id), {
+        coverUrl: downloadURL,
+      });
+    } else {
+      console.log(eventData);
+    }
+    await updateDoc(docRef, {
+      ...eventData,
+      date: Timestamp.fromMillis(eventData.date.valueOf()),
+    });
+  } catch (e) {
+    console.log(e);
   }
 };
 

@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
-import ErrorPage from '@/components/global/Error';
 
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // import Link from "next/link";
-// import Attendees from "../../../components/Attendees";
+// import Attendees from "@/components/events/AttendeesModal";
 import emailjs from '@emailjs/browser';
 // import { useRouter } from "next/router";
 import {
@@ -127,7 +126,6 @@ export default function EventPage({ event }: EventProps) {
     }
   };
 
-  if (!event.bookTitle) return <ErrorPage />;
   return (
     <DefaultLayout>
       <PageHead pageTitle={event.bookTitle} />

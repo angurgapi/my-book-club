@@ -38,7 +38,7 @@ const EditEvent = ({ eventData }: EventProps) => {
   }, [isAuth, router]);
 
   const onSaveEvent = () => {
-    router.push('/dashboard/events');
+    router.push(`/event/${eventData.id}`);
   };
   return (
     isAuth && (
@@ -46,7 +46,7 @@ const EditEvent = ({ eventData }: EventProps) => {
         <PageHead pageTitle="Edit book club meeting" />
         <div className="flex flex-col p-2 items-center mt-4">
           <Typography variant="h3" gutterBottom>
-            New event
+            Edit event details
           </Typography>
           <Card>
             <CardContent>

@@ -56,7 +56,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
       const userDetails = await getDoc(doc(db, 'users', user.uid));
       dispatch(setUser({ ...userDetails.data(), isAuth: true } as IUser));
       router.push('/dashboard/profile');
-    } catch (error) {
+    } catch (error: { code: string }) {
       if (error.code === 'auth/user-not-found') {
         sendErrorToast('There is no user with these credentials!');
       }

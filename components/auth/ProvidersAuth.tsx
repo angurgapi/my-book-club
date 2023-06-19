@@ -68,7 +68,7 @@ const ProvidersAuth = () => {
             console.log(docSnap.exists());
             //successfull google auth & not the first
             if (docSnap.exists()) {
-              dispatch(setUser(docSnap.data() as IUser));
+              dispatch(setUser({ ...docSnap.data(), isAuth: true } as IUser));
               console.log('docsnap data:', docSnap.data());
             }
             //successfull google auth but no user doc yet

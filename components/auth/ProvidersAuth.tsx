@@ -66,24 +66,30 @@ const ProvidersAuth = () => {
           await runTransaction(db, async (transaction) => {
             const docSnap = await transaction.get(docRef);
             console.log(docSnap.exists());
-            if (!docSnap.exists()) {
+            //successfull google auth & not the first
+            if (docSnap.exists()) {
+              dispatch(setUser(docSnap.data() as IUser));
+              console.log('docsnap data:', docSnap.data());
+            }
+            //successfull google auth but no user doc yet
+            else {
+              console.log('new user, google auth');
+              const userData = {
+                uid: user.uid,
+                displayName: user.displayName || '',
+                email: user.email,
+                photoURL: user.photoURL,
+                events: [],
+                createdAt:
+                  user.metadata.creationTime &&
+                  +new Date(user.metadata.creationTime).getTime(),
+              };
               try {
-                await setDoc(docRef, {
-                  uid: user.uid,
-                  displayName: user.displayName || '',
-                  email: user.email,
-                  password: null,
-                  photoURL: user.photoURL,
-                  createdAt:
-                    user.metadata.creationTime &&
-                    +new Date(user.metadata.creationTime).getTime(),
-                });
+                await setDoc(docRef, userData);
+                dispatch(setUser({ ...userData, isAuth: true } as IUser));
               } catch (e) {
                 console.error('Error adding document: ', e);
               }
-            } else {
-              dispatch(setUser(docSnap.data() as IUser));
-              console.log('docsnap data:', docSnap.data());
             }
           });
           router.push('/dashboard/profile');
@@ -101,9 +107,9 @@ const ProvidersAuth = () => {
   return (
     <div className="flex justify-start items-center">
       Enter with
-      <IconButton onClick={handleFacebookLogin}>
+      {/* <IconButton onClick={handleFacebookLogin}>
         <FacebookIcon className="mx-2 text-[#3b5998]" />
-      </IconButton>
+      </IconButton> */}
       <IconButton onClick={handleGoogleLogin}>
         <GoogleIcon className="text-[#4285F4]" />
       </IconButton>

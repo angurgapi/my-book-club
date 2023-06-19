@@ -2,6 +2,7 @@
 const path = require('path');
 
 const nextConfig = {
+  target: 'server',
   images: {
     domains: [
       'firebasestorage.googleapis.com',

@@ -4,7 +4,7 @@ import EventForm from '@/components/events/EventForm';
 import { useRouter } from 'next/router';
 import { useAppSelector } from '@/hooks/redux';
 import { useEffect } from 'react';
-import { Card, CardContent } from '@mui/material';
+import { Card, CardContent, Typography } from '@mui/material';
 
 const CreateEvent = () => {
   const router = useRouter();
@@ -24,9 +24,11 @@ const CreateEvent = () => {
       <DefaultLayout>
         <PageHead pageTitle="New book club meeting" />
         <div className="flex flex-col p-2 items-center mt-4">
+          <Typography variant="h3" gutterBottom>
+            New event
+          </Typography>
           <Card>
             <CardContent>
-              <h2>New event</h2>
               <EventForm uid={uid} onSaveEvent={onSaveEvent} />
             </CardContent>
           </Card>

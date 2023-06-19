@@ -91,18 +91,11 @@ export const getHostedEvents = async (uid: string) => {
       orderBy('date', 'desc')
     );
 
-    const eventsSnapshot = await getDocs(hostedEventsCollection); // Fetch the documents from the collection
+    const eventsSnapshot = await getDocs(hostedEventsCollection);
 
     const eventsData = eventsSnapshot.docs.map((doc) => ({
       id: doc.id,
-      bookTitle: doc.data().bookTitle,
-      bookAuthor: doc.data().bookAuthor,
-      city: doc.data().city,
-      participants: doc.data().participants,
-      date: doc.data().date,
-      coverUrl: doc.data().coverUrl,
-      fee: doc.data().fee,
-      registrationOpen: doc.data().registrationOpen,
+      ...doc.data(),
     }));
     return eventsData;
   } catch (error) {
@@ -120,20 +113,13 @@ export const getAttendedEvents = async (uid: string) => {
       orderBy('date', 'desc')
     );
 
-    const eventsSnapshot = await getDocs(attendedEventsCollection); // Fetch the documents from the collection
+    const eventsSnapshot = await getDocs(attendedEventsCollection);
 
     const eventsData = eventsSnapshot.docs.map((doc) => ({
       id: doc.id,
-      bookTitle: doc.data().bookTitle,
-      bookAuthor: doc.data().bookAuthor,
-      city: doc.data().city,
-      participants: doc.data().participants,
-      date: doc.data().date,
-      coverUrl: doc.data().coverUrl,
-      fee: doc.data().fee,
-      registrationOpen: doc.data().registrationOpen,
+      ...doc.data(),
     }));
-    return eventsData;
+    return eventsData as IEvent[];
   } catch (error) {
     console.error('Error fetching events:', error);
   }

@@ -8,7 +8,7 @@ import {
 import { doc, setDoc } from 'firebase/firestore';
 
 import { useAuth } from '@/hooks/useAuth';
-import { IUserData } from '@/types/user';
+import { IUser, IUserData } from '@/types/user';
 import { IAuthData } from '@/types/auth';
 import { setUser } from '@/store/reducers/UserSlice';
 
@@ -18,6 +18,7 @@ import Person2Icon from '@mui/icons-material/Person2';
 
 import { toast } from 'react-toastify';
 import { useAppDispatch } from '@/hooks/redux';
+import { Input, InputAdornment, InputLabel } from '@mui/material';
 
 interface AuthFormProps {
   mode: string;
@@ -35,16 +36,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     photoURL: '',
   });
 
-  // const [authData, setAuthData] = useState<IAuthData>({
-  //   invalidEmail: false,
-  //   invalidPassword: false,
-  //   wrongPassword: false,
-  //   userNotFound: false,
-  //   alreadyInUseEmail: false,
-  // });
-
-  const [value, setValue] = useState(0);
-
   const sendErrorToast = (message: string) => {
     toast.error(message, {
       position: 'top-right',
@@ -57,8 +48,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
 
   const logExistingUser = async (email: string, password: string) => {
     await signInWithEmailAndPassword(getFirebaseAuth, email, password)
-      .then((userCredential) => {
-        console.log(userCredential);
+      .then(({ user }) => {
+        // console.log(user);
+        console.log(user.displayName, 'user has logged in');
+        const userDetails = {
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          event: [],
+          uid: user.uid,
+          isAuth: true,
+        };
+
+        dispatch(setUser(userDetails as IUser));
+
         router.push('/dashboard/profile');
       })
       .catch((error) => {
@@ -90,7 +93,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
               uid: user.uid,
               displayName: user.displayName || '',
               email: user.email,
-              // password: userData.password,
               photoURL: user.photoURL,
               createdAt:
                 user.metadata.creationTime &&
@@ -113,21 +115,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
         });
     } else {
       logExistingUser(userData.email, userData.password);
-      // await signInWithEmailAndPassword(
-      //   getFirebaseAuth,
-      //   userData.email,
-      //   userData.password
-      // )
-      //   .then((userCredential) => {
-      //     console.log(userCredential);
-      //     router.push('/dashboard');
-      //   })
-      //   .catch((error) => {
-      //     error.code === 'auth/user-not-found' &&
-      //       setAuthData({ ...authData, userNotFound: true });
-      //     error.code === 'auth/wrong-password' &&
-      //       setAuthData({ ...authData, wrongPassword: true });
-      //   });
     }
   };
   return (
@@ -137,51 +124,58 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     >
       {mode === 'register' && (
         <>
-          <label htmlFor="displayName">User name</label>
-          <div className="w-full relative">
-            <input
-              type="text"
-              name="displayName"
-              className="border px-10 py-2 mb-3 rounded-md w-full"
-              required
-              value={userData.displayName}
-              onChange={(e) =>
-                setUserData({ ...userData, displayName: e.target.value })
-              }
-            />
-            <Person2Icon className=" absolute left-4 top-3 text-gray-300 text-xl" />
-          </div>
+          <InputLabel htmlFor="displayName">User name</InputLabel>
+
+          <Input
+            type="text"
+            name="displayName"
+            required
+            value={userData.displayName}
+            onChange={(e) =>
+              setUserData({ ...userData, displayName: e.target.value })
+            }
+            startAdornment={
+              <InputAdornment position="start">
+                <Person2Icon className="text-gray-300 text-xl" />
+              </InputAdornment>
+            }
+            sx={{ mb: 2 }}
+          />
         </>
       )}
-      <label htmlFor="email">Email address</label>
-      <div className="w-full relative">
-        <input
-          type="email"
-          name="email"
-          className="border px-10 py-2 mb-3 rounded-md w-full"
-          required
-          value={userData.email}
-          onChange={(e) => setUserData({ ...userData, email: e.target.value })}
-        />
-        <MailOutlineIcon className=" absolute left-4 top-3 text-gray-300 text-xl" />
-      </div>
-      <label htmlFor="password">Password</label>
-      <div className="w-full relative">
-        <input
-          type="password"
-          name="password"
-          value={userData.password}
-          onChange={(e) =>
-            setUserData({ ...userData, password: e.target.value })
-          }
-          className="border px-10 py-2 mb-4 rounded-md w-full"
-          required
-        />
-        <VpnKeyIcon className=" absolute left-4 top-3 text-gray-300 text-xl" />
-      </div>
+      <InputLabel htmlFor="email">Email address</InputLabel>
+
+      <Input
+        type="email"
+        name="email"
+        required
+        value={userData.email}
+        onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+        startAdornment={
+          <InputAdornment position="start">
+            <MailOutlineIcon className="text-gray-300 text-xl" />
+          </InputAdornment>
+        }
+        sx={{ mb: 2 }}
+      />
+
+      <InputLabel htmlFor="password">Password</InputLabel>
+      <Input
+        type="password"
+        name="password"
+        value={userData.password}
+        onChange={(e) => setUserData({ ...userData, password: e.target.value })}
+        required
+        startAdornment={
+          <InputAdornment position="start">
+            <VpnKeyIcon className="text-gray-300 text-xl" />
+          </InputAdornment>
+        }
+      />
+
       <button
         type="submit"
-        className="bg-[#FFD95A] p-3 font-medium hover:bg-[#C07F00] hover:text-[#FFF8DE] mb-3 rounded-md"
+        className="bg-[#FFD95A] p-3 font-medium hover:bg-[#C07F00] hover:text-[#FFF8DE] mt-3 mb-3 rounded-md"
       >
         {mode === 'register' ? 'Create account' : 'Log in'}
       </button>

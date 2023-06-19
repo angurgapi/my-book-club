@@ -21,12 +21,12 @@ const ProfileLayout: React.FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
   const { isAuth } = useAppSelector((state) => state.user);
 
-  useEffect(() => {
-    if (!isAuth) {
-      console.log('heh user logged out!');
-      router.replace('/auth');
-    }
-  }, [isAuth, router]);
+  // useEffect(() => {
+  //   if (!isAuth) {
+  //     console.log('heh user logged out!');
+  //     router.replace('/auth');
+  //   }
+  // }, [isAuth, router]);
 
   return (
     <>

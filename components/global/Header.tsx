@@ -60,7 +60,7 @@ function Header() {
 
   return (
     <AppBar position="sticky" sx={{ bgcolor: 'white' }}>
-      <Container maxWidth="xl" sx={{ pl: { xs: 1 }, pr: { xs: 1 } }}>
+      <Container maxWidth="xl" sx={{ pl: { xs: 1 }, pr: 2 }}>
         <Toolbar disableGutters>
           <Typography
             noWrap

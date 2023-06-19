@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { getEventById } from '@/utils/eventApi';
 import { IEvent } from '@/types/event';
 import dayjs from 'dayjs';
+import { Typography, Card, CardContent } from '@mui/material';
 // import { useParams } from 'react-router-dom';
 interface EventProps {
   eventData: IEvent;
@@ -44,12 +45,19 @@ const EditEvent = ({ eventData }: EventProps) => {
       <DefaultLayout>
         <PageHead pageTitle="Edit book club meeting" />
         <div className="flex flex-col p-2 items-center mt-4">
-          <EventForm
-            onSaveEvent={onSaveEvent}
-            uid={uid}
-            isEdit={true}
-            oldEvent={eventData}
-          />
+          <Typography variant="h3" gutterBottom>
+            New event
+          </Typography>
+          <Card>
+            <CardContent>
+              <EventForm
+                onSaveEvent={onSaveEvent}
+                uid={uid}
+                isEdit={true}
+                oldEvent={eventData}
+              />
+            </CardContent>
+          </Card>
         </div>
       </DefaultLayout>
     )

@@ -51,7 +51,7 @@ const AuthPage = () => {
         <CardMedia
           className="login md:w-[40%] relative"
           component="img"
-          image="signin.jpg"
+          image="/images/signin.jpg"
           alt="user authorization"
           sx={{ display: { xs: 'none', md: 'flex' } }}
         />

@@ -10,7 +10,7 @@ interface UserEventsProps {
 const UserEvents: React.FC<UserEventsProps> = ({ events }) => {
   return (
     <div className="flex flex-col w-full">
-      <ul className="flex flex-col w-full my-2">
+      <ul className="events-grid w-full my-2">
         {events.map((event) => (
           <EventCard event={event} key={event.id} />
         ))}

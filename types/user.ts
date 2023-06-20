@@ -17,10 +17,3 @@ export interface IUserState {
   uid: string;
   isAuth?: boolean;
 }
-
-export interface IUserData {
-  displayName: string;
-  email: string;
-  password: string;
-  photoURL: string;
-}

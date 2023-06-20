@@ -350,6 +350,7 @@ const EventForm: React.FC<EventFormProps> = ({
         handleCloseModal={() => setModalOpen(false)}
         onCropApply={onCropApply}
         imgSrc={imgSrc}
+        cropAspect={3 / 4}
       />
     </>
   );

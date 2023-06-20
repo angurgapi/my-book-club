@@ -8,7 +8,7 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 import { useAuth } from '@/hooks/useAuth';
-import { IUser, IUserData } from '@/types/user';
+import { IUser } from '@/types/user';
 import { IAuthData } from '@/types/auth';
 import { setUser } from '@/store/reducers/UserSlice';
 
@@ -29,11 +29,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const [userData, setUserData] = useState<IUserData>({
+  const [userData, setUserData] = useState<IAuthData>({
     displayName: '',
     email: '',
     password: '',
-    photoURL: '',
   });
 
   const sendErrorToast = (message: string) => {
@@ -56,7 +55,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
       const userDetails = await getDoc(doc(db, 'users', user.uid));
       dispatch(setUser({ ...userDetails.data(), isAuth: true } as IUser));
       router.push('/dashboard/profile');
-    } catch (error: { code: string }) {
+    } catch (error: any) {
       if (error.code === 'auth/user-not-found') {
         sendErrorToast('There is no user with these credentials!');
       }

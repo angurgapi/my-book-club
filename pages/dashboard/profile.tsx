@@ -11,7 +11,6 @@ import PageHead from '@/components/global/Head';
 import Loader from '@/components/global/Loader';
 import ProfileLayout from '@/layouts/profile';
 
-import placeholder from '@/images/avatar-placeholder.webp';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import EditIcon from '@mui/icons-material/Edit';
@@ -130,7 +129,11 @@ const DashboardProfile = () => {
                   onChange={onImageSelect}
                   className="hidden"
                 />
-                <Image fill alt="userpic" src={user.photoURL || placeholder} />
+                <Image
+                  fill
+                  alt="userpic"
+                  src={user.photoURL || '/images/avatar-placeholder.webp'}
+                />
                 <IconButton
                   aria-label="Upload avatar picture"
                   size="small"

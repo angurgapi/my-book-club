@@ -25,20 +25,22 @@ import {
   Timestamp,
 } from '@firebase/firestore';
 import { getStorage } from 'firebase/storage';
-
 import { IEvent, IEventFormData } from '@/types/event';
-import dayjs from 'dayjs';
 
 const addEventCover = async (picUrl: string, eventId: string) => {
   const storage = getStorage();
   const imageRef = ref(storage, `events/${eventId}/image`);
-  await uploadString(imageRef, picUrl, 'data_url').then(async () => {
+  try {
+    await uploadString(imageRef, picUrl, 'data_url');
     const downloadURL = await getDownloadURL(imageRef);
     return downloadURL;
-  });
+  } catch (error) {
+    console.error('Error adding event cover:', error);
+    throw error;
+  }
 };
+
 export const saveEvent = async (eventData: IEventFormData) => {
-  // eventData.date = Timestamp.fromMillis(eventData.date.valueOf()),
   const db = getFirestore();
 
   try {
@@ -57,7 +59,6 @@ export const saveEvent = async (eventData: IEventFormData) => {
     }
 
     console.log('Event saved successfully');
-    // getHostedEvents(eventData.hostId);
   } catch (error) {
     console.error('Error saving event:', error);
   }
@@ -70,15 +71,17 @@ export const updateEvent = async (id: string, eventData: IEventFormData) => {
     if (eventData.coverUrl) {
       const downloadURL = await addEventCover(eventData.coverUrl, id);
       await updateDoc(doc(db, 'events', docRef.id), {
+        ...eventData,
+        date: Timestamp.fromMillis(eventData.date.valueOf()),
         coverUrl: downloadURL,
       });
     } else {
-      console.log(eventData);
+      await updateDoc(docRef, {
+        ...eventData,
+        date: Timestamp.fromMillis(eventData.date.valueOf()),
+        coverUrl: '',
+      });
     }
-    await updateDoc(docRef, {
-      ...eventData,
-      date: Timestamp.fromMillis(eventData.date.valueOf()),
-    });
   } catch (e) {
     console.log(e);
   }
@@ -114,9 +117,7 @@ export const getHostedEvents = async (uid: string) => {
       where('date', '>', Timestamp.now()),
       orderBy('date', 'desc')
     );
-
     const eventsSnapshot = await getDocs(hostedEventsCollection);
-
     const eventsData = eventsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -136,9 +137,7 @@ export const getAttendedEvents = async (uid: string) => {
       where('date', '>', Timestamp.now()),
       orderBy('date', 'desc')
     );
-
     const eventsSnapshot = await getDocs(attendedEventsCollection);
-
     const eventsData = eventsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -150,12 +149,14 @@ export const getAttendedEvents = async (uid: string) => {
 };
 
 export const getUpcomingEvents = async (
-  queryString: string
-): Promise<IEvent[]> => {
+  queryString: string,
+  pageNum: number
+): Promise<{ events: IEvent[]; totalLength: number }> => {
+  console.log(pageNum);
   const db = getFirestore();
   let eventsCollectionQuery = query(
     collection(db, 'events'),
-    where('date', '>', Timestamp.now()),
+    // where('date', '>', Timestamp.now()),
     orderBy('date', 'asc')
   );
 
@@ -176,10 +177,15 @@ export const getUpcomingEvents = async (
       events.push(eventData);
     });
 
-    return events;
+    const totalLength = events.length;
+    const startIndex = (pageNum - 1) * 12;
+    const endIndex = startIndex + 12;
+    const pagedEvents = events.slice(startIndex, endIndex);
+
+    return { events: pagedEvents, totalLength };
   } catch (error) {
     console.error('Error fetching events:', error);
-    return [];
+    return { events: [], totalLength: 0 };
   }
 };
 

@@ -21,7 +21,7 @@ import Link from 'next/link';
 import { getEventById, toggleAttendee, getEventHost } from '@/utils/eventApi';
 
 import EditIcon from '@mui/icons-material/Edit';
-import { Card, CardActions, CardContent } from '@mui/material';
+import { Card, CardActions, CardContent, Skeleton } from '@mui/material';
 
 import { EventHostCard } from '@/components/events/EventHostCard';
 
@@ -51,6 +51,7 @@ export default function EventPage() {
   const [attending, setAttending] = useState<boolean | undefined>(false);
   const [event, setEvent] = useState<IEvent | undefined>(undefined);
   const [host, setHost] = useState<IUser | undefined>(undefined);
+  const [isLoading, setLoading] = useState(true);
 
   const [participantsLength, setParticipantsLength] = useState(
     event?.participants.length
@@ -60,6 +61,7 @@ export default function EventPage() {
   console.log(router);
 
   const fetchEventData = async () => {
+    setLoading(true);
     const { id } = router.query;
     try {
       const event = await getEventById(id as string);
@@ -68,11 +70,13 @@ export default function EventPage() {
     } catch (e) {
       console.log('no such event', e);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
     fetchEventData();
   }, [router.query.id]);
+
   useEffect(() => {
     const fetchHostData = async () => {
       if (event) {
@@ -80,7 +84,6 @@ export default function EventPage() {
         setHost(hostData as IUser);
       }
     };
-
     fetchHostData();
   }, [event]);
 
@@ -137,7 +140,32 @@ export default function EventPage() {
       }
     }
   };
+  if (isLoading) {
+    return (
+      <DefaultLayout>
+        <PageHead pageTitle="Loading..." />
+        <div className="flex flex-col p-2 items-center mt-4">
+          <Skeleton animation="wave" height={40} style={{ marginBottom: 16 }} />
+          <Card className="w-full md:max-w-[800px] mb-4">
+            <Skeleton
+              animation="wave"
+              height={170}
+              style={{ marginBottom: 6 }}
+              width="100%"
+            />
 
+            {Array.from({ length: 6 }, (_, index) => (
+              <div className="grid grid-cols-[1fr,4fr] gap-3 pt-2" key={index}>
+                <Skeleton height={20} />
+                <Skeleton height={20} />
+              </div>
+            ))}
+            <Skeleton height={40} width="100%" />
+          </Card>
+        </div>
+      </DefaultLayout>
+    );
+  }
   return (
     <DefaultLayout>
       {event && (
@@ -149,12 +177,21 @@ export default function EventPage() {
             </Typography>
             <Card className="w-full md:max-w-[800px] mb-4">
               <div className="relative w-full  aspect-[18/4]">
-                <Image
-                  src={getImgSrc()}
-                  fill
-                  alt="book cover"
-                  style={{ objectFit: 'cover' }}
-                />
+                {isLoading ? (
+                  <Skeleton
+                    sx={{ height: 190 }}
+                    animation="wave"
+                    variant="rectangular"
+                  />
+                ) : (
+                  <Image
+                    src={getImgSrc()}
+                    fill
+                    alt="book cover"
+                    style={{ objectFit: 'cover' }}
+                  />
+                )}
+
                 {attending && (
                   <div className="absolute bottom-2 right-2 bg-amber-400 text-black rounded p-2 w-fit">
                     You are attending

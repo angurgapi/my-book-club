@@ -145,7 +145,7 @@ const EventForm: React.FC<EventFormProps> = ({
       setPreviewImg(file);
       setModalOpen(false);
     } else {
-      formik.setFieldValue('coverUrl', null);
+      formik.setFieldValue('coverUrl', '');
     }
   };
 
@@ -162,7 +162,7 @@ const EventForm: React.FC<EventFormProps> = ({
         onSubmit={formik.handleSubmit}
         className="flex flex-col items-center"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <TextField
             id="bookTitle"
             label="Book title"
@@ -261,22 +261,6 @@ const EventForm: React.FC<EventFormProps> = ({
             </div>
           )}
 
-          {/* {previewImg && (
-          <div className="w-full h-[200px] max-h-[200px] mb-3">
-            <Image
-              height={150}
-              width={300}
-              alt="event cover"
-              src={previewImg}
-            />
-            <button
-              onClick={clearFile}
-              className="absolute top-2 right-2 bg-white rounded text-teal-500"
-            >
-              <DeleteIcon />
-            </button>
-          </div>
-        )} */}
           <div className="mt-2">
             <TextField
               className="w-full"

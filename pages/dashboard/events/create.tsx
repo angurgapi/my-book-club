@@ -23,11 +23,11 @@ const CreateEvent = () => {
     isAuth && (
       <DefaultLayout>
         <PageHead pageTitle="New book club meeting" />
-        <div className="flex flex-col p-2 items-center mt-4">
+        <div className="flex w-fill flex-col p-2 items-center mt-4">
           <Typography variant="h3" gutterBottom>
             New event
           </Typography>
-          <Card>
+          <Card sx={{ width: { xs: '100%', md: '600px' } }}>
             <CardContent>
               <EventForm uid={uid} onSaveEvent={onSaveEvent} />
             </CardContent>

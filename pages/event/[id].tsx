@@ -52,13 +52,11 @@ export default function EventPage() {
   const [event, setEvent] = useState<IEvent | undefined>(undefined);
   const [host, setHost] = useState<IUser | undefined>(undefined);
   const [isLoading, setLoading] = useState(true);
-
   const [participantsLength, setParticipantsLength] = useState(
     event?.participants.length
   );
 
   const router = useRouter();
-  console.log(router);
 
   const fetchEventData = async () => {
     setLoading(true);
@@ -75,7 +73,7 @@ export default function EventPage() {
 
   useEffect(() => {
     fetchEventData();
-  }, [router.query.id]);
+  }, []);
 
   useEffect(() => {
     const fetchHostData = async () => {

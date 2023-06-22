@@ -1,4 +1,4 @@
-import DefaultLayout from '@/layouts/default';
+import ProfileLayout from '@/layouts/profile';
 import PageHead from '@/components/global/Head';
 import EventForm from '@/components/events/EventForm';
 import { useRouter } from 'next/router';
@@ -58,7 +58,7 @@ const EditEvent = () => {
     return <Loader />;
   }
   return (
-    <DefaultLayout>
+    <ProfileLayout>
       <PageHead pageTitle="Edit book club meeting" />
       <div className="flex flex-col p-2 items-center mt-4">
         <Typography variant="h3" gutterBottom>
@@ -75,7 +75,7 @@ const EditEvent = () => {
           </CardContent>
         </Card>
       </div>
-    </DefaultLayout>
+    </ProfileLayout>
   );
 };
 export default EditEvent;

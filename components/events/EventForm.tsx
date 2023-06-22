@@ -131,7 +131,7 @@ const EventForm: React.FC<EventFormProps> = ({
       try {
         const preview = await toDataUrl(e.target.files[0]);
         setImgSrc(preview);
-        setPreviewImg(preview);
+        // setPreviewImg(preview);
         setModalOpen(true);
       } catch (error) {
         console.log('Error: ', error);
@@ -139,11 +139,12 @@ const EventForm: React.FC<EventFormProps> = ({
     }
   };
 
-  const onCropApply = (file: any) => {
+  const onCropApply = async (file: string) => {
     if (file) {
+      setModalOpen(false);
       formik.setFieldValue('coverUrl', file);
       setPreviewImg(file);
-      setModalOpen(false);
+      // alert(file);
     } else {
       formik.setFieldValue('coverUrl', '');
     }
@@ -292,10 +293,12 @@ const EventForm: React.FC<EventFormProps> = ({
               <CameraAltIcon className="mr-2" /> Upload cover picture
             </button>
             {previewImg && (
-              <div className="img-preview relative aspect-[18/4]">
+              <div className="img-preview relative aspect-[3/4]">
                 <Image
-                  className="m-auto aspect-[18/4]"
+                  className="m-auto aspect-[3/4]"
                   src={previewImg}
+                  // height={200}
+                  // width={150}
                   fill
                   style={{ objectFit: 'cover' }}
                   alt="event cover"

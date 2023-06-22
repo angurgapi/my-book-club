@@ -52,8 +52,6 @@ export const CropperModal: FC<Props> = ({
   const blobUrlRef = useRef('');
   const [crop, setCrop] = useState<Crop>();
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
-  const [scale, setScale] = useState(1);
-  const [rotate, setRotate] = useState(0);
 
   const aspect = cropAspect || 18 / 4;
 
@@ -65,24 +63,15 @@ export const CropperModal: FC<Props> = ({
       imgRef.current &&
       previewCanvasRef.current
     ) {
-      canvasPreview(
-        imgRef.current,
-        previewCanvasRef.current,
-        completedCrop,
-        scale,
-        rotate
-      );
+      canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop);
     }
   };
   //  console.log('cropper comp src prop:', imgSrc);
-  const TO_RADIANS = Math.PI / 180;
 
   function canvasPreview(
     image: HTMLImageElement,
     canvas: HTMLCanvasElement,
-    crop: PixelCrop,
-    scale = 1,
-    rotate = 0
+    crop: PixelCrop
   ) {
     const ctx = canvas.getContext('2d');
 
@@ -98,15 +87,12 @@ export const CropperModal: FC<Props> = ({
     ctx.imageSmoothingQuality = 'high';
     const cropX = crop.x * scaleX;
     const cropY = crop.y * scaleY;
-    // const rotateRads = rotate * TO_RADIANS;
     const centerX = image.naturalWidth / 2;
     const centerY = image.naturalHeight / 2;
     ctx.save();
 
     ctx.translate(-cropX, -cropY);
     ctx.translate(centerX, centerY);
-    // ctx.rotate(rotateRads);
-    // ctx.scale(scale, scale);
     ctx.translate(-centerX, -centerY);
     ctx.drawImage(
       image,
@@ -136,7 +122,18 @@ export const CropperModal: FC<Props> = ({
   function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
     if (aspect) {
       const { width, height } = e.currentTarget;
-      setCrop(centerAspectCrop(width, height, aspect));
+      // setCrop(centerAspectCrop(width, height, aspect));
+      // setCompletedCrop(centerAspectCrop(width, height, aspect));
+      const initialCrop = centerAspectCrop(width, height, aspect);
+      const pixelCrop: PixelCrop = {
+        unit: 'px',
+        x: Math.round((initialCrop.x / 100) * width),
+        y: Math.round((initialCrop.y / 100) * height),
+        width: Math.round((initialCrop.width / 100) * width),
+        height: Math.round((initialCrop.height / 100) * height),
+      };
+      setCrop(initialCrop);
+      setCompletedCrop(pixelCrop);
     }
   }
 

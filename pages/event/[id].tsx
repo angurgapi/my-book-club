@@ -88,7 +88,7 @@ export default function EventPage() {
   const formattedDate = dayjs(event?.date).format('MMM DD hh:mm a');
 
   const getImgSrc = () => {
-    return event?.coverUrl || '/images.cover.jpg';
+    return event?.coverUrl || '/images/cover.jpg';
   };
 
   const isOwnEvent = () => {

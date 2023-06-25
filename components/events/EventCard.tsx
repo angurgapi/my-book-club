@@ -26,13 +26,13 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const getImgSrc = event.coverUrl || '/images/cover.jpg';
 
   return (
-    <Link href={`/event/${event.id}`} className="w-fill">
+    <Link href={`/event/${event.id}`} className="w-full">
       <Card
         sx={{
           width: '100%',
           display: 'flex',
           height: '100%',
-          flexDirection: { xs: 'column', md: 'row' },
+          flexDirection: 'column',
         }}
       >
         <CardContent
@@ -49,7 +49,9 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
             component="p"
             className="event-card-title"
           >
-            {event.bookTitle} | {event.bookAuthor}
+            <b>
+              {event.bookTitle} | {event.bookAuthor}
+            </b>
           </Typography>
 
           <div className="flex items-center mt-2">

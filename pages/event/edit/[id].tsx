@@ -49,7 +49,7 @@ const EditEvent = () => {
 
   useEffect(() => {
     fetchEventData();
-  }, [router.query.id]);
+  }, []);
 
   const onSaveEvent = () => {
     router.push(`/event/${id}`);
@@ -60,11 +60,11 @@ const EditEvent = () => {
   return (
     <ProfileLayout>
       <PageHead pageTitle="Edit book club meeting" />
-      <div className="flex flex-col p-2 items-center mt-4">
+      <div className="flex w-fill flex-col p-2 items-center mt-4">
         <Typography variant="h3" gutterBottom>
           Edit event details
         </Typography>
-        <Card>
+        <Card sx={{ width: { xs: '100%', md: '600px' } }}>
           <CardContent>
             <EventForm
               onSaveEvent={onSaveEvent}

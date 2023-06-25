@@ -24,6 +24,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Card, CardActions, CardContent, Skeleton } from '@mui/material';
 
 import { EventHostCard } from '@/components/events/EventHostCard';
+import { AttendDialog } from '@/components/events/AttendDialog';
 
 // interface EventProps {
 //   event: IEvent;
@@ -70,6 +71,8 @@ export default function EventPage() {
     }
     setLoading(false);
   };
+
+  const [isDialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchEventData();
@@ -118,21 +121,15 @@ export default function EventPage() {
   //       }
   //     );
   // };
-
-  const toggleAttendEvent = async (addNew: boolean) => {
+  const onHandleConfirm = async (confirmed: boolean) => {
+    await toggleAttendEvent();
+    setDialogOpen(false);
+    fetchEventData();
+  };
+  const toggleAttendEvent = async () => {
     if (event) {
       try {
         await toggleAttendee(uid, event.participants, event.id);
-        if (addNew) {
-          setParticipantsLength(event.participants.length + 1);
-          event.participants.push(uid);
-          setAttending(true);
-          // sendEmail(event);
-        } else {
-          event.participants.splice(event.participants.indexOf(uid), 1);
-          setAttending(false);
-          setParticipantsLength(event.participants.length - 1);
-        }
       } catch (e) {
         console.log(e);
       }
@@ -246,7 +243,7 @@ export default function EventPage() {
                   <button
                     className="mt-3 p-2 bg-teal-500 text-white rounded w-fit"
                     onClick={() => {
-                      toggleAttendEvent(true);
+                      setDialogOpen(true);
                     }}
                   >
                     Attend
@@ -256,7 +253,7 @@ export default function EventPage() {
                   <button
                     className="mt-3 p-2 bg-teal-500 text-white rounded w-fit"
                     onClick={() => {
-                      toggleAttendEvent(false);
+                      setDialogOpen(true);
                     }}
                   >
                     Leave event
@@ -266,6 +263,18 @@ export default function EventPage() {
               </CardActions>
             </Card>
           </div>
+          <AttendDialog
+            title={
+              attending
+                ? 'Are you sure you are not coming?'
+                : 'Are you sure you want to attend?'
+            }
+            handleConfirm={onHandleConfirm}
+            handleClose={() => {
+              setDialogOpen(false);
+            }}
+            open={isDialogOpen}
+          />
         </>
       )}
     </DefaultLayout>

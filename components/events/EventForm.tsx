@@ -144,7 +144,6 @@ const EventForm: React.FC<EventFormProps> = ({
       setModalOpen(false);
       formik.setFieldValue('coverUrl', file);
       setPreviewImg(file);
-      // alert(file);
     } else {
       formik.setFieldValue('coverUrl', '');
     }
@@ -293,7 +292,7 @@ const EventForm: React.FC<EventFormProps> = ({
               <CameraAltIcon className="mr-2" /> Upload cover picture
             </button>
             {previewImg && (
-              <div className="img-preview relative aspect-[3/4]">
+              <div className="img-preview relative aspect-[3/4] w-[300px] m-auto">
                 <Image
                   className="m-auto aspect-[3/4]"
                   src={previewImg}
@@ -307,7 +306,7 @@ const EventForm: React.FC<EventFormProps> = ({
                   <IconButton
                     size="small"
                     type="button"
-                    sx={{ backgroundColor: '#fff' }}
+                    sx={{ backgroundColor: '#fff', hover: { color: '#fff' } }}
                     onClick={() => setModalOpen(true)}
                   >
                     <CropIcon />

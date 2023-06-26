@@ -21,8 +21,7 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
-  const formattedDate = dayjs.unix(event.date).format('MMM DD hh:mm a');
-
+  const formattedDate = dayjs(event?.date).format('MMM DD hh:mm a');
   const getImgSrc = event.coverUrl || '/images/cover.jpg';
 
   return (

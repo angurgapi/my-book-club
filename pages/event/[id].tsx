@@ -22,7 +22,7 @@ import {
   CardContent,
   Skeleton,
   Typography,
-  CardHeader,
+  Button,
 } from '@mui/material';
 
 import { EventHostCard } from '@/components/events/EventHostCard';
@@ -79,8 +79,14 @@ export default function EventPage() {
         : router.query.id;
       setEventId(queryId);
     }
-    fetchEventData();
+    // fetchEventData();
   }, [router.isReady]);
+
+  useEffect(() => {
+    if (eventId) {
+      fetchEventData();
+    }
+  }, [eventId]);
 
   useEffect(() => {
     const fetchHostData = async () => {
@@ -247,24 +253,24 @@ export default function EventPage() {
               </CardContent>
               <CardActions>
                 {canRegister() && (
-                  <button
-                    className="mt-3 p-2 bg-teal-500 text-white rounded w-fit"
+                  <Button
+                    variant="contained"
                     onClick={() => {
                       setDialogOpen(true);
                     }}
                   >
-                    Attend
-                  </button>
+                    Attend event
+                  </Button>
                 )}
                 {attending && (
-                  <button
-                    className="mt-3 p-2 bg-teal-500 text-white rounded w-fit"
+                  <Button
+                    variant="contained"
                     onClick={() => {
                       setDialogOpen(true);
                     }}
                   >
                     Leave event
-                  </button>
+                  </Button>
                 )}
                 {!event.registrationOpen && <span>Registration is closed</span>}
               </CardActions>

@@ -31,28 +31,40 @@ interface EventProps {
 
 const EditEvent = () => {
   const router = useRouter();
-  const { id } = router.query;
+  // const { id } = router.query;
   const { uid } = useAppSelector((state) => state.user);
   const [event, setEvent] = useState<IEvent | undefined>(undefined);
   const [isLoading, setLoading] = useState(true);
+  const [eventId, setEventId] = useState('');
 
   const fetchEventData = async () => {
     setLoading(true);
     try {
-      const event = await getEventById(id as string);
+      const event = await getEventById(eventId as string);
       setEvent(event as IEvent);
     } catch (e) {
       console.log('no such event', e);
     }
     setLoading(false);
   };
+  useEffect(() => {
+    if (router.isReady && router.query.id) {
+      const queryId = Array.isArray(router.query.id)
+        ? router.query.id[0]
+        : router.query.id;
+      setEventId(queryId);
+    }
+    // fetchEventData();
+  }, [router.isReady]);
 
   useEffect(() => {
-    fetchEventData();
-  }, []);
+    if (eventId) {
+      fetchEventData();
+    }
+  }, [eventId]);
 
   const onSaveEvent = () => {
-    router.push(`/event/${id}`);
+    router.push(`/event/${eventId}`);
   };
   if (isLoading) {
     return <Loader />;

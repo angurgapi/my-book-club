@@ -116,6 +116,7 @@ export const getHostedEvents = async (uid: string) => {
     const eventsData = eventsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      date: doc.data().date.toMillis(),
     }));
     return eventsData;
   } catch (error) {
@@ -136,6 +137,7 @@ export const getAttendedEvents = async (uid: string) => {
     const eventsData = eventsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      date: doc.data().date.toMillis(),
     }));
     return eventsData as IEvent[];
   } catch (error) {
@@ -168,7 +170,11 @@ export const getUpcomingEvents = async (
     const events: IEvent[] = [];
 
     querySnapshot.forEach((doc) => {
-      const eventData = { id: doc.id, ...doc.data() } as IEvent;
+      const eventData = {
+        id: doc.id,
+        ...doc.data(),
+        date: doc.data().date.toMillis(),
+      } as IEvent;
       events.push(eventData);
     });
 

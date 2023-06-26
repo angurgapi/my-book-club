@@ -1,12 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-// import Link from "next/link";
-// import Attendees from "@/components/events/AttendeesModal";
 import emailjs from '@emailjs/browser';
-// import { useRouter } from "next/router";
 import { getFirestore } from '@firebase/firestore';
 // import { GetServerSideProps } from 'next';
 import { IEvent } from '@/types/event';
@@ -21,38 +16,39 @@ import Link from 'next/link';
 import { getEventById, toggleAttendee, getEventHost } from '@/utils/eventApi';
 
 import EditIcon from '@mui/icons-material/Edit';
-import { Card, CardActions, CardContent, Skeleton } from '@mui/material';
+import {
+  Card,
+  CardActions,
+  CardContent,
+  Skeleton,
+  Typography,
+  CardHeader,
+} from '@mui/material';
 
 import { EventHostCard } from '@/components/events/EventHostCard';
 import { AttendDialog } from '@/components/events/AttendDialog';
 
-// interface EventProps {
-//   event: IEvent;
-// }
+interface EventProps {
+  eventId: string;
+}
 
-// export async function getServerSideProps(context: any) {
-//   const docId = context.query.id;
-//   try {
-//     const event = await getEventById(docId);
+export async function getServerSideProps(context: any) {
+  const eventId = context.query.id;
+  return {
+    props: {
+      eventId,
+    },
+  };
+}
 
-//     return {
-//       props: {
-//         event,
-//       },
-//     };
-//   } catch (e) {
-//     console.log('no such event', e);
-//   }
-// }
-
-export default function EventPage() {
+export default function EventPage({ eventId }: EventProps) {
   const { uid, email, isAuth } = useAppSelector((state) => state.user);
   const db = getFirestore();
 
   const [attending, setAttending] = useState<boolean | undefined>(false);
   const [event, setEvent] = useState<IEvent | undefined>(undefined);
   const [host, setHost] = useState<IUser | undefined>(undefined);
-  const [isLoading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(false);
   const [participantsLength, setParticipantsLength] = useState(
     event?.participants.length
   );
@@ -61,9 +57,8 @@ export default function EventPage() {
 
   const fetchEventData = async () => {
     setLoading(true);
-    const { id } = router.query;
     try {
-      const event = await getEventById(id as string);
+      const event = await getEventById(eventId);
       setEvent(event as IEvent);
       setAttending(isAuth && event?.participants.includes(uid));
     } catch (e) {
@@ -76,6 +71,7 @@ export default function EventPage() {
 
   useEffect(() => {
     fetchEventData();
+    console.log(eventId);
   }, []);
 
   useEffect(() => {
@@ -121,7 +117,7 @@ export default function EventPage() {
   //       }
   //     );
   // };
-  const onHandleConfirm = async (confirmed: boolean) => {
+  const onHandleConfirm = async () => {
     await toggleAttendEvent();
     setDialogOpen(false);
     fetchEventData();
@@ -135,27 +131,38 @@ export default function EventPage() {
       }
     }
   };
-  if (isLoading) {
+  if (isLoading || router.isFallback) {
     return (
       <DefaultLayout>
         <PageHead pageTitle="Loading..." />
-        <div className="flex flex-col p-2 items-center mt-4">
-          <Skeleton animation="wave" height={40} style={{ marginBottom: 16 }} />
-          <Card className="w-full md:max-w-[800px] mb-4">
+        <div className="flex flex-col items-center mt-4 pt-0">
+          <Skeleton
+            animation="wave"
+            height={40}
+            width={220}
+            style={{ marginBottom: 16 }}
+          />
+          <Card className="w-full md:max-w-[800px] pt-0 mb-4">
             <Skeleton
               animation="wave"
               height={170}
-              style={{ marginBottom: 6 }}
+              style={{ marginBottom: 6, marginTop: 0, display: 'flex' }}
+              variant="rectangular"
               width="100%"
             />
 
-            {Array.from({ length: 6 }, (_, index) => (
-              <div className="grid grid-cols-[1fr,4fr] gap-3 pt-2" key={index}>
-                <Skeleton height={20} />
-                <Skeleton height={20} />
-              </div>
-            ))}
-            <Skeleton height={40} width="100%" />
+            <div className="p-2">
+              {Array.from({ length: 6 }, (_, index) => (
+                <div
+                  className="grid grid-cols-[1fr,4fr] gap-3 pt-2"
+                  key={index}
+                >
+                  <Skeleton height={20} />
+                  <Skeleton height={20} />
+                </div>
+              ))}
+              <Skeleton height={60} width="100%" />
+            </div>
           </Card>
         </div>
       </DefaultLayout>
@@ -171,21 +178,13 @@ export default function EventPage() {
               {event.bookTitle} by {event.bookAuthor}
             </Typography>
             <Card className="w-full md:max-w-[800px] mb-4">
-              <div className="relative w-full  aspect-[18/4]">
-                {isLoading ? (
-                  <Skeleton
-                    sx={{ height: 190 }}
-                    animation="wave"
-                    variant="rectangular"
-                  />
-                ) : (
-                  <Image
-                    src={getImgSrc()}
-                    fill
-                    alt="book cover"
-                    style={{ objectFit: 'cover' }}
-                  />
-                )}
+              <div className="relative w-full aspect-[18/4]">
+                <Image
+                  src={getImgSrc()}
+                  fill
+                  alt="book cover"
+                  style={{ objectFit: 'cover' }}
+                />
 
                 {attending && (
                   <div className="absolute bottom-2 right-2 bg-amber-400 text-black rounded p-2 w-fit">

@@ -97,11 +97,6 @@ export const getEventById = async (id: string): Promise<IEvent | undefined> => {
       date: docSnap.data().date.toMillis(),
     } as IEvent;
     event.id = docSnap.id;
-    console.log(typeof event.date);
-    // return {
-    //   ...event,
-    //   date: event.date.toMillis(),
-    // };
     return event;
   } else {
     console.log('No such document!');

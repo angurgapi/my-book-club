@@ -67,13 +67,19 @@ export const saveEvent = async (eventData: IEventFormData) => {
 export const updateEvent = async (id: string, eventData: IEventFormData) => {
   const db = getFirestore();
   const docRef = doc(db, 'events', id);
+  const newImgRegex = /^data:/;
   try {
-    if (eventData.coverUrl) {
+    if (eventData.coverUrl && newImgRegex.test(eventData.coverUrl)) {
       const downloadURL = await addEventCover(eventData.coverUrl, id);
       await updateDoc(doc(db, 'events', docRef.id), {
         ...eventData,
         date: Timestamp.fromMillis(eventData.date.valueOf()),
         coverUrl: downloadURL,
+      });
+    } else if (eventData.coverUrl && eventData.coverUrl.length) {
+      await updateDoc(docRef, {
+        ...eventData,
+        date: Timestamp.fromMillis(eventData.date.valueOf()),
       });
     } else {
       await updateDoc(docRef, {

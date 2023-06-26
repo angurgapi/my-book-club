@@ -109,7 +109,7 @@ function Header() {
           <Typography
             noWrap
             component="a"
-            href=""
+            href="/"
             sx={{
               display: { xs: 'flex', md: 'none' },
               flexGrow: 1,

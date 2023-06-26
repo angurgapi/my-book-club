@@ -75,7 +75,7 @@ const EventForm: React.FC<EventFormProps> = ({
       location: oldEvent ? oldEvent.location : '',
       coverUrl: oldEvent ? oldEvent.coverUrl : '',
       fee: oldEvent ? oldEvent.fee : 0,
-      currency: oldEvent ? oldEvent.currency : '',
+      currency: oldEvent?.currency ? oldEvent.currency : '',
       description: oldEvent ? oldEvent.description : '',
       participants: oldEvent ? oldEvent.participants : [],
       registrationOpen: true,

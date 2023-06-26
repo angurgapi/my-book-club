@@ -23,6 +23,7 @@ import {
   Skeleton,
   Typography,
   Button,
+  CardMedia,
 } from '@mui/material';
 
 import { EventHostCard } from '@/components/events/EventHostCard';
@@ -187,94 +188,100 @@ export default function EventPage() {
       {event && (
         <>
           <PageHead pageTitle={event.bookTitle} />
-          <div className="flex flex-col p-2 items-center mt-4">
-            <Typography variant="h3" gutterBottom>
+          <div className="flex flex-col p-2 items-center m-auto w-full max-w-[800px]">
+            <Typography variant="h3" gutterBottom className="event-title">
               {event.bookTitle} by {event.bookAuthor}
             </Typography>
-            <Card className="w-full md:max-w-[800px] mb-4">
-              <div className="relative w-full aspect-[18/4]">
-                <Image
-                  src={getImgSrc()}
-                  fill
-                  alt="book cover"
-                  style={{ objectFit: 'cover' }}
-                />
+            <div className="event-page w-full">
+              <Card>
+                <div className="relative w-full h-full min-h-[300px] aspect-ratio-[3/4]">
+                  <Image
+                    src={getImgSrc()}
+                    fill
+                    alt="book cover"
+                    style={{ objectFit: 'cover' }}
+                  />
 
-                {attending && (
-                  <div className="absolute bottom-2 right-2 bg-amber-400 text-black rounded p-2 w-fit">
-                    You are attending
-                  </div>
-                )}
-                {isOwnEvent() && (
-                  <Link
-                    className="btn absolute top-2 right-2 w-fit btn bg-teal-500 text-white"
-                    href={`/event/edit/${event.id}`}
-                  >
-                    <EditIcon />
-                    edit
-                  </Link>
-                )}
-              </div>
-              <CardContent>
-                <div className="event-data">
-                  <p className="text-teal-800">city</p>
-                  <p className="text-xl">{event.city}</p>
-                  <p className="text-teal-800">location </p>
-                  <p className="text-xl">{event.location}</p>
-                  <p className="text-teal-800">date/time </p>
-                  <p className="text-xl">{formattedDate}</p>
-                  <p className="text-teal-800">attendees </p>
-                  <p className="text-xl">
-                    {event.participants.length || 'nobody yet'}
-                  </p>
-                  <p className="text-teal-800">capacity </p>
-                  {event.capacity && (
-                    <p className="text-xl">{event.capacity} ppl</p>
+                  {attending && (
+                    <div className="absolute bottom-2 right-2 bg-amber-400 text-black rounded p-2 w-fit">
+                      You are attending
+                    </div>
                   )}
-                  {!event.capacity && <p className="text-xl">no limit</p>}
-
-                  {host && (
-                    <>
-                      <p className="text-teal-800">Hosted by</p>
-                      <div className="w-fit">
-                        <EventHostCard hostData={host} />
-                      </div>
-                    </>
+                  {isOwnEvent() && (
+                    <Link
+                      className="btn absolute top-2 right-2 w-fit btn bg-teal-500 text-white"
+                      href={`/event/edit/${event.id}`}
+                    >
+                      <EditIcon />
+                      edit
+                    </Link>
                   )}
                 </div>
+              </Card>
 
-                {event.description && (
-                  <div className="bg-slate-100 mt-3 p-2 rounded">
-                    <span className="text-justify italic break-all">
-                      {event.description}
-                    </span>
+              <Card>
+                <CardContent>
+                  <div className="event-page__data">
+                    <p className="text-teal-800">city</p>
+                    <p className="text-xl">{event.city}</p>
+                    <p className="text-teal-800">location </p>
+                    <p className="text-xl">{event.location}</p>
+                    <p className="text-teal-800">date/time </p>
+                    <p className="text-xl">{formattedDate}</p>
+                    <p className="text-teal-800">attendees </p>
+                    <p className="text-xl">
+                      {event.participants.length || 'nobody yet'}
+                    </p>
+                    <p className="text-teal-800">capacity </p>
+                    {event.capacity && (
+                      <p className="text-xl">{event.capacity} ppl</p>
+                    )}
+                    {!event.capacity && <p className="text-xl">no limit</p>}
+
+                    {host && (
+                      <>
+                        <p className="text-teal-800">Hosted by</p>
+                        <div className="w-fit">
+                          <EventHostCard hostData={host} />
+                        </div>
+                      </>
+                    )}
                   </div>
-                )}
-              </CardContent>
-              <CardActions>
-                {canRegister() && (
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      setDialogOpen(true);
-                    }}
-                  >
-                    Attend event
-                  </Button>
-                )}
-                {attending && (
-                  <Button
-                    variant="contained"
-                    onClick={() => {
-                      setDialogOpen(true);
-                    }}
-                  >
-                    Leave event
-                  </Button>
-                )}
-                {!event.registrationOpen && <span>Registration is closed</span>}
-              </CardActions>
-            </Card>
+                </CardContent>
+                <CardActions>
+                  {canRegister() && (
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        setDialogOpen(true);
+                      }}
+                    >
+                      Attend event
+                    </Button>
+                  )}
+                  {attending && (
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        setDialogOpen(true);
+                      }}
+                    >
+                      Leave event
+                    </Button>
+                  )}
+                  {!event.registrationOpen && (
+                    <span>Registration is closed</span>
+                  )}
+                </CardActions>
+              </Card>
+            </div>
+            {event.description && (
+              <div className="bg-slate-100 mt-3 p-2 rounded w-full">
+                <span className="text-justify italic break-all">
+                  {event.description}
+                </span>
+              </div>
+            )}
           </div>
           <AttendDialog
             title={

@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 import emailjs from '@emailjs/browser';
 import { getFirestore } from '@firebase/firestore';
-// import { GetServerSideProps } from 'next';
+import { GetServerSideProps, GetStaticProps } from 'next';
 import { IEvent } from '@/types/event';
 import { IUser } from '@/types/user';
 import DefaultLayout from '@/layouts/default';
@@ -32,23 +32,25 @@ interface EventProps {
   eventId: string;
 }
 
-export async function getServerSideProps(context: any) {
-  const eventId = context.query.id;
-  return {
-    props: {
-      eventId,
-    },
-  };
-}
+// export async function getStaticProps(context: any) {
+//   // const eventId = context.query.id;
+//   const eventId = context.query.id;
+//   return {
+//     props: {
+//       eventId,
+//     },
+//   };
+// }
 
-export default function EventPage({ eventId }: EventProps) {
+// args: { eventId }: EventProps
+export default function EventPage() {
   const { uid, email, isAuth } = useAppSelector((state) => state.user);
   const db = getFirestore();
-
+  const [eventId, setEventId] = useState('');
   const [attending, setAttending] = useState<boolean | undefined>(false);
   const [event, setEvent] = useState<IEvent | undefined>(undefined);
   const [host, setHost] = useState<IUser | undefined>(undefined);
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(true);
   const [participantsLength, setParticipantsLength] = useState(
     event?.participants.length
   );
@@ -70,9 +72,15 @@ export default function EventPage({ eventId }: EventProps) {
   const [isDialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
+    if (router.isReady && router.query.id) {
+      console.log(router);
+      const queryId = Array.isArray(router.query.id)
+        ? router.query.id[0]
+        : router.query.id;
+      setEventId(queryId);
+    }
     fetchEventData();
-    console.log(eventId);
-  }, []);
+  }, [router.isReady]);
 
   useEffect(() => {
     const fetchHostData = async () => {
@@ -131,7 +139,7 @@ export default function EventPage({ eventId }: EventProps) {
       }
     }
   };
-  if (isLoading || router.isFallback) {
+  if (isLoading) {
     return (
       <DefaultLayout>
         <PageHead pageTitle="Loading..." />

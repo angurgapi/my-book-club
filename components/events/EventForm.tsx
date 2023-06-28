@@ -74,12 +74,14 @@ const EventForm: React.FC<EventFormProps> = ({
       city: oldEvent ? oldEvent.city : '',
       location: oldEvent ? oldEvent.location : '',
       coverUrl: oldEvent ? oldEvent.coverUrl : '',
-      fee: oldEvent ? oldEvent.fee : 0,
+      fee: oldEvent?.fee ? oldEvent.fee : 0,
       currency: oldEvent?.currency ? oldEvent.currency : '',
       description: oldEvent ? oldEvent.description : '',
       participants: oldEvent ? oldEvent.participants : [],
-      registrationOpen: true,
-      capacity: oldEvent ? oldEvent.capacity : 5,
+      isRegistrationOpen: oldEvent?.isRegistrationOpen
+        ? oldEvent.isRegistrationOpen
+        : true,
+      capacity: oldEvent?.capacity ? oldEvent.capacity : 5,
     },
 
     validationSchema,

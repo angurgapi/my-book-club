@@ -70,6 +70,7 @@ export const updateEvent = async (id: string, eventData: IEventFormData) => {
   const newImgRegex = /^data:/;
   try {
     if (eventData.coverUrl && newImgRegex.test(eventData.coverUrl)) {
+      console.log('new image, blob!');
       const downloadURL = await addEventCover(eventData.coverUrl, id);
       await updateDoc(doc(db, 'events', docRef.id), {
         ...eventData,
@@ -77,6 +78,7 @@ export const updateEvent = async (id: string, eventData: IEventFormData) => {
         coverUrl: downloadURL,
       });
     } else if (eventData.coverUrl && eventData.coverUrl.length) {
+      console.log('data has image, but its an old url!');
       await updateDoc(docRef, {
         ...eventData,
         date: Timestamp.fromMillis(eventData.date.valueOf()),
@@ -203,16 +205,18 @@ export const toggleAttendee = async (
 ) => {
   const db = getFirestore();
   const docRef = doc(db, 'events', eventId);
+  const freshEventData = await getDoc(docRef);
+  console.log(freshEventData.data());
   const newAttendeesList = attendees.includes(uid)
     ? attendees.filter((attendee) => attendee !== uid)
     : [...attendees, uid];
-  try {
-    await updateDoc(docRef, {
-      participants: newAttendeesList,
-    });
-  } catch (e) {
-    console.log(e);
-  }
+  // try {
+  //   await updateDoc(docRef, {
+  //     participants: newAttendeesList,
+  //   });
+  // } catch (e) {
+  //   console.log(e);
+  // }
 };
 
 export const getEventHost = async (uid: string) => {
@@ -221,6 +225,18 @@ export const getEventHost = async (uid: string) => {
   try {
     const hostData = await getDoc(hostRef);
     return hostData.data();
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const closeRegistration = async (eventId: string) => {
+  const db = getFirestore();
+  const docRef = doc(db, 'events', eventId);
+  try {
+    await updateDoc(docRef, {
+      isRegistrationOpen: false,
+    });
   } catch (e) {
     console.log(e);
   }

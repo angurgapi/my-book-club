@@ -19,7 +19,7 @@ export interface IEvent {
   fee?: number;
   currency?: string;
   capacity?: number;
-  registrationOpen: boolean;
+  isRegistrationOpen: boolean;
 }
 
 export interface IEventsState {

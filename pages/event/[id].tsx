@@ -13,7 +13,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
 import Link from 'next/link';
-import { getEventById, toggleAttendee, getEventHost } from '@/utils/eventApi';
+import {
+  getEventById,
+  toggleAttendee,
+  getEventHost,
+  closeRegistration,
+} from '@/utils/eventApi';
 
 import EditIcon from '@mui/icons-material/Edit';
 import {
@@ -23,6 +28,7 @@ import {
   Skeleton,
   Typography,
   Button,
+  Chip,
   CardMedia,
 } from '@mui/material';
 
@@ -90,6 +96,21 @@ export default function EventPage() {
   }, [eventId]);
 
   useEffect(() => {
+    if (
+      event?.isRegistrationOpen &&
+      event?.date &&
+      event?.date < new Date().getTime()
+    ) {
+      console.log('time to close');
+      const autoCloseRegistration = async () => {
+        await closeRegistration(event.id);
+        fetchEventData();
+      };
+      autoCloseRegistration();
+    }
+  }, [event]);
+
+  useEffect(() => {
     const fetchHostData = async () => {
       if (event) {
         const hostData = await getEventHost(event.hostId);
@@ -110,8 +131,9 @@ export default function EventPage() {
   };
 
   const canRegister = () => {
+    console.log(event.isRegistrationOpen);
     return (
-      event && isAuth && !isOwnEvent() && event.registrationOpen && !attending
+      event && isAuth && !isOwnEvent() && event.isRegistrationOpen && !attending
     );
   };
 
@@ -246,7 +268,25 @@ export default function EventPage() {
                         </div>
                       </>
                     )}
+                    {event.description && (
+                      <div className="bg-slate-100 mt-3 p-2 rounded w-full">
+                        <span className="text-justify italic break-all">
+                          {event.description}
+                        </span>
+                      </div>
+                    )}
                   </div>
+                  {!event.isRegistrationOpen && (
+                    <Chip
+                      sx={{
+                        backgroundColor: '#eb4034',
+                        color: '#fff',
+                        mt: 2,
+                        justifySelf: 'end',
+                      }}
+                      label="Registration is closed"
+                    />
+                  )}
                 </CardContent>
                 <CardActions>
                   {canRegister() && (
@@ -269,19 +309,9 @@ export default function EventPage() {
                       Leave event
                     </Button>
                   )}
-                  {!event.registrationOpen && (
-                    <span>Registration is closed</span>
-                  )}
                 </CardActions>
               </Card>
             </div>
-            {event.description && (
-              <div className="bg-slate-100 mt-3 p-2 rounded w-full">
-                <span className="text-justify italic break-all">
-                  {event.description}
-                </span>
-              </div>
-            )}
           </div>
           <AttendDialog
             title={

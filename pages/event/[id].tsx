@@ -80,7 +80,6 @@ export default function EventPage() {
 
   useEffect(() => {
     if (router.isReady && router.query.id) {
-      console.log(router);
       const queryId = Array.isArray(router.query.id)
         ? router.query.id[0]
         : router.query.id;
@@ -101,7 +100,6 @@ export default function EventPage() {
       event?.date &&
       event?.date < new Date().getTime()
     ) {
-      console.log('time to close');
       const autoCloseRegistration = async () => {
         await closeRegistration(event.id);
         fetchEventData();
@@ -131,7 +129,6 @@ export default function EventPage() {
   };
 
   const canRegister = () => {
-    console.log(event.isRegistrationOpen);
     return (
       event && isAuth && !isOwnEvent() && event.isRegistrationOpen && !attending
     );
@@ -179,28 +176,35 @@ export default function EventPage() {
             width={220}
             style={{ marginBottom: 16 }}
           />
-          <Card className="w-full md:max-w-[800px] pt-0 mb-4">
-            <Skeleton
-              animation="wave"
-              height={170}
-              style={{ marginBottom: 6, marginTop: 0, display: 'flex' }}
-              variant="rectangular"
-              width="100%"
-            />
-
-            <div className="p-2">
-              {Array.from({ length: 6 }, (_, index) => (
-                <div
-                  className="grid grid-cols-[1fr,4fr] gap-3 pt-2"
-                  key={index}
-                >
-                  <Skeleton height={20} />
-                  <Skeleton height={20} />
+          <div className="event-page w-full">
+            <Card>
+              <div className="relative w-full h-full min-h-[300px] aspect-ratio-[3/4]">
+                <Skeleton
+                  animation="wave"
+                  height={'100%'}
+                  style={{ marginBottom: 6, marginTop: 0, display: 'flex' }}
+                  variant="rectangular"
+                  width="100%"
+                />
+              </div>
+            </Card>
+            <Card>
+              <CardContent>
+                <div className="p-2">
+                  {Array.from({ length: 6 }, (_, index) => (
+                    <div
+                      className="grid grid-cols-[1fr,4fr] gap-3 pt-2"
+                      key={index}
+                    >
+                      <Skeleton height={20} />
+                      <Skeleton height={20} />
+                    </div>
+                  ))}
+                  <Skeleton height={60} width="100%" />
                 </div>
-              ))}
-              <Skeleton height={60} width="100%" />
-            </div>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </DefaultLayout>
     );
@@ -268,14 +272,14 @@ export default function EventPage() {
                         </div>
                       </>
                     )}
-                    {event.description && (
-                      <div className="bg-slate-100 mt-3 p-2 rounded w-full">
-                        <span className="text-justify italic break-all">
-                          {event.description}
-                        </span>
-                      </div>
-                    )}
                   </div>
+                  {event.description && (
+                    <div className="bg-slate-100 mt-3 p-2 rounded w-full">
+                      <span className="text-justify italic break-all">
+                        {event.description}
+                      </span>
+                    </div>
+                  )}
                   {!event.isRegistrationOpen && (
                     <Chip
                       sx={{

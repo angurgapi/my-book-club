@@ -63,6 +63,15 @@ const EditEvent = () => {
     }
   }, [eventId]);
 
+  useEffect(() => {
+    console.log('got event data');
+    console.log(event?.hostId, uid);
+    if (event && event.hostId !== uid) {
+      console.log('not my event');
+      router.push('/');
+    }
+  }, [event]);
+
   const onSaveEvent = () => {
     router.push(`/event/${eventId}`);
   };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { IEvent } from '@/types/event';
-
+import { useAppSelector } from '@/hooks/redux';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import {
@@ -10,11 +10,18 @@ import {
   Card,
   CardMedia,
   CardContent,
+  IconButton,
 } from '@mui/material';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import PublicIcon from '@mui/icons-material/Public';
+// import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+// import LocationOnIcon from '@mui/icons-material/LocationOn';
+// import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import {
+  MonetizationOn,
+  LocationOn,
+  CalendarMonth,
+  Public,
+  Edit,
+} from '@mui/icons-material';
 
 interface EventCardProps {
   event: IEvent;
@@ -23,23 +30,41 @@ interface EventCardProps {
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const formattedDate = dayjs(event?.date).format('MMM DD hh:mm a');
   const getImgSrc = event.coverUrl || '/images/cover.jpg';
+  const { uid, isAuth } = useAppSelector((state) => state.user);
+  const isOwnEvent = isAuth && uid === event.hostId ? true : false;
 
   return (
     <Link href={`/event/${event.id}`} className="w-full">
       <Card
-        sx={{
-          width: '100%',
-          display: 'flex',
-          height: '100%',
-          flexDirection: 'column',
-        }}
+        className="event-card"
+        // sx={{
+        //   width: '100%',
+        //   display: 'flex',
+        //   height: '100%',
+        //   flexDirection: 'column',
+        //   position: 'relative',
+        // }}
       >
+        {isOwnEvent && (
+          <IconButton
+            sx={{
+              width: '40px',
+              position: 'absolute',
+              right: '-2px',
+              background: '#fff',
+              color: 'primary',
+            }}
+          >
+            <Edit />
+          </IconButton>
+        )}
         <CardContent
           sx={{
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
+            flexGrow: 1,
           }}
         >
           <Typography
@@ -54,12 +79,12 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           </Typography>
 
           <div className="flex items-center mt-2">
-            <CalendarMonthIcon className="text-teal-500 mr-2" />
+            <CalendarMonth className="text-teal-500 mr-2" />
             <span className="text-start">{formattedDate}</span>
           </div>
 
           <div className="flex items-center  mt-2">
-            <LocationOnIcon className="text-teal-500 mr-2" />
+            <LocationOn className="text-teal-500 mr-2" />
             <span> {event.city}</span>
           </div>
           <Box
@@ -69,7 +94,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           >
             {event.fee ? (
               <div className="flex items-center  mt-2">
-                <MonetizationOnIcon className="text-teal-500 mr-2" />
+                <MonetizationOn className="text-teal-500 mr-2" />
                 <span>
                   {' '}
                   {event.fee} {event.currency}
@@ -93,7 +118,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           component="img"
           image={getImgSrc}
           alt="bookclub event cover"
-          sx={{ aspectRatio: '3/4', width: '100%', maxHeight: '320px' }}
+          sx={{ aspectRatio: '3/4', width: 'auto', maxHeight: '100%' }}
         />
       </Card>
     </Link>

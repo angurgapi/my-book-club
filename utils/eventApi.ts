@@ -157,11 +157,10 @@ export const getUpcomingEvents = async (
   queryString: string,
   pageNum: number
 ): Promise<{ events: IEvent[]; totalLength: number }> => {
-  console.log(pageNum);
   const db = getFirestore();
   let eventsCollectionQuery = query(
     collection(db, 'events'),
-    // where('date', '>', Timestamp.now()),
+    where('date', '>', Timestamp.now()),
     orderBy('date', 'asc')
   );
 
@@ -205,18 +204,30 @@ export const toggleAttendee = async (
 ) => {
   const db = getFirestore();
   const docRef = doc(db, 'events', eventId);
-  const freshEventData = await getDoc(docRef);
-  console.log(freshEventData.data());
-  const newAttendeesList = attendees.includes(uid)
-    ? attendees.filter((attendee) => attendee !== uid)
-    : [...attendees, uid];
-  // try {
-  //   await updateDoc(docRef, {
-  //     participants: newAttendeesList,
-  //   });
-  // } catch (e) {
-  //   console.log(e);
-  // }
+  try {
+    const currentEvent = await getDoc(docRef);
+    const currentEventData = currentEvent.data();
+    const newAttendeesList = currentEventData?.participants.includes(uid)
+      ? currentEventData?.filter((attendee: string) => attendee !== uid)
+      : [...currentEventData?.participants, uid];
+    if (
+      currentEventData?.capacity &&
+      newAttendeesList.length < currentEventData?.capacity
+    ) {
+      try {
+        await updateDoc(docRef, {
+          participants: newAttendeesList,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      alert('oops, limit if attendees exceeded');
+      closeRegistration(eventId);
+    }
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 export const getEventHost = async (uid: string) => {

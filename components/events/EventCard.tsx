@@ -22,6 +22,7 @@ import {
   Public,
   Edit,
 } from '@mui/icons-material';
+import { useRouter } from 'next/router';
 
 interface EventCardProps {
   event: IEvent;
@@ -33,18 +34,16 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const { uid, isAuth } = useAppSelector((state) => state.user);
   const isOwnEvent = isAuth && uid === event.hostId ? true : false;
 
+  const router = useRouter();
+
+  const editEvent = (id: string) => (event: any) => {
+    event.stopPropagation();
+    router.push(`/event/edit/${id}`);
+  };
+
   return (
     <Link href={`/event/${event.id}`} className="w-full">
-      <Card
-        className="event-card"
-        // sx={{
-        //   width: '100%',
-        //   display: 'flex',
-        //   height: '100%',
-        //   flexDirection: 'column',
-        //   position: 'relative',
-        // }}
-      >
+      <Card className="event-card">
         {isOwnEvent && (
           <IconButton
             sx={{
@@ -54,6 +53,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
               background: '#fff',
               color: 'primary',
             }}
+            onClick={editEvent(event.id)}
           >
             <Edit />
           </IconButton>

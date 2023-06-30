@@ -70,7 +70,7 @@ const EditEvent = () => {
       console.log('not my event');
       router.push('/');
     }
-  }, [event]);
+  }, [event?.hostId]);
 
   const onSaveEvent = () => {
     router.push(`/event/${eventId}`);

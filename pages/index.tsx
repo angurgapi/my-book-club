@@ -1,5 +1,6 @@
 import DefaultLayout from '@/layouts/default';
-import Hero from '@/components/global/Hero';
+import Hero from '@/components/index/Hero';
+import Stages from '@/components/index/Stages';
 import PageHead from '@/components/global/Head';
 
 export default function Home() {
@@ -8,6 +9,7 @@ export default function Home() {
       <PageHead pageTitle="Home" />
       <div className="flex flex-col items-center justify-start p-0">
         <Hero />
+        <Stages />
       </div>
     </DefaultLayout>
   );

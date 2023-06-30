@@ -1,4 +1,4 @@
-import React, { useState, SyntheticEvent } from 'react';
+import React, { useState, SyntheticEvent, useEffect } from 'react';
 import { ChangeEvent } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -30,6 +30,36 @@ interface EventFormProps {
   isEdit?: boolean;
   oldEvent?: IEvent;
 }
+
+const toDataUrl = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result?.toString() || '');
+    reader.onerror = (error) => reject(error);
+  });
+};
+
+const toBlob = async (imageUrl: string) => {
+  const response = await fetch(imageUrl);
+  const blob = await response.blob();
+  const reader = new FileReader();
+
+  return new Promise((resolve, reject) => {
+    reader.onloadend = () => {
+      const base64String = reader.result?.toString() || '';
+      const blobData = `data:image/webp;base64,${base64String.split(',')[1]}`;
+      resolve(blobData);
+    };
+
+    reader.onerror = (error) => {
+      reject(error);
+    };
+
+    reader.readAsDataURL(blob);
+  });
+};
+
 const EventForm: React.FC<EventFormProps> = ({
   onSaveEvent,
   uid,
@@ -73,7 +103,7 @@ const EventForm: React.FC<EventFormProps> = ({
       date: oldEvent ? dayjs(oldEvent.date) : dayjs().add(2, 'hour'),
       city: oldEvent ? oldEvent.city : '',
       location: oldEvent ? oldEvent.location : '',
-      coverUrl: oldEvent ? oldEvent.coverUrl : '',
+      coverUrl: oldEvent?.coverUrl ? oldEvent.coverUrl : '',
       fee: oldEvent?.fee ? oldEvent.fee : 0,
       currency: oldEvent?.currency ? oldEvent.currency : '',
       description: oldEvent ? oldEvent.description : '',
@@ -83,7 +113,6 @@ const EventForm: React.FC<EventFormProps> = ({
         : true,
       capacity: oldEvent?.capacity ? oldEvent.capacity : 5,
     },
-
     validationSchema,
     onSubmit: async (values) => {
       setLoading(true);
@@ -119,14 +148,20 @@ const EventForm: React.FC<EventFormProps> = ({
     }
   };
 
-  const toDataUrl = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result?.toString() || '');
-      reader.onerror = (error) => reject(error);
-    });
-  };
+  // useEffect(() => {
+  //   const setBlobPicture = async () => {
+  //     if (oldEvent?.coverUrl) {
+  //       try {
+  //         const preview = await toBlob(oldEvent.coverUrl);
+  //         setImgSrc(preview as string);
+  //       } catch (error) {
+  //         console.error(error);
+  //       }
+  //     }
+  //   };
+
+  //   setBlobPicture();
+  // }, [oldEvent?.coverUrl]);
 
   const onImageSelect = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { IconButton, Modal } from '@mui/material';
 import React, { useState, useRef } from 'react';
 import ReactCrop, {
@@ -55,6 +55,11 @@ export const CropperModal: FC<Props> = ({
 
   const aspect = cropAspect || 18 / 4;
 
+  useEffect(() => {
+    console.log('crop changed');
+    console.log(completedCrop);
+  }, [crop]);
+
   const applyCrop = () => {
     console.log('apply');
     if (
@@ -64,6 +69,8 @@ export const CropperModal: FC<Props> = ({
       previewCanvasRef.current
     ) {
       canvasPreview(imgRef.current, previewCanvasRef.current, completedCrop);
+      const dataUrl = previewCanvasRef.current.toDataURL();
+      onCropApply(dataUrl);
     }
   };
   //  console.log('cropper comp src prop:', imgSrc);
@@ -115,11 +122,12 @@ export const CropperModal: FC<Props> = ({
     //   onCropApply(blob);
     //   console.log('emit crop to parent');
     // });
-    const dataUrl = canvas.toDataURL();
-    onCropApply(dataUrl);
+    // const dataUrl = canvas.toDataURL();
+    // onCropApply(dataUrl);
   }
 
   function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
+    console.log('onImageLoad');
     if (aspect) {
       const { width, height } = e.currentTarget;
       // setCrop(centerAspectCrop(width, height, aspect));
@@ -134,6 +142,7 @@ export const CropperModal: FC<Props> = ({
       };
       setCrop(initialCrop);
       setCompletedCrop(pixelCrop);
+      // setCompletedCrop(initialCrop);
     }
   }
 

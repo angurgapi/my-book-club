@@ -98,6 +98,9 @@
     grid-template-columns: 150px 1fr;
     grid-gap: 20px;
     align-items: center;
+    p {
+      line-height: 1rem;
+    }
     @media (max-width: 600px) {
       grid-template-columns: 1fr;
       grid-gap: 12px;

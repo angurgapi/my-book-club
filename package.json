@@ -6,15 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:cypress": "cypress run"
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.11.16",
+    "@mui/lab": "^5.0.0-alpha.136",
     "@mui/material": "^5.13.2",
     "@mui/x-date-pickers": "^6.5.0",
     "@reduxjs/toolkit": "^1.9.5",
+    "@testing-library/react": "^14.0.0",
     "@types/node": "20.2.0",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
@@ -38,12 +41,20 @@
     "react-toastify": "^9.1.3",
     "redux-persist": "^6.0.0",
     "sass": "^1.62.1",
+    "swiper": "^10.0.4",
     "tailwindcss": "3.3.2",
     "typescript": "5.0.4",
     "yup": "^1.2.0"
   },
   "devDependencies": {
     "@emailjs/browser": "^3.11.0",
-    "@types/fabric": "^5.3.3"
+    "@types/fabric": "^5.3.3",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^9.1.3",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "cypress": "^12.17.1"
   }
 }

@@ -212,7 +212,7 @@ export const toggleAttendee = async (
       : [...currentEventData?.participants, uid];
     if (
       currentEventData?.capacity &&
-      newAttendeesList.length < currentEventData?.capacity
+      newAttendeesList.length <= currentEventData?.capacity
     ) {
       try {
         await updateDoc(docRef, {
@@ -222,7 +222,7 @@ export const toggleAttendee = async (
         console.log(e);
       }
     } else {
-      alert('oops, limit if attendees exceeded');
+      alert('oops, limit of attendees exceeded');
       closeRegistration(eventId);
     }
   } catch (e) {

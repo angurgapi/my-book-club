@@ -12,10 +12,10 @@ import { persistor, store } from '@/store/store';
 import { PersistGate } from 'redux-persist/integration/react';
 import '@/utils/firebase';
 import { ThemeProvider } from '@emotion/react';
-import { createTheme } from '@mui/material';
+import { createTheme, responsiveFontSizes } from '@mui/material';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  const theme = createTheme({
+  let theme = createTheme({
     typography: {
       fontFamily: 'Como',
     },
@@ -25,6 +25,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       },
     },
   });
+  theme = responsiveFontSizes(theme);
 
   return (
     <>

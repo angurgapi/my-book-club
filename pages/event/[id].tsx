@@ -34,6 +34,7 @@ import {
 
 import { EventHostCard } from '@/components/events/EventHostCard';
 import { AttendDialog } from '@/components/events/AttendDialog';
+import PageNotFound from '../404';
 
 interface EventProps {
   eventId: string;
@@ -165,6 +166,9 @@ export default function EventPage() {
       }
     }
   };
+  if (!isLoading && !event) {
+    return <PageNotFound />;
+  }
   if (isLoading) {
     return (
       <DefaultLayout>
@@ -219,8 +223,8 @@ export default function EventPage() {
               {event.bookTitle} by {event.bookAuthor}
             </Typography>
             <div className="event-page w-full">
-              <Card>
-                <div className="relative w-full h-full min-h-[300px] aspect-ratio-[3/4]">
+              <Card className="h-[300px] w-[225px] m-auto mt-0">
+                <div className="relative w-full h-full">
                   <Image
                     src={getImgSrc()}
                     fill
@@ -292,7 +296,7 @@ export default function EventPage() {
                     />
                   )}
                 </CardContent>
-                <CardActions>
+                <CardActions sx={{ paddingBottom: 2 }}>
                   {canRegister() && (
                     <Button
                       variant="contained"

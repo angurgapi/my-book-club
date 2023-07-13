@@ -38,6 +38,13 @@ p {
   white-space: normal;
   word-break: break-all;
   word-break: break-word;
+  margin: 0;
+}
+
+h4 {
+  @media (max-width: 800px) {
+    font-size: 22px !important;
+  }
 }
 
 a {
@@ -73,4 +80,12 @@ a {
   font-weight: 600;
   font-style: normal;
   src: url('../assets/fonts/Como-SemiBold.ttf');
+}
+
+.swiper-wrapper {
+  align-items: stretch;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #0b074a !important;
 }

@@ -17,12 +17,13 @@ import CropIcon from '@mui/icons-material/Crop';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { DateValidationError } from '@mui/x-date-pickers/models';
 import dayjs from 'dayjs';
-import Image from 'next/image';
+import NextImage from 'next/image';
 import { CropperModal } from './CropperModal';
 import { Timestamp } from 'firebase/firestore';
 import { saveEvent, updateEvent } from '@/utils/eventApi';
 import Loader from '../global/Loader';
 import { IEvent, IEventFormData } from '@/types/event';
+import { sendErrorToast, sendSuccessToast } from '@/utils/toast';
 
 interface EventFormProps {
   onSaveEvent: () => void;
@@ -60,6 +61,44 @@ const toBlob = async (imageUrl: string) => {
   });
 };
 
+const compressDataUrl = (
+  dataUrl: string,
+  outputType: 'image/webp' | 'image/jpeg' = 'image/webp',
+  quality = 0.8,
+  maxWidth = 1200,
+  maxHeight = 1200
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const image = new window.Image();
+    image.onload = () => {
+      const originalWidth = image.width;
+      const originalHeight = image.height;
+      const scale = Math.min(maxWidth / originalWidth, maxHeight / originalHeight, 1);
+      const targetWidth = Math.round(originalWidth * scale);
+      const targetHeight = Math.round(originalHeight * scale);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Canvas 2D context not available'));
+        return;
+      }
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
+      try {
+        const compressed = canvas.toDataURL(outputType, quality);
+        resolve(compressed);
+      } catch (err) {
+        reject(err);
+      }
+    };
+    image.onerror = (e: Event | string) => reject(e);
+    image.src = dataUrl;
+  });
+};
+
 const EventForm: React.FC<EventFormProps> = ({
   onSaveEvent,
   uid,
@@ -72,7 +111,6 @@ const EventForm: React.FC<EventFormProps> = ({
   const [previewImg, setPreviewImg] = useState(
     oldEvent ? oldEvent.coverUrl : ''
   );
-  const [paidEvent, setPaidEvent] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = React.useState<DateValidationError | null>(null);
@@ -84,17 +122,17 @@ const EventForm: React.FC<EventFormProps> = ({
     city: Yup.string().required('City is required'),
     location: Yup.string().required('Location is required'),
     description: Yup.string(),
-    fee: Yup.number(),
+    fee: Yup.number().when('isPaid', {
+      is: true, then: (s) => s.min(0.01, 'Define the fee').required('Fee required'),
+      otherwise: (s) => s.notRequired()
+    }),
+    currency: Yup.string().when('isPaid', {
+      is: true, then: (s) => s.length(3, 'ISO-4217').required('Currency required'),
+      otherwise: (s) => s.notRequired()
+    }),
+
     coverUrl: Yup.mixed(),
   });
-
-  //   const validate = (values: any) => {
-  //     if (values.date && values.date.isBefore(dayjs(), 'day')) {
-  //       errors.date = true;
-  //     }
-
-  //     return errors;
-  //   };
 
   const formik = useFormik({
     initialValues: {
@@ -104,6 +142,7 @@ const EventForm: React.FC<EventFormProps> = ({
       city: oldEvent ? oldEvent.city : '',
       location: oldEvent ? oldEvent.location : '',
       coverUrl: oldEvent?.coverUrl ? oldEvent.coverUrl : '',
+      isPaid: Boolean(oldEvent?.fee && oldEvent.fee > 0),
       fee: oldEvent?.fee ? oldEvent.fee : 0,
       currency: oldEvent?.currency ? oldEvent.currency : '',
       description: oldEvent ? oldEvent.description : '',
@@ -116,7 +155,6 @@ const EventForm: React.FC<EventFormProps> = ({
     validationSchema,
     onSubmit: async (values) => {
       setLoading(true);
-      //   validate(values);
       let eventData = {
         hostId: uid,
         ...values,
@@ -127,19 +165,23 @@ const EventForm: React.FC<EventFormProps> = ({
           await saveEvent(eventData as IEventFormData);
           onSaveEvent();
         } catch (e) {
-          console.log(e);
+          const message = e instanceof Error ? e.message : 'Failed to save event';
+          sendErrorToast(message);
         }
       } else {
         try {
           await updateEvent(oldEvent.id, eventData);
           onSaveEvent();
         } catch (e) {
-          console.log(e);
+          const message = e instanceof Error ? e.message : 'Failed to update event';
+          sendErrorToast(message);
         }
       }
       setLoading(false);
     },
   });
+
+  const paidEvent = formik.values.isPaid;
 
   const openFileInput = () => {
     const fileInput = document.getElementById('fileInput');
@@ -179,8 +221,14 @@ const EventForm: React.FC<EventFormProps> = ({
   const onCropApply = async (file: string) => {
     if (file) {
       setModalOpen(false);
-      formik.setFieldValue('coverUrl', file);
-      setPreviewImg(file);
+      try {
+        // const compressed = await compressDataUrl(file, 'image/webp', 0.8, 1200, 1200);
+        formik.setFieldValue('coverUrl', file);
+        setPreviewImg(file);
+      } catch (err) {
+        formik.setFieldValue('coverUrl', file);
+        setPreviewImg(file);
+      }
     } else {
       formik.setFieldValue('coverUrl', '');
     }
@@ -193,7 +241,6 @@ const EventForm: React.FC<EventFormProps> = ({
   };
 
   return (
-    // <Container maxWidth="sm">
     <>
       <form
         onSubmit={formik.handleSubmit}
@@ -268,7 +315,7 @@ const EventForm: React.FC<EventFormProps> = ({
             control={
               <Checkbox
                 checked={paidEvent}
-                onChange={() => setPaidEvent(!paidEvent)}
+                onChange={(e) => formik.setFieldValue('isPaid', e.target.checked)}
               />
             }
             label="Entrance fee"
@@ -330,7 +377,7 @@ const EventForm: React.FC<EventFormProps> = ({
             </button>
             {previewImg && (
               <div className="img-preview relative aspect-[3/4] w-[300px] m-auto">
-                <Image
+                <NextImage
                   className="m-auto aspect-[3/4]"
                   src={previewImg}
                   // height={200}

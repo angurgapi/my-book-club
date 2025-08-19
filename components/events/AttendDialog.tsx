@@ -16,11 +16,11 @@ export const AttendDialog: React.FC<AttendDialogProps> = ({
   return (
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>{title}</DialogTitle>
-      <DialogActions>
-        <Button onClick={handleConfirm}>yes</Button>
+      <DialogActions>        
         <Button sx={{ color: 'red' }} onClick={handleClose}>
           cancel
         </Button>
+        <Button onClick={handleConfirm}>yes</Button>
       </DialogActions>
     </Dialog>
   );

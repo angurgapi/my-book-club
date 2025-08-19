@@ -3,7 +3,6 @@ import Image from 'next/image';
 
 import emailjs from '@emailjs/browser';
 import { getFirestore } from '@firebase/firestore';
-import { GetServerSideProps, GetStaticProps } from 'next';
 import { IEvent } from '@/types/event';
 import { IUser } from '@/types/user';
 import DefaultLayout from '@/layouts/default';
@@ -40,17 +39,6 @@ interface EventProps {
   eventId: string;
 }
 
-// export async function getStaticProps(context: any) {
-//   // const eventId = context.query.id;
-//   const eventId = context.query.id;
-//   return {
-//     props: {
-//       eventId,
-//     },
-//   };
-// }
-
-// args: { eventId }: EventProps
 export default function EventPage() {
   const { uid, email, isAuth } = useAppSelector((state) => state.user);
   const db = getFirestore();
@@ -86,7 +74,6 @@ export default function EventPage() {
         : router.query.id;
       setEventId(queryId);
     }
-    // fetchEventData();
   }, [router.isReady]);
 
   useEffect(() => {
@@ -271,7 +258,7 @@ export default function EventPage() {
                     {host && (
                       <>
                         <p className="text-teal-800">Hosted by</p>
-                        <div className="w-fit">
+                        <div className="w-full max-w-[90%]">
                           <EventHostCard hostData={host} />
                         </div>
                       </>

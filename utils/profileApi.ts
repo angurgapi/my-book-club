@@ -5,28 +5,7 @@ import {
   ref,
   uploadString,
 } from 'firebase/storage';
-
-import { toast } from 'react-toastify';
-
-const sendErrorToast = (message: string) => {
-  toast.error(message, {
-    position: 'top-right',
-    autoClose: 5000,
-    closeOnClick: true,
-    hideProgressBar: true,
-    theme: 'light',
-  });
-};
-
-const sendSuccessToast = (message: string) => {
-  toast.success(message, {
-    position: 'top-right',
-    autoClose: 5000,
-    closeOnClick: true,
-    hideProgressBar: true,
-    theme: 'light',
-  });
-};
+import { sendErrorToast, sendSuccessToast } from './toast';
 
 export const uploadUserpic = async (uid: string, profilePic: any) => {
   const storage = getStorage();
@@ -36,7 +15,6 @@ export const uploadUserpic = async (uid: string, profilePic: any) => {
     const downloadURL = await getDownloadURL(imageRef);
     return downloadURL;
   } catch (error) {
-    console.log('Error uploading userpic: ', error);
     sendErrorToast('Error uploading userpic');
     return null;
   }

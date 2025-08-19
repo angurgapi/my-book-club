@@ -42,7 +42,6 @@ interface IContext {
   googleProvider: GoogleAuthProvider;
   facebookProvider: FacebookAuthProvider;
   rdb: Database;
-  usersRdb: any;
 }
 
 export const AuthContext = createContext<IContext>({} as IContext);
@@ -59,62 +58,6 @@ export const AuthProvider: FC<Props> = ({ children }) => {
   const facebookProvider = new FacebookAuthProvider();
   const rdb = getDatabase();
 
-  useEffect(() => {
-    const unListen = onAuthStateChanged(getFirebaseAuth, (userAuth) => {
-      if (!userAuth) return;
-      dispatch(
-        setUser({
-          // events: [...userAuth.events] || [],
-          // createdAt: userAuth.createdAt || [],
-          displayName: userAuth.displayName,
-          photoURL: userAuth.photoURL,
-          // images: [...userAuth.images],
-          uid: userAuth.uid,
-          isAuth: true,
-        })
-      );
-
-      onSnapshot(doc(db, 'users', userAuth.uid), (doc) => {
-        const userData: DocumentData | undefined = doc.data();
-        console.log(userData);
-        if (!userData) return;
-
-        // Realtime Database
-        // const userRef = ref(rdb, `users/${userData.uid}`);
-
-        // const connectedRef = ref(rdb, '.info/connected');
-
-        // onValue(connectedRef, (snap) => {
-        //   if (snap.val() === true) {
-        //     set(userRef, {
-        //       events: [...userData.events],
-        //       createdAt: userData.createdAt,
-        //       displayName: userData.displayName,
-        //       email: userData.email,
-        //       password: userData.password,
-        //       photoURL: userData.photoURL,
-        //       images: [...userData.images],
-        //       uid: userData.uid,
-        //       isOnline: true,
-        //     });
-        //   }
-        // });
-
-        const usersRef = ref(rdb, 'users');
-
-        onValue(usersRef, (snapshot) => {
-          const data = snapshot.val();
-          setUsersRdb(data);
-        });
-      });
-    });
-
-    return () => {
-      unListen();
-    };
-    // eslint-disable-next-line
-  }, []);
-
   const values = useMemo(
     () => ({
       getFirebaseAuth,
@@ -123,10 +66,9 @@ export const AuthProvider: FC<Props> = ({ children }) => {
       googleProvider,
       facebookProvider,
       rdb,
-      usersRdb,
     }),
     // eslint-disable-next-line
-    [getFirebaseAuth, db, storage, rdb, usersRdb]
+    [getFirebaseAuth, db, storage, rdb]
   );
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

@@ -19,6 +19,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { removeUser } from '@/store/reducers/UserSlice';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/router';
+import { AddCircleOutline } from '@mui/icons-material';
 
 function Header() {
   const { getFirebaseAuth } = useAuth();
@@ -51,14 +52,15 @@ function Header() {
   };
 
   const logOut = () => {
+    handleCloseUserMenu();
     signOut(getFirebaseAuth);
     dispatch(removeUser());
-    router.push('/');
+    // router.push('/');
   };
 
   return (
-    <AppBar position="static">
-      <Container maxWidth="xl">
+    <AppBar position="sticky" sx={{ bgcolor: 'white' }}>
+      <Container maxWidth="xl" sx={{ pl: { xs: 1 }, pr: 2 }}>
         <Toolbar disableGutters>
           <Typography
             noWrap
@@ -76,7 +78,7 @@ function Header() {
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
-              color="inherit"
+              sx={{ p: 1 }}
             >
               <MenuIcon />
             </IconButton>
@@ -103,66 +105,120 @@ function Header() {
               </MenuItem>
             </Menu>
           </Box>
-          {/* <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} /> */}
+
           <Typography
-            variant="h5"
             noWrap
             component="a"
-            href=""
+            href="/"
             sx={{
-              mr: 2,
               display: { xs: 'flex', md: 'none' },
               flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
             }}
           >
-            <Image src="/svg/logo2.svg" alt="logo" height={20} width={120} />
+            <Image src="/svg/logo2.svg" alt="logo" height={36} width={130} />
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            <Link color="inherit" href="/events">
+          <Box
+            sx={{
+              flexGrow: 1,
+              pr: '20px',
+              display: { xs: 'none', md: 'flex' },
+            }}
+            justifyContent="end"
+          >
+            <Link
+              sx={{
+                align: 'right',
+              }}
+              href="/events"
+            >
               events
             </Link>
           </Box>
 
           {isAuth ? (
-            <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="userpic" src={photoURL || ''} />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
+            <>
+              <Toolbar
+                sx={{
+                  backgroundColor: '#0b074a',
+                  mr: { xs: 0.5, md: 1 },
+                  pl: { xs: 1 },
+                  pr: { xs: 1 },
                 }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
               >
-                <MenuItem onClick={handleCloseUserMenu}>
-                  <Link href="/dashboard">Dashboard</Link>
-                </MenuItem>
-                <MenuItem onClick={handleCloseUserMenu}>
-                  <Button onClick={logOut}>Log out</Button>
-                </MenuItem>
-              </Menu>
-            </Box>
+                <Link
+                  className="flex"
+                  href="/dashboard/events/create"
+                  sx={{ display: 'flex', height: '100%', color: '#fff' }}
+                >
+                  <AddCircleOutline />{' '}
+                  <span className="hidden md:flex ml-2">New event</span>
+                </Link>
+              </Toolbar>
+
+              <Box sx={{ flexGrow: 0 }}>
+                <Tooltip title="Open settings">
+                  <Button
+                    onClick={handleOpenUserMenu}
+                    sx={{
+                      p: 0,
+                      textTransform: 'none',
+                      '&:hover': {
+                        backgroundColor: 'white',
+                        textDecoration: 'underline',
+                      },
+                    }}
+                  >
+                    <span className="hidden md:block mr-2 text-slate-500 max-w-[150px] truncate">
+                      {displayName}
+                    </span>
+                    <Avatar alt="userpic" src={photoURL || ''} />
+                  </Button>
+                </Tooltip>
+                <Menu
+                  sx={{ mt: '45px' }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}
+                >
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    <Link href="/dashboard/profile">Dashboard</Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    <Link href="/dashboard/events/hosting">Hosted events</Link>
+                  </MenuItem>
+                  <MenuItem onClick={handleCloseUserMenu}>
+                    <Link href="/dashboard/events/attending">
+                      You are attending
+                    </Link>
+                  </MenuItem>
+
+                  <Button
+                    sx={{
+                      pl: '16px',
+                      '&:hover': {
+                        color: '#898791',
+                        background: 'none',
+                      },
+                    }}
+                    onClick={logOut}
+                  >
+                    Log out
+                  </Button>
+                </Menu>
+              </Box>
+            </>
           ) : (
-            <Link color="inherit" href="/auth">
-              log in
-            </Link>
+            <Link href="/auth">log in</Link>
           )}
         </Toolbar>
       </Container>

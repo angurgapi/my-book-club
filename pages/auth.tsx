@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import PageHead from '@/components/global/Head';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegistrationForm } from '@/components/auth/RegForm';
-import { Card, CardContent } from '@mui/material';
+import { Card, CardContent, CardMedia } from '@mui/material';
+import DefaultLayout from '@/layouts/default';
 
 const AuthPage = () => {
   const [currentTab, setCurrentTab] = useState('login');
 
   return (
-    <div>
+    <DefaultLayout>
       <PageHead pageTitle="Sign in/Sign up" />
-      <main className="w-full flex items-center justify-between min-h-[100vh]">
-        <div className="md:w-[60%] bg-[#fffade] w-full flex flex-col items-center justify-center min-h-[100vh] px-[30px] py-[30px] relative">
+      <Card sx={{ display: 'flex' }}>
+        <div className="bg-[#fffade] w-full flex flex-col items-center justify-center px-[30px] py-[30px] relative">
           {/* <Card>
             <CardContent> */}
           <div className="flex my-3">
@@ -47,9 +48,15 @@ const AuthPage = () => {
           {/* </CardContent>
           </Card> */}
         </div>
-        <div className="login md:w-[40%] h-[100vh] relative" />
-      </main>
-    </div>
+        <CardMedia
+          className="login md:w-[40%] relative"
+          component="img"
+          image="/images/signin.jpg"
+          alt="user authorization"
+          sx={{ display: { xs: 'none', md: 'flex' } }}
+        />
+      </Card>
+    </DefaultLayout>
   );
 };
 

@@ -1,11 +1,5 @@
 export interface IAuthData {
-  invalidEmail: boolean;
-  invalidPassword: boolean;
-  wrongPassword: boolean;
-  userNotFound: boolean;
-  alreadyInUseEmail: boolean;
+  displayName: string;
+  email: string;
+  password: string;
 }
-
-// export interface IRegData extends IAuthData {
-//   alreadyInUseEmail: boolean;
-// }

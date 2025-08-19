@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 const Hero = () => {
   return (
-    <div className="hero w-full h-[80vh] md:px-[80px] px-[20px] flex flex-col md:items-center justify-center">
+    <div className="hero w-full h-[75vh] md:px-[80px] px-[20px] flex flex-col md:items-center justify-center">
       <h1 className="sigmar md:text-6xl text-[32px] font-extrabold mb-5 md:text-center">
         Reading is much more fun{' '}
         <span className="sigmar md:text-[#14b8a6]">with friends</span>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import PageHead from '@/components/global/Head';
@@ -7,80 +7,127 @@ import EventCard from '@/components/events/EventCard';
 import DefaultLayout from '../layouts/default';
 import { IEvent } from '@/types/event';
 import { getUpcomingEvents } from '@/utils/eventApi';
+import { subscribeRdb } from '@/utils/eventsRdb';
 
 import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore';
-import dayjs from 'dayjs';
+  Typography,
+  Input,
+  InputAdornment,
+  IconButton,
+  Pagination,
+} from '@mui/material';
+import { Clear, Search } from '@mui/icons-material';
 
 const Events = () => {
   const [events, setEvents] = useState<IEvent[]>([]);
   const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const fetchEvents = async (query: string, page: number) => {
+    try {
+      setLoading(true);
+      const { events, totalLength } = await getUpcomingEvents(query, page);
+      setEvents(events);
+      setTotalPages(Math.ceil(totalLength / 12));
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
+  };
+
+  const handleChangePage = (newPage: number) => {
+    setPage((prevPage) => {
+      if (newPage !== prevPage) {
+        fetchEvents(query, newPage);
+        return newPage;
+      }
+      return prevPage;
+    });
+  };
+
+  const clearSearch = () => {
+    setQuery('');
+    setPage(1);
+    fetchEvents('', 1);
+  };
 
   useEffect(() => {
-    // const fetchEvents = async () => {
-    //   setLoading(true);
-    //   try {
-    //     const db = getFirestore();
-    //     const eventsCollection = collection(db, 'events');
-    //     const eventsSnapshot = await getDocs(eventsCollection); // Fetch the documents from the collection
-
-    //     const eventsData: IEvent[] = eventsSnapshot.docs.map((doc) => ({
-    //       id: doc.id,
-    //       bookTitle: doc.data().bookTitle,
-    //       bookAuthor: doc.data().bookAuthor,
-    //       city: doc.data().city,
-    //       participants: doc.data().participants,
-    //       date: doc.data().date,
-    //       time: doc.data().time,
-    //       coverUrl: doc.data().coverUrl,
-    //     }));
-
-    //     setEvents(eventsData);
-    //   } catch (error) {
-    //     console.error('Error fetching events:', error);
-    //   }
-    //   setLoading(false);
-    // };
-    const fetchEvents = async () => {
-      const upcomingEvents: IEvent[] = await getUpcomingEvents();
-      setEvents(upcomingEvents);
-    };
-
-    fetchEvents();
+    fetchEvents(query, page);
+    // subscribeRdb();
   }, []);
 
   return (
     <DefaultLayout>
       <PageHead pageTitle="Events" />
-      {!loading && (
-        <div className="p-2 md:p-5 text-center">
-          <h2 className="text-2xl">Upcoming events</h2>
-          <div className="flex">
-            {/* <input
-              type="text"
-              name="name"
-              className="w-full border px-2 py-2 mb-3 rounded-md"
-              required
-              value={queryString}
-              onChange={(e) => setQuery(e.target.value)}
-            /> */}
-          </div>
+      <div className="p-2 md:p-5 text-center">
+        <Typography variant="h3" gutterBottom>
+          Upcoming events
+        </Typography>
+        {!loading && (
           <div className="flex items-center flex-col ">
             {events && (
               <div className="flex flex-col items-center justify-center w-full my-2">
-                {events.map((event) => (
-                  <EventCard event={event} key={event.id} />
-                ))}
+                <div className="flex w-full items-center justify-end mb-4">
+                  <span className="mr-2">Search by city</span>
+                  <Input
+                    type="text"
+                    name="name"
+                    required
+                    value={query}
+                    sx={{ width: 250 }}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) =>
+                      e.key === 'Enter' ? fetchEvents(query, 1) : null
+                    }
+                    endAdornment={
+                      <InputAdornment position="end">
+                        {query && (
+                          <IconButton disableRipple onClick={clearSearch}>
+                            <Clear />
+                          </IconButton>
+                        )}
+                        <IconButton
+                          color="primary"
+                          onClick={() => {
+                            fetchEvents(query, 1);
+                          }}
+                        >
+                          <Search />
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                  />
+                </div>
+                <div className="events-grid">
+                  {events.map((event) => (
+                    <EventCard event={event} key={event.id} />
+                  ))}
+                </div>
+                {totalPages > 1 && (
+                  <Pagination
+                    count={totalPages}
+                    page={page}
+                    onChange={(e, page) => {
+                      handleChangePage(page);
+                    }}
+                    defaultPage={6}
+                    siblingCount={0}
+                    color="primary"
+                  />
+                )}
               </div>
             )}
+            {!events && !query && (
+              <span>There are no upcoming events at the moment</span>
+            )}
+            {!events && query && (
+              <span>There are no upcoming events matching your query</span>
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
       {loading && <Loader />}
     </DefaultLayout>
   );

@@ -1,205 +1,327 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
-import ErrorPage from '@/components/global/Error';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-// import Link from "next/link";
-// import Attendees from "../../../components/Attendees";
-// import { useRouter } from "next/router";
-import {
-  doc,
-  getDoc,
-  updateDoc,
-  collection,
-  getFirestore,
-  runTransaction,
-} from '@firebase/firestore';
-import { GetServerSideProps } from 'next';
+
+import emailjs from '@emailjs/browser';
+import { getFirestore } from '@firebase/firestore';
 import { IEvent } from '@/types/event';
+import { IUser } from '@/types/user';
 import DefaultLayout from '@/layouts/default';
 import PageHead from '@/components/global/Head';
-import cover from '@/images/cover.jpg';
 import { useAppSelector } from '@/hooks/redux';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/router';
 import dayjs from 'dayjs';
 import Link from 'next/link';
-import EditIcon from '@mui/icons-material/Edit';
+import {
+  getEventById,
+  toggleAttendee,
+  getEventHost,
+  closeRegistration,
+} from '@/utils/eventApi';
 
-// import ShareEventModal from "../../../components/ShareEventModal";
-// import ErrorPage from "../../../components/ErrorPage";
+import EditIcon from '@mui/icons-material/Edit';
+import {
+  Card,
+  CardActions,
+  CardContent,
+  Skeleton,
+  Typography,
+  Button,
+  Chip,
+  CardMedia,
+} from '@mui/material';
+
+import { EventHostCard } from '@/components/events/EventHostCard';
+import { AttendDialog } from '@/components/events/AttendDialog';
+import PageNotFound from '../404';
 
 interface EventProps {
-  event: IEvent;
+  eventId: string;
 }
 
-export async function getServerSideProps(context) {
+export default function EventPage() {
+  const { uid, email, isAuth } = useAppSelector((state) => state.user);
   const db = getFirestore();
-  const docId = context.query.id;
-  const docRef = doc(db, 'events', docId);
-  const docSnap = await getDoc(docRef);
-
-  if (docSnap.exists()) {
-    const event = docSnap.data() as IEvent;
-    event.id = docId;
-
-    return {
-      props: {
-        event: {
-          ...event,
-          date: event.date.seconds,
-        },
-      },
-    };
-  } else {
-    console.log('No such document!');
-  }
-}
-
-export default function EventPage({ event }: EventProps) {
-  const { uid } = useAppSelector((state) => state.user);
-  const db = getFirestore();
-  const [attending, setAttending] = useState(
-    Array.isArray(event.participants) && uid && event.participants.includes(uid)
-  );
+  const [eventId, setEventId] = useState('');
+  const [attending, setAttending] = useState<boolean | undefined>(false);
+  const [event, setEvent] = useState<IEvent | undefined>(undefined);
+  const [host, setHost] = useState<IUser | undefined>(undefined);
+  const [isLoading, setLoading] = useState(true);
   const [participantsLength, setParticipantsLength] = useState(
-    event.participants.length
+    event?.participants.length
   );
 
-  // const [click, setClick] = useState(firebaseEvent.disableRegistration);
-  // const [showModal, setShowModal] = useState(false);
-  // const [disableRegModal, setDisableRegModal] = useState(false);
-  // const openModal = () => setShowModal(true);
-  // const closeModal = () => setShowModal(false);
+  const router = useRouter();
 
-  const getFormattedDate = () => {
-    return dayjs.unix(event.date).format('MMM DD hh:mm a');
+  const fetchEventData = async () => {
+    setLoading(true);
+    try {
+      const event = await getEventById(eventId);
+      setEvent(event as IEvent);
+      setAttending(isAuth && event?.participants.includes(uid));
+    } catch (e) {
+      console.log('no such event', e);
+    }
+    setLoading(false);
   };
 
+  const [isDialogOpen, setDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (router.isReady && router.query.id) {
+      const queryId = Array.isArray(router.query.id)
+        ? router.query.id[0]
+        : router.query.id;
+      setEventId(queryId);
+    }
+  }, [router.isReady]);
+
+  useEffect(() => {
+    if (eventId) {
+      fetchEventData();
+    }
+  }, [eventId]);
+
+  useEffect(() => {
+    if (
+      event?.isRegistrationOpen &&
+      event?.date &&
+      event?.date < new Date().getTime()
+    ) {
+      const autoCloseRegistration = async () => {
+        await closeRegistration(event.id);
+        fetchEventData();
+      };
+      autoCloseRegistration();
+    }
+  }, [event]);
+
+  useEffect(() => {
+    const fetchHostData = async () => {
+      if (event) {
+        const hostData = await getEventHost(event.hostId);
+        setHost(hostData as IUser);
+      }
+    };
+    fetchHostData();
+  }, [event]);
+
+  const formattedDate = dayjs(event?.date).format('MMM DD hh:mm a');
+
   const getImgSrc = () => {
-    return event.coverUrl || cover;
+    return event?.coverUrl || '/images/cover.jpg';
   };
 
   const isOwnEvent = () => {
-    console.log();
-    return event.hostId === uid;
+    return event?.hostId === uid;
   };
 
-  const attendEvent = async () => {
-    const docRef = doc(db, 'events', event.id);
-    if (uid && !event.participants.includes(uid)) {
-      let participantsList = Array.isArray(event.participants)
-        ? [...event.participants, uid]
-        : [uid];
-      await updateDoc(docRef, {
-        participants: participantsList,
-      });
-      setParticipantsLength(participantsLength + 1);
-      event.participants.push(uid);
-      setAttending(true);
-    }
+  const canRegister = () => {
+    return (
+      event && isAuth && !isOwnEvent() && event.isRegistrationOpen && !attending
+    );
   };
 
-  const unattendEvent = async () => {
-    if (uid && event.participants.includes(uid)) {
-      const docRef = doc(db, 'events', event.id);
-      event.participants.splice(event.participants.indexOf(uid), 1);
-      await updateDoc(docRef, {
-        participants: event.participants,
-      });
-      setAttending(false);
-      setParticipantsLength(participantsLength - 1);
+  // const sendEmail = (eventDetails: IEvent) => {
+  //   emailjs
+  //     .send(
+  //       process.env.NEXT_PUBLIC_SERVICE_ID,
+  //       process.env.NEXT_PUBLIC_TEMPLATE_ID,
+  //       { ...eventDetails, attendeeEmail: email },
+  //       process.env.NEXT_PUBLIC_MAILER_KEY
+  //     )
+  //     .then(
+  //       (result) => {
+  //         console.log(result);
+  //       },
+  //       (error) => {
+  //         console.log(error);
+  //       }
+  //     );
+  // };
+  const onHandleConfirm = async () => {
+    await toggleAttendEvent();
+    setDialogOpen(false);
+    fetchEventData();
+  };
+  const toggleAttendEvent = async () => {
+    if (event) {
+      try {
+        await toggleAttendee(uid, event.participants, event.id);
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
-  if (!event.bookTitle) return <ErrorPage />;
-  return (
-    <DefaultLayout>
-      <PageHead pageTitle={event.bookTitle} />
-      <div className="flex flex-col p-2 items-center mt-4">
-        <h1 className="text-center text-2xl">
-          {event.bookTitle} by {event.bookAuthor}
-        </h1>
-        <div className="flex flex-col mt-4 w-full max-w-[800px] justify-start items-center">
-          <div className="relative w-full aspect-[16/7]">
-            <Image
-              className="rounded"
-              src={getImgSrc()}
-              fill
-              alt="book cover"
-            />
-            {attending && (
-              <div className="absolute bottom-2 right-2 bg-amber-400 text-black rounded p-2 w-fit">
-                You are attending
+  if (!isLoading && !event) {
+    return <PageNotFound />;
+  }
+  if (isLoading) {
+    return (
+      <DefaultLayout>
+        <PageHead pageTitle="Loading..." />
+        <div className="flex flex-col items-center mt-4 pt-0">
+          <Skeleton
+            animation="wave"
+            height={40}
+            width={220}
+            style={{ marginBottom: 16 }}
+          />
+          <div className="event-page w-full">
+            <Card>
+              <div className="relative w-full h-full min-h-[300px] aspect-ratio-[3/4]">
+                <Skeleton
+                  animation="wave"
+                  height={'100%'}
+                  style={{ marginBottom: 6, marginTop: 0, display: 'flex' }}
+                  variant="rectangular"
+                  width="100%"
+                />
               </div>
-            )}
-            {isOwnEvent() && (
-              <Link
-                className="btn absolute top-2 right-2 w-fit btn bg-teal-500 text-white"
-                href={`/event/edit/${event.id}`}
-              >
-                <EditIcon />
-                edit
-              </Link>
-            )}
-          </div>
-
-          <div className="p-3 md:col-span-2 flex flex-col w-full justify-start items-start">
-            {event.description && (
-              <span className="text-justify italic text-emerald-700">
-                {event.description}
-              </span>
-              //   <Accordion className="w-full">
-              //     <AccordionSummary
-              //       expandIcon={<ExpandMoreIcon />}
-              //       aria-controls="panel1a-content"
-              //       id="panel1a-header"
-              //     >
-              //       <Typography><span>Event details</span></Typography>
-              //     </AccordionSummary>
-              //     <AccordionDetails>
-              //       <Typography>{event.description}</Typography>
-              //     </AccordionDetails>
-              //   </Accordion>
-            )}
-            <div className="grid md:grid-cols-3 auto-cols-max gap-2 mt-3">
-              <span className="text-teal-800">city</span>
-              <span className="col-span-2">{event.city}</span>
-              <span className="text-teal-800">location </span>
-              <span className="col-span-2">{event.location}</span>
-              <span className="text-teal-800">date/time </span>
-              <span className="col-span-2">{getFormattedDate()}</span>
-              <span className="text-teal-800">attendees </span>
-              <span className="col-span-2">
-                {participantsLength || 'nobody yet'}
-              </span>
-              <span className="text-teal-800">capacity </span>
-              {event.capacity && (
-                <span className="col-span-2">{event.capacity} ppl</span>
-              )}
-              {!event.capacity && <span className="col-span-2">no limit</span>}
-            </div>
-            {!attending && !isOwnEvent && (
-              <button
-                className="mt-3 p-2 bg-teal-500 text-white rounded w-fit"
-                onClick={attendEvent}
-              >
-                Attend
-              </button>
-            )}
-            {attending && (
-              <button
-                className="mt-3 p-2 bg-teal-500 text-white rounded w-fit"
-                onClick={unattendEvent}
-              >
-                Leave event
-              </button>
-            )}
+            </Card>
+            <Card>
+              <CardContent>
+                <div className="p-2">
+                  {Array.from({ length: 6 }, (_, index) => (
+                    <div
+                      className="grid grid-cols-[1fr,4fr] gap-3 pt-2"
+                      key={index}
+                    >
+                      <Skeleton height={20} />
+                      <Skeleton height={20} />
+                    </div>
+                  ))}
+                  <Skeleton height={60} width="100%" />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </div>
+      </DefaultLayout>
+    );
+  }
+  return (
+    <DefaultLayout>
+      {event && (
+        <>
+          <PageHead pageTitle={event.bookTitle} />
+          <div className="flex flex-col p-2 items-center m-auto w-full max-w-[800px]">
+            <Typography variant="h3" gutterBottom className="event-title">
+              {event.bookTitle} by {event.bookAuthor}
+            </Typography>
+            <div className="event-page w-full">
+              <Card className="h-[300px] w-[225px] m-auto mt-0">
+                <div className="relative w-full h-full">
+                  <Image
+                    src={getImgSrc()}
+                    fill
+                    alt="book cover"
+                    style={{ objectFit: 'cover' }}
+                  />
+
+                  {attending && (
+                    <div className="absolute bottom-2 right-2 bg-amber-400 text-black rounded p-2 w-fit">
+                      You are attending
+                    </div>
+                  )}
+                  {isOwnEvent() && (
+                    <Link
+                      className="btn absolute top-2 right-2 w-fit btn bg-teal-500 text-white"
+                      href={`/event/edit/${event.id}`}
+                    >
+                      <EditIcon />
+                      edit
+                    </Link>
+                  )}
+                </div>
+              </Card>
+
+              <Card>
+                <CardContent>
+                  <div className="event-page__data">
+                    <p className="text-teal-800">city</p>
+                    <p className="text-xl">{event.city}</p>
+                    <p className="text-teal-800">location </p>
+                    <p className="text-xl">{event.location}</p>
+                    <p className="text-teal-800">date/time </p>
+                    <p className="text-xl">{formattedDate}</p>
+                    <p className="text-teal-800">attendees </p>
+                    <p className="text-xl">
+                      {event.participants.length || 'nobody yet'}
+                    </p>
+                    <p className="text-teal-800">capacity </p>
+                    {event.capacity && (
+                      <p className="text-xl">{event.capacity} ppl</p>
+                    )}
+                    {!event.capacity && <p className="text-xl">no limit</p>}
+
+                    {host && (
+                      <>
+                        <p className="text-teal-800">Hosted by</p>
+                        <div className="w-full max-w-[90%]">
+                          <EventHostCard hostData={host} />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  {event.description && (
+                    <div className="bg-slate-100 mt-3 p-2 rounded w-full">
+                      <span className="text-justify italic break-all">
+                        {event.description}
+                      </span>
+                    </div>
+                  )}
+                  {!event.isRegistrationOpen && (
+                    <Chip
+                      sx={{
+                        backgroundColor: '#eb4034',
+                        color: '#fff',
+                        mt: 2,
+                        justifySelf: 'end',
+                      }}
+                      label="Registration is closed"
+                    />
+                  )}
+                </CardContent>
+                <CardActions sx={{ paddingBottom: 2 }}>
+                  {canRegister() && (
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        setDialogOpen(true);
+                      }}
+                    >
+                      Attend event
+                    </Button>
+                  )}
+                  {attending && (
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        setDialogOpen(true);
+                      }}
+                    >
+                      Leave event
+                    </Button>
+                  )}
+                </CardActions>
+              </Card>
+            </div>
+          </div>
+          <AttendDialog
+            title={
+              attending
+                ? 'Are you sure you are not coming?'
+                : 'Are you sure you want to attend?'
+            }
+            handleConfirm={onHandleConfirm}
+            handleClose={() => {
+              setDialogOpen(false);
+            }}
+            open={isDialogOpen}
+          />
+        </>
+      )}
     </DefaultLayout>
   );
 }

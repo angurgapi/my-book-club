@@ -24,7 +24,7 @@ import { saveEvent, updateEvent } from '@/utils/eventApi';
 import Loader from '../global/Loader';
 import { IEvent, IEventFormData } from '@/types/event';
 import { sendErrorToast, sendSuccessToast } from '@/utils/toast';
-
+import { compressDataUrl } from '@/utils/imageCompress';
 interface EventFormProps {
   onSaveEvent: () => void;
   uid: string;
@@ -41,72 +41,12 @@ const toDataUrl = (file: File): Promise<string> => {
   });
 };
 
-const toBlob = async (imageUrl: string) => {
-  const response = await fetch(imageUrl);
-  const blob = await response.blob();
-  const reader = new FileReader();
-
-  return new Promise((resolve, reject) => {
-    reader.onloadend = () => {
-      const base64String = reader.result?.toString() || '';
-      const blobData = `data:image/webp;base64,${base64String.split(',')[1]}`;
-      resolve(blobData);
-    };
-
-    reader.onerror = (error) => {
-      reject(error);
-    };
-
-    reader.readAsDataURL(blob);
-  });
-};
-
-const compressDataUrl = (
-  dataUrl: string,
-  outputType: 'image/webp' | 'image/jpeg' = 'image/webp',
-  quality = 0.8,
-  maxWidth = 1200,
-  maxHeight = 1200
-): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const image = new window.Image();
-    image.onload = () => {
-      const originalWidth = image.width;
-      const originalHeight = image.height;
-      const scale = Math.min(maxWidth / originalWidth, maxHeight / originalHeight, 1);
-      const targetWidth = Math.round(originalWidth * scale);
-      const targetHeight = Math.round(originalHeight * scale);
-
-      const canvas = document.createElement('canvas');
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        reject(new Error('Canvas 2D context not available'));
-        return;
-      }
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
-      try {
-        const compressed = canvas.toDataURL(outputType, quality);
-        resolve(compressed);
-      } catch (err) {
-        reject(err);
-      }
-    };
-    image.onerror = (e: Event | string) => reject(e);
-    image.src = dataUrl;
-  });
-};
-
 const EventForm: React.FC<EventFormProps> = ({
   onSaveEvent,
   uid,
   isEdit,
   oldEvent,
 }) => {
-  // const { uid } = useAppSelector((state) => state.user);
-  // const [previewImg, setPreviewImage] = useState('');
   const [imgSrc, setImgSrc] = useState(oldEvent ? oldEvent.coverUrl : '');
   const [previewImg, setPreviewImg] = useState(
     oldEvent ? oldEvent.coverUrl : ''
@@ -190,27 +130,12 @@ const EventForm: React.FC<EventFormProps> = ({
     }
   };
 
-  // useEffect(() => {
-  //   const setBlobPicture = async () => {
-  //     if (oldEvent?.coverUrl) {
-  //       try {
-  //         const preview = await toBlob(oldEvent.coverUrl);
-  //         setImgSrc(preview as string);
-  //       } catch (error) {
-  //         console.error(error);
-  //       }
-  //     }
-  //   };
-
-  //   setBlobPicture();
-  // }, [oldEvent?.coverUrl]);
 
   const onImageSelect = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       try {
         const preview = await toDataUrl(e.target.files[0]);
         setImgSrc(preview);
-        // setPreviewImg(preview);
         setModalOpen(true);
       } catch (error) {
         console.log('Error: ', error);
@@ -222,9 +147,9 @@ const EventForm: React.FC<EventFormProps> = ({
     if (file) {
       setModalOpen(false);
       try {
-        // const compressed = await compressDataUrl(file, 'image/webp', 0.8, 1200, 1200);
-        formik.setFieldValue('coverUrl', file);
-        setPreviewImg(file);
+        const compressed = await compressDataUrl(file, 'image/webp', 0.8, 1200, 1200);
+        formik.setFieldValue('coverUrl', compressed);
+        setPreviewImg(compressed);
       } catch (err) {
         formik.setFieldValue('coverUrl', file);
         setPreviewImg(file);

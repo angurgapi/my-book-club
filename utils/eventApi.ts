@@ -27,10 +27,28 @@ import {
 import { getStorage } from 'firebase/storage';
 import { IEvent, IEventFormData } from '@/types/event';
 
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
+
+const estimateDataUrlSizeBytes = (dataUrl: string): number => {
+  // data:[<mediatype>][;base64],<data>
+  const parts = dataUrl.split(',');
+  if (parts.length < 2) return 0;
+  const base64 = parts[1];
+  // Each base64 char encodes 6 bits; 4 chars -> 3 bytes
+  const size = Math.floor((base64.length * 3) / 4);
+  return size;
+};
+
 const addEventCover = async (picUrl: string, eventId: string) => {
   const storage = getStorage();
   const imageRef = ref(storage, `events/${eventId}/image`);
   try {
+    if (picUrl.startsWith('data:')) {
+      const sizeBytes = estimateDataUrlSizeBytes(picUrl);
+      if (sizeBytes > MAX_IMAGE_BYTES) {
+        throw new Error('Image too large. Please upload an image under 5MB.');
+      }
+    }
     await uploadString(imageRef, picUrl, 'data_url');
     const downloadURL = await getDownloadURL(imageRef);
     return downloadURL;
@@ -50,17 +68,25 @@ export const saveEvent = async (eventData: IEventFormData) => {
     });
 
     if (eventData.coverUrl) {
-      const downloadURL = await addEventCover(eventData.coverUrl, docRef.id);
-      await updateDoc(doc(db, 'events', docRef.id), {
-        coverUrl: downloadURL,
-      });
-    } else {
-      console.log('No cover picture provided');
+      try {
+        const downloadURL = await addEventCover(eventData.coverUrl, docRef.id);
+        await updateDoc(doc(db, 'events', docRef.id), {
+          coverUrl: downloadURL,
+        });
+      } catch (coverError) {
+        await deleteDoc(docRef);
+        const readableError =
+          coverError instanceof Error
+            ? coverError.message
+            : 'Failed to upload event cover image.';
+        throw new Error(`Event image upload failed: ${readableError}`);
+      }
     }
-
     console.log('Event saved successfully');
   } catch (error) {
     console.error('Error saving event:', error);
+    // Propagate error so callers can handle failure (e.g., image too large)
+    throw error instanceof Error ? error : new Error('Failed to save event');
   }
 };
 
@@ -71,12 +97,20 @@ export const updateEvent = async (id: string, eventData: IEventFormData) => {
   try {
     if (eventData.coverUrl && newImgRegex.test(eventData.coverUrl)) {
       console.log('new image, blob!');
-      const downloadURL = await addEventCover(eventData.coverUrl, id);
-      await updateDoc(doc(db, 'events', docRef.id), {
-        ...eventData,
-        date: Timestamp.fromMillis(eventData.date.valueOf()),
-        coverUrl: downloadURL,
-      });
+      try {
+        const downloadURL = await addEventCover(eventData.coverUrl, id);
+        await updateDoc(doc(db, 'events', docRef.id), {
+          ...eventData,
+          date: Timestamp.fromMillis(eventData.date.valueOf()),
+          coverUrl: downloadURL,
+        });
+      } catch (coverError) {
+        const readableError =
+          coverError instanceof Error
+            ? coverError.message
+            : 'Failed to upload event cover image.';
+        throw new Error(`Event image upload failed: ${readableError}`);
+      }
     } else if (eventData.coverUrl && eventData.coverUrl.length) {
       console.log('data has image, but its an old url!');
       await updateDoc(docRef, {
@@ -92,6 +126,8 @@ export const updateEvent = async (id: string, eventData: IEventFormData) => {
     }
   } catch (e) {
     console.log(e);
+    // Propagate error so callers can handle failure (e.g., image too large)
+    throw e instanceof Error ? e : new Error('Failed to update event');
   }
 };
 

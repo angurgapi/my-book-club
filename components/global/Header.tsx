@@ -168,7 +168,7 @@ function Header() {
                       },
                     }}
                   >
-                    <span className="hidden md:block mr-2 text-slate-500">
+                    <span className="hidden md:block mr-2 text-slate-500 max-w-[150px] truncate">
                       {displayName}
                     </span>
                     <Avatar alt="userpic" src={photoURL || ''} />
@@ -198,7 +198,7 @@ function Header() {
                   </MenuItem>
                   <MenuItem onClick={handleCloseUserMenu}>
                     <Link href="/dashboard/events/attending">
-                      Events to attend
+                      You are attending
                     </Link>
                   </MenuItem>
 

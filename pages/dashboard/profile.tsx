@@ -119,7 +119,7 @@ const DashboardProfile = () => {
             <Typography variant="h3" gutterBottom>
               My profile
             </Typography>
-            <div className="flex flex-col md:flex-row items-start md:items-start">
+            <div className="flex flex-col items-start md:items-start">
               <div className="relative h-[100px] w-[100px]">
                 <input
                   type="file"
@@ -144,13 +144,14 @@ const DashboardProfile = () => {
                   <CameraAltIcon />
                 </IconButton>
               </div>
-              <div className="flex flex-col items-start justify-start md:ml-5">
+              <div className="flex flex-col items-start justify-start mt-5 w-full">
                 <label htmlFor="name" className="mr-2">
                   Username
                 </label>
 
                 <Input
                   placeholder="username"
+                  className="w-full"
                   disabled={!edit}
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
@@ -170,11 +171,12 @@ const DashboardProfile = () => {
                   }
                 />
               </div>
-              <div className="flex flex-col items-start justify-start md:ml-5">
+              <div className="flex flex-col items-start justify-start mt-5 w-full">
                 <label htmlFor="name" className="mr-2">
                   E-mail
                 </label>
                 <Input
+                  className="w-full"
                   placeholder="e-mail"
                   disabled
                   value={user.email}

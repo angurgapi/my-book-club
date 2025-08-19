@@ -23,6 +23,7 @@ import {
   Edit,
 } from '@mui/icons-material';
 import { useRouter } from 'next/router';
+import { Button } from '../ui/button';
 
 interface EventCardProps {
   event: IEvent;
@@ -37,6 +38,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const router = useRouter();
 
   const editEvent = (id: string) => (event: any) => {
+     event.preventDefault();  
     event.stopPropagation();
     router.push(`/event/edit/${id}`);
   };
@@ -45,18 +47,13 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
     <Link href={`/event/${event.id}`} className="w-full">
       <Card className="event-card">
         {isOwnEvent && (
-          <IconButton
-            sx={{
-              width: '40px',
-              position: 'absolute',
-              right: '-2px',
-              background: '#fff',
-              color: 'primary',
-            }}
+          <Button
+           variant="secondary" size="icon"
+            className='absolute top-[2px] right-[2px] rounded-full bg-[#fff] shadow-md hover:color-[#fff]'
             onClick={editEvent(event.id)}
           >
-            <Edit />
-          </IconButton>
+            <Edit className='h-[16px] w-[16px]' />
+          </Button>
         )}
         <CardContent
           sx={{

@@ -16,7 +16,6 @@ import {
   HowToReg,
   AddCircleOutline,
 } from '@mui/icons-material';
-import { deregisterAllFonts } from 'canvas';
 
 const Begin = () => {
   return (

@@ -18,6 +18,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import { useAppDispatch } from '@/hooks/redux';
 import { Input, InputAdornment, InputLabel } from '@mui/material';
+import { set } from 'cypress/types/lodash';
 
 interface AuthFormProps {
   mode: string;
@@ -34,6 +35,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     password: '',
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const sendErrorToast = (message: string) => {
     toast.error(message, {
       position: 'top-right',
@@ -51,15 +53,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
 
   const logExistingUser = async (email: string, password: string) => {
     try {
+      setIsLoading(true);
       const { user } = await signInWithEmailAndPassword(
         getFirebaseAuth,
         email,
         password
       );
+      setIsLoading(false);
       const userDetails = await getDoc(doc(db, 'users', user.uid));
       dispatch(setUser({ ...userDetails.data(), isAuth: true } as IUser));
       router.push('/dashboard/profile');
     } catch (error: any) {
+      setIsLoading(false);
       if (error.code === 'auth/user-not-found') {
         sendErrorToast('There is no user with these credentials!');
       }
@@ -73,6 +78,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     e.preventDefault();
 
     if (mode === 'register') {
+      setIsLoading(true);
       await createUserWithEmailAndPassword(
         getFirebaseAuth,
         userData.email,
@@ -98,8 +104,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
 
             dispatch(setUser(user));
             logExistingUser(userData.email, userData.password);
+            setIsLoading(false);
           } catch (e) {
             console.error('Error adding document: ', e);
+            setIsLoading(false);
           }
         })
         .catch((error) => {
@@ -185,7 +193,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
         type="submit"
         className="bg-[#FFD95A] p-2 font-medium hover:bg-[#C07F00] hover:text-[#FFF8DE] mt-4 mb-3 text-[18px] rounded-md"
       >
-        {mode === 'register' ? 'Create account' : 'Sign in'}
+        {isLoading ? 'Loading...' : <span>{mode === 'register' ? 'Create account' : 'Sign in'}</span>}
       </button>
     </form>
   );

@@ -106,9 +106,9 @@ const ProvidersAuth = () => {
   return (
     <div className="flex justify-start items-center gap-1">
       Or enter with
-      <button className="flex items-center shrink-0 h-[32px] w-[32px] hover:bg-[#e1e3e1] rounded-full p-1" onClick={handleFacebookLogin}>
+      {/* <button className="flex items-center shrink-0 h-[32px] w-[32px] hover:bg-[#e1e3e1] rounded-full p-1" onClick={handleFacebookLogin}>
         <FacebookIcon className="text-[#3b5998]" />
-      </button>
+      </button> */}
       <button className="flex items-center shrink-0 h-[32px] w-[32px] hover:bg-[#e1e3e1] rounded-full p-1" onClick={handleGoogleLogin}>
         <GoogleIcon className="text-[#4285F4]" />
       </button>

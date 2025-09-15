@@ -158,3 +158,18 @@ a {
     @apply bg-background text-foreground;
   }
 }
+
+
+@layer utilities {
+  input:-webkit-autofill {
+    @apply bg-white text-black;
+    -webkit-box-shadow: 0 0 0px 1000px white inset;
+    -webkit-text-fill-color: #000;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+  input:-webkit-autofill:focus {
+    @apply bg-white text-black;
+    -webkit-box-shadow: 0 0 0px 1000px white inset;
+    -webkit-text-fill-color: #000;
+  }
+}

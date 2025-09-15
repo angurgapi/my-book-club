@@ -10,7 +10,6 @@ import { useAppDispatch } from '@/hooks/redux';
 
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import { IconButton } from '@mui/material';
 import { IUser } from '@/types/user';
 
 const ProvidersAuth = () => {
@@ -66,12 +65,12 @@ const ProvidersAuth = () => {
           await runTransaction(db, async (transaction) => {
             const docSnap = await transaction.get(docRef);
             console.log(docSnap.exists());
-            //successfull google auth & not the first
+            // Successfull google auth & not the first
             if (docSnap.exists()) {
               dispatch(setUser({ ...docSnap.data(), isAuth: true } as IUser));
               console.log('docsnap data:', docSnap.data());
             }
-            //successfull google auth but no user doc yet
+            // Successfull google auth but no user doc yet
             else {
               console.log('new user, google auth');
               const userData = {
@@ -105,14 +104,14 @@ const ProvidersAuth = () => {
   };
 
   return (
-    <div className="flex justify-start items-center">
-      Enter with
-      {/* <IconButton onClick={handleFacebookLogin}>
-        <FacebookIcon className="mx-2 text-[#3b5998]" />
-      </IconButton> */}
-      <IconButton onClick={handleGoogleLogin}>
+    <div className="flex justify-start items-center gap-1">
+      Or enter with
+      <button className="flex items-center shrink-0 h-[32px] w-[32px] hover:bg-[#e1e3e1] rounded-full p-1" onClick={handleFacebookLogin}>
+        <FacebookIcon className="text-[#3b5998]" />
+      </button>
+      <button className="flex items-center shrink-0 h-[32px] w-[32px] hover:bg-[#e1e3e1] rounded-full p-1" onClick={handleGoogleLogin}>
         <GoogleIcon className="text-[#4285F4]" />
-      </IconButton>
+      </button>
     </div>
   );
 };

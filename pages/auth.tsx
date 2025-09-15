@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import PageHead from '@/components/global/Head';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegistrationForm } from '@/components/auth/RegForm';
-import { Card, CardContent, CardMedia } from '@mui/material';
+import { AuthTabs } from '@/components/auth/AuthTabs';
 import DefaultLayout from '@/layouts/default';
 
 const AuthPage = () => {
@@ -11,29 +12,10 @@ const AuthPage = () => {
   return (
     <DefaultLayout>
       <PageHead pageTitle="Sign in/Sign up" />
-      <Card sx={{ display: 'flex' }}>
-        <div className="bg-[#fffade] w-full flex flex-col items-center justify-center px-[30px] py-[30px] relative">
-          {/* <Card>
-            <CardContent> */}
-          <div className="flex my-3">
-            <button
-              className={`tab-btn mx-2 ${
-                currentTab === 'login' ? 'tab-btn--active' : ''
-              }`}
-              onClick={() => setCurrentTab('login')}
-            >
-              login
-            </button>
-            <button
-              className={`tab-btn mx-2 ${
-                currentTab === 'register' ? 'tab-btn--active' : ''
-              }`}
-              onClick={() => setCurrentTab('register')}
-            >
-              register
-            </button>
-          </div>
-          <div className="flex flex-col">
+      <div className="flex flex-col w-full h-full grow items-center justify-center">
+        <div className="bg-[#fff] w-[90vw] md:w-[600px] rounded-[18px] p-[20px] h-[80vh] md:h-[60vh] border border-gray flex flex-col md:flex-row items-start justify-center gap-[20px]">
+          <div className="flex flex-col w-full">
+            <AuthTabs currentTab={currentTab} setCurrentTab={setCurrentTab} />
             {currentTab === 'login' && (
               <div>
                 <LoginForm />
@@ -45,17 +27,16 @@ const AuthPage = () => {
               </div>
             )}
           </div>
-          {/* </CardContent>
-          </Card> */}
+          <Image
+            className="login w-[45%] h-auto hidden md:flex"
+            src="/images/signin.jpg"
+            alt="user authorization"
+            width={600}
+            height={400}
+            priority
+          />
         </div>
-        <CardMedia
-          className="login md:w-[40%] relative"
-          component="img"
-          image="/images/signin.jpg"
-          alt="user authorization"
-          sx={{ display: { xs: 'none', md: 'flex' } }}
-        />
-      </Card>
+      </div>
     </DefaultLayout>
   );
 };

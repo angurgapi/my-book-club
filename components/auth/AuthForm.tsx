@@ -11,11 +11,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { IUser } from '@/types/user';
 import { IAuthData } from '@/types/auth';
 import { setUser } from '@/store/reducers/UserSlice';
-
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import KeyIcon from '@mui/icons-material/Key';
 import Person2Icon from '@mui/icons-material/Person2';
-
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import { useAppDispatch } from '@/hooks/redux';
 import { Input, InputAdornment, InputLabel } from '@mui/material';
@@ -44,6 +43,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
       theme: 'light',
     });
   };
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  useEffect(() => {
+    setUserData({ displayName: '', email: '', password: '' });
+  }, [mode]);
 
   const logExistingUser = async (email: string, password: string) => {
     try {
@@ -112,7 +116,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
   };
   return (
     <form
-      className="w-full flex flex-col justify-center"
+      className="w-full flex flex-col h-full grow justify-center overflow-x-hidden"
       onSubmit={handleSubmit}
     >
       {mode === 'register' && (
@@ -152,25 +156,36 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
         sx={{ mb: 2 }}
       />
 
-      <InputLabel htmlFor="password">Password</InputLabel>
-      <Input
-        type="password"
-        name="password"
-        value={userData.password}
-        onChange={(e) => setUserData({ ...userData, password: e.target.value })}
-        required
-        startAdornment={
-          <InputAdornment position="start">
-            <VpnKeyIcon className="text-gray-300 text-xl" />
-          </InputAdornment>
-        }
-      />
+      <div className='flex flex-col items-start justify-start w-full'>
+        <span>Password</span>
+   
+      <div className="relative h-[48px] w-full">
+        <input
+        className='absolute w-full border-b border-gray-300 focus:border-black bg-transparent outline-none p-1 pl-8 text-[16px] mt-1'
+          type={isPasswordVisible ? 'text' : 'password'}
+          name="password"
+          value={userData.password}
+          onChange={(e) =>
+            setUserData({ ...userData, password: e.target.value })
+          }
+          required
+        />
 
+        <KeyIcon className="absolute left-1 top-2 text-gray-300 text-xl" />
+        <button className='h-[32px] w-[32px] absolute right-0 top-1 flex items-center justify-center text-gray-300' type="button" onClick={() => setIsPasswordVisible(!isPasswordVisible)}>
+          {isPasswordVisible ? (
+            <VisibilityOff className="text-gray-300 text-xl" />
+          ) : (
+            <Visibility className="text-gray-300 text-xl" />
+          )}
+        </button>
+      </div>
+   </div>
       <button
         type="submit"
-        className="bg-[#FFD95A] p-3 font-medium hover:bg-[#C07F00] hover:text-[#FFF8DE] mt-3 mb-3 rounded-md"
+        className="bg-[#FFD95A] p-2 font-medium hover:bg-[#C07F00] hover:text-[#FFF8DE] mt-4 mb-3 text-[18px] rounded-md"
       >
-        {mode === 'register' ? 'Create account' : 'Log in'}
+        {mode === 'register' ? 'Create account' : 'Sign in'}
       </button>
     </form>
   );

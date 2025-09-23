@@ -12,9 +12,6 @@ import {
   CardContent,
   IconButton,
 } from '@mui/material';
-// import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-// import LocationOnIcon from '@mui/icons-material/LocationOn';
-// import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import {
   MonetizationOn,
   LocationOn,
@@ -24,6 +21,7 @@ import {
 } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 import { Button } from '../ui/button';
+import Image from 'next/image';
 
 interface EventCardProps {
   event: IEvent;
@@ -44,8 +42,8 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   };
 
   return (
-    <Link href={`/event/${event.id}`} className="w-full">
-      <Card className="event-card">
+    <Link href={`/event/${event.id}`} className="w-full mt-2 inline-flex">
+      <Card className="flex flex-col justify-between items-center p-0 relative hover:shadow-lg transition-shadow w-full rounded-md h-full">
         {isOwnEvent && (
           <Button
            variant="secondary" size="icon"
@@ -55,6 +53,14 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
             <Edit className='h-[16px] w-[16px]' />
           </Button>
         )}
+        <Image
+          src={getImgSrc}
+          alt="bookclub event cover"
+          width={200}
+          height={300}
+          className="w-full h-48 object-cover rounded-t-md"
+          priority
+        />
         <CardContent
           sx={{
             width: '100%',
@@ -64,6 +70,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
             flexGrow: 1,
           }}
         >
+
           <Typography
             gutterBottom
             variant="h5"
@@ -110,13 +117,6 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
             )}
           </Box>
         </CardContent>
-
-        <CardMedia
-          component="img"
-          image={getImgSrc}
-          alt="bookclub event cover"
-          sx={{ aspectRatio: '3/4', width: 'auto', maxHeight: '100%' }}
-        />
       </Card>
     </Link>
   );

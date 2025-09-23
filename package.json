@@ -10,8 +10,10 @@
     "test:cypress": "cypress run"
   },
   "dependencies": {
+    "@dotlottie/react-player": "^1.6.19",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
+    "@lottiefiles/lottie-player": "^2.0.12",
     "@mui/icons-material": "^5.11.16",
     "@mui/lab": "^5.0.0-alpha.136",
     "@mui/material": "^5.13.2",
@@ -62,6 +64,7 @@
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
+    "jsdoc": "^4.0.4",
     "prettier": "^3.6.2"
   }
 }

@@ -1,4 +1,4 @@
-import { createContext, FC, useEffect, useMemo, useState } from 'react';
+import { createContext, FC, useMemo } from 'react';
 import {
   getAuth,
   onAuthStateChanged,
@@ -9,27 +9,12 @@ import {
 import {
   getFirestore,
   Firestore,
-  onSnapshot,
-  DocumentData,
-  doc,
-  collection,
-  query,
 } from 'firebase/firestore';
 import {
   getDatabase,
-  ref,
-  onValue,
-  onDisconnect,
-  set,
-  serverTimestamp,
   Database,
 } from 'firebase/database';
 import { FirebaseStorage, getStorage } from 'firebase/storage';
-
-import { useAppDispatch } from '@/hooks/redux';
-import { setUser } from '@/store/reducers/UserSlice';
-
-import { IUser } from '@/types/user';
 
 type Props = {
   children: any;
@@ -47,10 +32,6 @@ interface IContext {
 export const AuthContext = createContext<IContext>({} as IContext);
 
 export const AuthProvider: FC<Props> = ({ children }) => {
-  const [usersRdb, setUsersRdb] = useState<any>({});
-
-  const dispatch = useAppDispatch();
-
   const getFirebaseAuth = getAuth();
   const db = getFirestore();
   const storage = getStorage();

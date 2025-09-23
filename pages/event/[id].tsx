@@ -16,7 +16,6 @@ import {
   getEventById,
   toggleAttendee,
   getEventHost,
-  closeRegistration,
 } from '@/utils/eventApi';
 
 import EditIcon from '@mui/icons-material/Edit';
@@ -46,9 +45,9 @@ export default function EventPage() {
   const [attending, setAttending] = useState<boolean | undefined>(false);
   const [event, setEvent] = useState<IEvent | undefined>(undefined);
   const [host, setHost] = useState<IUser | undefined>(undefined);
-  const [isLoading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(false);
   const [participantsLength, setParticipantsLength] = useState(
-    event?.participants.length
+    event?.participants.length,
   );
 
   const router = useRouter();
@@ -66,7 +65,7 @@ export default function EventPage() {
   };
 
   const [isDialogOpen, setDialogOpen] = useState(false);
-
+  const isPaidEvent = event && typeof event.fee === 'number' && event.fee > 0;
   useEffect(() => {
     if (router.isReady && router.query.id) {
       const queryId = Array.isArray(router.query.id)
@@ -81,20 +80,6 @@ export default function EventPage() {
       fetchEventData();
     }
   }, [eventId]);
-
-  useEffect(() => {
-    if (
-      event?.isRegistrationOpen &&
-      event?.date &&
-      event?.date < new Date().getTime()
-    ) {
-      const autoCloseRegistration = async () => {
-        await closeRegistration(event.id);
-        fetchEventData();
-      };
-      autoCloseRegistration();
-    }
-  }, [event]);
 
   useEffect(() => {
     const fetchHostData = async () => {
@@ -254,7 +239,19 @@ export default function EventPage() {
                       <p className="text-xl">{event.capacity} ppl</p>
                     )}
                     {!event.capacity && <p className="text-xl">no limit</p>}
-
+                    {isPaidEvent ? (
+                      <>
+                        <p className="text-teal-800">fee </p>
+                        <p className="text-xl">
+                          {event.fee} {event.currency}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-teal-800">free</p>
+                        <div />
+                      </>
+                    )}
                     {host && (
                       <>
                         <p className="text-teal-800">Hosted by</p>

@@ -154,7 +154,7 @@ export const getHostedEvents = async (uid: string) => {
       collection(db, 'events'),
       where('hostId', '==', uid),
       where('date', '>', Timestamp.now()),
-      orderBy('date', 'desc')
+      orderBy('date', 'desc'),
     );
     const eventsSnapshot = await getDocs(hostedEventsCollection);
     const eventsData = eventsSnapshot.docs.map((doc) => ({
@@ -175,7 +175,7 @@ export const getAttendedEvents = async (uid: string) => {
       collection(db, 'events'),
       where('participants', 'array-contains', uid),
       where('date', '>', Timestamp.now()),
-      orderBy('date', 'desc')
+      orderBy('date', 'desc'),
     );
     const eventsSnapshot = await getDocs(attendedEventsCollection);
     const eventsData = eventsSnapshot.docs.map((doc) => ({
@@ -208,6 +208,7 @@ export const getUpcomingEvents = async (
       orderBy('date', 'asc')
     );
   }
+
   try {
     const querySnapshot = await getDocs(eventsCollectionQuery);
     const events: IEvent[] = [];
@@ -236,7 +237,7 @@ export const getUpcomingEvents = async (
 export const toggleAttendee = async (
   uid: string,
   attendees: string[],
-  eventId: string
+  eventId: string,
 ) => {
   const db = getFirestore();
   const docRef = doc(db, 'events', eventId);

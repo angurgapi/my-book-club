@@ -63,10 +63,14 @@ const Events = () => {
     fetchEvents(1, period);
   };
 
+  const filteredEvents = React.useMemo(() => {
+    return filterEventsByPeriod(events, activeFilter);
+  }, [events, activeFilter]);
+
   return (
     <DefaultLayout>
       <PageHead pageTitle="Events" />
-      <div className="p-2 md:p-5 text-center max-w-[1100px] mx-auto">
+      <div className="p-2 md:p-5 text-center w-full max-w-[1100px] mx-auto">
         <Typography variant="h3" gutterBottom>
           Upcoming events
         </Typography>
@@ -74,7 +78,6 @@ const Events = () => {
           <div className="flex items-center flex-col ">
             {events && (
               <div className="flex flex-col items-center justify-center w-full my-2">
-               
                 <div className="flex w-full items-center justify-end mb-4 gap-2">
                   <button
                     className={`px-3 py-1 rounded border ${activeFilter === 'all' ? 'bg-teal-600 text-white' : 'bg-white'}`}
@@ -94,9 +97,11 @@ const Events = () => {
                   >
                     tomorrow
                   </button>
-                
                 </div>
-                <EventsGrid events={events} />
+                <div className="pt-5">
+                  <EventsGrid events={filteredEvents} />
+                </div>
+
                 {totalPages > 1 && (
                   <Pagination
                     count={totalPages}
@@ -112,11 +117,12 @@ const Events = () => {
               </div>
             )}
             {!events.length && (
-              <div className='flex flex-col items-center justify-center mt-10 max-w-md'>
+              <div className="flex flex-col items-center justify-center mt-10 w-full max-w-md">
                 <LottiePlayer src="/animations/no-events.lottie" size="m" />
-                 <Typography variant="h4" sx={{ mt: 3 }}>There are no upcoming events at the moment</Typography>
+                <Typography variant="h4" sx={{ mt: 3 }}>
+                  There are no upcoming events at the moment
+                </Typography>
               </div>
-             
             )}
           </div>
         )}

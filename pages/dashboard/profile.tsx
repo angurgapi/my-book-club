@@ -113,7 +113,7 @@ const DashboardProfile = () => {
   return (
     <ProfileLayout>
       <PageHead pageTitle="Dashboard" />
-      <div className="flex flex-col md:flex-row items-center md:items-start">
+      <div className="flex flex-col md:flex-row items-center md:items-start pt-2 md:pt-5">
         <Card className="w-full">
           <CardContent>
             <Typography variant="h3" gutterBottom>

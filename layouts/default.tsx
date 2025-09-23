@@ -13,7 +13,7 @@ const DefaultLayout: React.FC<LayoutProps> = ({
     <>
       <Header />
       <main className="wrapper">
-        <div>
+        <div className='w-full flex-1 flex items-center justify-center h-full'>
           {children}
         </div>
       </main>

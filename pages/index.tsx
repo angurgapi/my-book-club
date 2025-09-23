@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <DefaultLayout>
       <PageHead pageTitle="Home" />
-      <div className="flex flex-col items-center justify-start p-0">
+      <div className="flex flex-col w-full items-center justify-start p-0">
         <Hero />
         <Stages />
         <Begin />

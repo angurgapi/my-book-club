@@ -17,42 +17,43 @@ const ProvidersAuth = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const handleFacebookLogin = () => {
-    signInWithPopup(getFirebaseAuth, facebookProvider)
-      .then(async (result) => {
-        const user = result.user;
-        const docRef = doc(db, 'users', user.uid);
+  // Facebook keeps failing, disabled
+  // const handleFacebookLogin = () => {
+  //   signInWithPopup(getFirebaseAuth, facebookProvider)
+  //     .then(async (result) => {
+  //       const user = result.user;
+  //       const docRef = doc(db, 'users', user.uid);
 
-        try {
-          await runTransaction(db, async (transaction) => {
-            const sfDoc = await transaction.get(docRef);
-            console.log(sfDoc.exists());
-            if (!sfDoc.exists()) {
-              try {
-                await setDoc(docRef, {
-                  uid: user.uid,
-                  displayName: user.displayName || '',
-                  email: user.email,
-                  photoURL: user.photoURL,
-                  createdAt:
-                    user.metadata.creationTime &&
-                    +new Date(user.metadata.creationTime).getTime(),
-                });
-              } catch (e) {
-                console.error('Error adding document: ', e);
-              }
-            }
-          });
-        } catch (e) {
-          console.log('runTransaction Auth failed: ', e);
-        }
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log('----------------', errorCode, errorMessage);
-      });
-  };
+  //       try {
+  //         await runTransaction(db, async (transaction) => {
+  //           const sfDoc = await transaction.get(docRef);
+  //           console.log(sfDoc.exists());
+  //           if (!sfDoc.exists()) {
+  //             try {
+  //               await setDoc(docRef, {
+  //                 uid: user.uid,
+  //                 displayName: user.displayName || '',
+  //                 email: user.email,
+  //                 photoURL: user.photoURL,
+  //                 createdAt:
+  //                   user.metadata.creationTime &&
+  //                   +new Date(user.metadata.creationTime).getTime(),
+  //               });
+  //             } catch (e) {
+  //               console.error('Error adding document: ', e);
+  //             }
+  //           }
+  //         });
+  //       } catch (e) {
+  //         console.log('runTransaction Auth failed: ', e);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       const errorCode = error.code;
+  //       const errorMessage = error.message;
+  //       console.log('----------------', errorCode, errorMessage);
+  //     });
+  // };
 
   const handleGoogleLogin = () => {
     signInWithPopup(getFirebaseAuth, googleProvider)

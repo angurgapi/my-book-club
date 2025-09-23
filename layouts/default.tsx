@@ -4,22 +4,16 @@ import Header from '@/components/global/Header';
 
 type LayoutProps = {
   children: ReactNode;
-  isLanding?: boolean;
 };
 
 const DefaultLayout: React.FC<LayoutProps> = ({
   children,
-  isLanding = false,
 }) => {
   return (
     <>
       <Header />
       <main className="wrapper">
-        <div
-          className={
-            'wrapper__content' + (isLanding ? '' : ' wrapper__content--sided')
-          }
-        >
+        <div>
           {children}
         </div>
       </main>

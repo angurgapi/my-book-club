@@ -35,8 +35,8 @@ const HostedEvents = () => {
     <ProfileLayout>
       <PageHead pageTitle="Dashboard" />
       {!loading && (
-        <div className="flex flex-col">
-          <Typography variant="h3" gutterBottom>
+        <div className="flex flex-col p-2 md:p-5 w-full">
+          <Typography variant="h3" gutterBottom align='center'>
             Events you host
           </Typography>
           {events.length ? (

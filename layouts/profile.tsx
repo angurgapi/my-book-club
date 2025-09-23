@@ -3,8 +3,10 @@ import Footer from '@/components/global/Footer';
 import Header from '@/components/global/Header';
 import Sidebar from '@/components/global/Sidebar';
 
-import { useMediaQuery, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { SCREENS } from '@/styles/breakpoints';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 type LayoutProps = {
   children: ReactNode;
@@ -12,8 +14,8 @@ type LayoutProps = {
 
 const ProfileLayout: React.FC<LayoutProps> = ({ children }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { isAuth } = useRequireAuth();
+const isMdUp = useMediaQuery(`(min-width: ${SCREENS.md})`);
 
   if (!isAuth) {
     return null;
@@ -22,8 +24,10 @@ const ProfileLayout: React.FC<LayoutProps> = ({ children }) => {
     <>
       <Header />
       <main className="wrapper flex flex-col">
-        <div className="wrapper__content wrapper__content--sided profile-page">
-          {!isMobile && <Sidebar />}
+        <div className={`w-full max-w-[1100px] mx-auto grid grid-cols-1 gap-4 px-2 md:px-0 ${isMdUp ? 'wrapper__grid' : ''}`}>
+          <aside className="hidden md:block md:bg-[#ebb2b6]">
+            <Sidebar />
+          </aside>
           {children}
         </div>
       </main>

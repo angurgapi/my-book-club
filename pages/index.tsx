@@ -6,7 +6,7 @@ import PageHead from '@/components/global/Head';
 
 export default function Home() {
   return (
-    <DefaultLayout landing={true}>
+    <DefaultLayout>
       <PageHead pageTitle="Home" />
       <div className="flex flex-col items-center justify-start p-0">
         <Hero />

@@ -16,7 +16,6 @@ import {
   getEventById,
   toggleAttendee,
   getEventHost,
-  closeRegistration,
 } from '@/utils/eventApi';
 
 import EditIcon from '@mui/icons-material/Edit';
@@ -81,20 +80,6 @@ export default function EventPage() {
       fetchEventData();
     }
   }, [eventId]);
-
-  useEffect(() => {
-    if (
-      event?.isRegistrationOpen &&
-      event?.date &&
-      event?.date < new Date().getTime()
-    ) {
-      const autoCloseRegistration = async () => {
-        await closeRegistration(event.id);
-        fetchEventData();
-      };
-      autoCloseRegistration();
-    }
-  }, [event]);
 
   useEffect(() => {
     const fetchHostData = async () => {

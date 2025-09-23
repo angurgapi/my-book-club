@@ -55,12 +55,12 @@ function Header() {
     handleCloseUserMenu();
     signOut(getFirebaseAuth);
     dispatch(removeUser());
-    // router.push('/');
+    router.push('/auth');
   };
 
   return (
     <AppBar position="sticky" sx={{ bgcolor: 'white' }}>
-      <Container maxWidth="xl" sx={{ pl: { xs: 1 }, pr: 2 }}>
+      <Container maxWidth={false} sx={{ pl: { md: 2, xs: 1 }, pr: { md: 2, xs: 1 } }}>
         <Toolbar disableGutters>
           <Typography
             noWrap

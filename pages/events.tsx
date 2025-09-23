@@ -3,34 +3,40 @@ import { useRouter } from 'next/router';
 
 import PageHead from '@/components/global/Head';
 import Loader from '@/components/global/Loader';
-import EventCard from '@/components/events/EventCard';
 import DefaultLayout from '../layouts/default';
 import { IEvent } from '@/types/event';
 import { getUpcomingEvents } from '@/utils/eventApi';
-import { subscribeRdb } from '@/utils/eventsRdb';
 
-import {
-  Typography,
-  Input,
-  InputAdornment,
-  IconButton,
-  Pagination,
-} from '@mui/material';
-import { Clear, Search } from '@mui/icons-material';
+import { Typography, Pagination } from '@mui/material';
+import EventsGrid from '@/components/events/EventsGrid';
+import LottiePlayer from '@/components/ui/LottiePlayer';
 
 const Events = () => {
   const [events, setEvents] = useState<IEvent[]>([]);
   const [loading, setLoading] = useState(false);
-  const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  type Period = 'all' | 'today' | 'tomorrow';
 
-  const fetchEvents = async (query: string, page: number) => {
+  const [activeFilter, setActiveFilter] = useState<Period>('all');
+
+  const filterEventsByPeriod = (items: IEvent[], period: Period): IEvent[] => {
+    if (period === 'all') return items;
+    const now = new Date();
+    const base = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const offset = period === 'today' ? 0 : 1;
+    const start = new Date(base.getFullYear(), base.getMonth(), base.getDate() + offset).getTime();
+    const end = new Date(base.getFullYear(), base.getMonth(), base.getDate() + offset + 1).getTime();
+    return items.filter((e) => e.date >= start && e.date < end);
+  };
+
+  const fetchEvents = async (pageNum: number, period: Period = activeFilter) => {
     try {
       setLoading(true);
-      const { events, totalLength } = await getUpcomingEvents(query, page);
-      setEvents(events);
-      setTotalPages(Math.ceil(totalLength / 12));
+      const { events, totalLength } = await getUpcomingEvents('', pageNum);
+      const filtered = filterEventsByPeriod(events, period);
+      setEvents(filtered);
+      setTotalPages(period === 'all' ? Math.ceil(totalLength / 12) : 1);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -40,28 +46,27 @@ const Events = () => {
   const handleChangePage = (newPage: number) => {
     setPage((prevPage) => {
       if (newPage !== prevPage) {
-        fetchEvents(query, newPage);
+        fetchEvents(newPage, activeFilter);
         return newPage;
       }
       return prevPage;
     });
   };
 
-  const clearSearch = () => {
-    setQuery('');
-    setPage(1);
-    fetchEvents('', 1);
-  };
-
   useEffect(() => {
-    fetchEvents(query, page);
-    // subscribeRdb();
+    fetchEvents(page, activeFilter);
   }, []);
+
+  const filterByDate = (period: Period) => {
+    setActiveFilter(period);
+    setPage(1);
+    fetchEvents(1, period);
+  };
 
   return (
     <DefaultLayout>
       <PageHead pageTitle="Events" />
-      <div className="p-2 md:p-5 text-center">
+      <div className="p-2 md:p-5 text-center max-w-[1100px] mx-auto">
         <Typography variant="h3" gutterBottom>
           Upcoming events
         </Typography>
@@ -69,42 +74,29 @@ const Events = () => {
           <div className="flex items-center flex-col ">
             {events && (
               <div className="flex flex-col items-center justify-center w-full my-2">
-                <div className="flex w-full items-center justify-end mb-4">
-                  <span className="mr-2">Search by city</span>
-                  <Input
-                    type="text"
-                    name="name"
-                    required
-                    value={query}
-                    sx={{ width: 250 }}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === 'Enter' ? fetchEvents(query, 1) : null
-                    }
-                    endAdornment={
-                      <InputAdornment position="end">
-                        {query && (
-                          <IconButton disableRipple onClick={clearSearch}>
-                            <Clear />
-                          </IconButton>
-                        )}
-                        <IconButton
-                          color="primary"
-                          onClick={() => {
-                            fetchEvents(query, 1);
-                          }}
-                        >
-                          <Search />
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
+               
+                <div className="flex w-full items-center justify-end mb-4 gap-2">
+                  <button
+                    className={`px-3 py-1 rounded border ${activeFilter === 'all' ? 'bg-teal-600 text-white' : 'bg-white'}`}
+                    onClick={() => filterByDate('all')}
+                  >
+                    all
+                  </button>
+                  <button
+                    className={`px-3 py-1 rounded border ${activeFilter === 'today' ? 'bg-teal-600 text-white' : 'bg-white'}`}
+                    onClick={() => filterByDate('today')}
+                  >
+                    today
+                  </button>
+                  <button
+                    className={`px-3 py-1 rounded border ${activeFilter === 'tomorrow' ? 'bg-teal-600 text-white' : 'bg-white'}`}
+                    onClick={() => filterByDate('tomorrow')}
+                  >
+                    tomorrow
+                  </button>
+                
                 </div>
-                <div className="events-grid">
-                  {events.map((event) => (
-                    <EventCard event={event} key={event.id} />
-                  ))}
-                </div>
+                <EventsGrid events={events} />
                 {totalPages > 1 && (
                   <Pagination
                     count={totalPages}
@@ -119,11 +111,12 @@ const Events = () => {
                 )}
               </div>
             )}
-            {!events && !query && (
-              <span>There are no upcoming events at the moment</span>
-            )}
-            {!events && query && (
-              <span>There are no upcoming events matching your query</span>
+            {!events.length && (
+              <div className='flex flex-col items-center justify-center mt-10 max-w-md'>
+                <LottiePlayer src="/animations/no-events.lottie" size="m" />
+                 <Typography variant="h4" sx={{ mt: 3 }}>There are no upcoming events at the moment</Typography>
+              </div>
+             
             )}
           </div>
         )}

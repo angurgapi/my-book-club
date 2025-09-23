@@ -24,10 +24,10 @@ import * as Yup from 'yup';
 const schemaFor = (mode: 'register' | 'login') =>
   Yup.object({
     displayName: mode === 'register'
-      ? Yup.string().trim().min(3, 'At least 3 chars').required('Required')
+      ? Yup.string().trim().min(3, '3 characters minimum').required('This field is required')
       : Yup.string().strip(),
-    email: Yup.string().trim().email('Invalid email').required('Required'),
-    password: Yup.string().min(6, 'Min 6 chars').required('Required'),
+    email: Yup.string().trim().email('Invalid email').required('This field is required'),
+    password: Yup.string().min(8, '8 characters minimum').required('This field is required'),
   });
 
 interface AuthFormProps {
@@ -61,6 +61,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     setUserData({ displayName: '', email: '', password: '' });
   }, [mode]);
 
+/**
+ * For users that already have an account, log them in and fetch their data from Firestore
+ *
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @returns {void} No return value
+ */
   const logExistingUser = async (email: string, password: string) => {
     try {
       setIsLoading(true);
@@ -84,54 +91,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     }
   };
 
-  // const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-
-  //   if (mode === 'register') {
-  //     setIsLoading(true);
-  //     await createUserWithEmailAndPassword(
-  //       getFirebaseAuth,
-  //       userData.email,
-  //       userData.password
-  //     )
-  //       .then(async (userCredential: any) => {
-  //         const user = userCredential.user;
-
-  //         await updateProfile(user, {
-  //           displayName: userData.displayName,
-  //         });
-
-  //         try {
-  //           await setDoc(doc(db, 'users', user.uid), {
-  //             uid: user.uid,
-  //             displayName: user.displayName || '',
-  //             email: user.email,
-  //             photoURL: user.photoURL,
-  //             createdAt:
-  //               user.metadata.creationTime &&
-  //               +new Date(user.metadata.creationTime).getTime(),
-  //           });
-
-  //           dispatch(setUser(user));
-  //           logExistingUser(userData.email, userData.password);
-  //           setIsLoading(false);
-  //         } catch (e) {
-  //           console.error('Error adding document: ', e);
-  //           setIsLoading(false);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         error.code === 'auth/invalid-email' &&
-  //           sendErrorToast('Invald email!');
-  //         error.code === 'auth/email-already-in-use' &&
-  //           sendErrorToast('This email is already in use!');
-  //         error.code === 'auth/weak-password' &&
-  //           sendErrorToast('Password chosen is too insecure!');
-  //       });
-  //   } else {
-  //     logExistingUser(userData.email, userData.password);
-  //   }
-  // };
   const formik = useFormik({
     initialValues: { displayName: '', email: '', password: '' },
     enableReinitialize: true,             
@@ -156,7 +115,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
         } else {
           await logExistingUser(values.email, values.password);
         }
-        // resetForm(); 
       } catch (e: any) {
           e.code === 'auth/invalid-email' &&
             sendErrorToast('Invald email!');
